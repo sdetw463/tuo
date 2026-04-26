@@ -3,94 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAMI Style Album (TuoTuo Ed.)</title>
+    <title>TuoTuo's World</title>
     <style>
-        /* 1. 基础样式 (保持原样) */
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            overflow: hidden; background-color: #000;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        /* 基础样式：确保铺满全屏且无滚动条 */
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            overflow: hidden; background-color: #000; 
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif; 
         }
 
         #app { position: relative; width: 100%; height: 100vh; }
 
-        /* 2. 全屏背景层 (保持原样) */
-        .image-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            transition: opacity 1.2s ease-in-out; opacity: 0;
+        /* 全屏背景图层：负责平滑的淡入淡出 */
+        .image-layer { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            transition: opacity 1.2s ease-in-out; opacity: 0; 
         }
-        #img1 { z-index: 1; }
+        #img1 { z-index: 1; } 
         #img2 { z-index: 2; }
 
-        /* 3. 修改：中央卡片 -> 左下角卡片 */
+        /* 左下角 TuoTuo 卡片：极简透明、磨砂感 */
         .main-card {
-            position: absolute;
-            /* ======= 修改：从中间移至左下角 ======= */
-            bottom: 20px; /* 距离底部 20px */
-            left: 20px; /* 距离左侧 20px */
-            transform: none; /* 移除之前的居中偏移 */
-            /* ======================================= */
-            z-index: 20;
-            width: 85%; max-width: 400px;
-            padding: 20px; /* 减小一点 padding，更紧凑 */
-            text-align: left; /* 文字改为左对齐 */
-            /* ======= 修改：增加透明度，降低模糊 ======= */
-            background: rgba(255, 255, 255, 0.08); /* 更加透明 (从 0.15 降到 0.08) */
-            backdrop-filter: blur(5px); /* 降低模糊度 (从 15px 降到 5px) */
-            -webkit-backdrop-filter: blur(5px);
-            /* ======================================= */
-            border: 1px solid rgba(255, 255, 255, 0.15); /* 边框也淡一点 */
-            border-radius: 16px; /* 圆角小一点 */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            color: white;
+            position: absolute; bottom: 30px; left: 30px; z-index: 20;
+            width: 220px; padding: 15px; text-align: left;
+            background: rgba(255, 255, 255, 0.05); /* 极低透明度 */
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 15px; color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        h1 { margin: 0; font-size: 22px; font-weight: 400; letter-spacing: 1px; }
+        .quote { margin-top: 6px; font-size: 11px; opacity: 0.6; line-height: 1.4; }
 
-        h1 { margin: 10px 0; font-size: 22px; font-weight: 300; letter-spacing: 2px; }
-        p { margin: 5px 0; font-size: 13px; opacity: 0.8; line-height: 1.6; }
-
-        /* 4. 左右切换箭头 (保持原样) */
-        .arrow {
-            position: absolute; top: 0; width: 15%; height: 100%;
-            z-index: 30; display: flex; align-items: center; justify-content: center;
-            color: rgba(255, 255, 255, 0.2); font-size: 40px;
-            cursor: pointer; transition: 0.3s; pointer-events: auto;
-        }
-        .arrow:hover { color: rgba(255, 255, 255, 0.7); background: rgba(255,255,255,0.05); }
-        .left-arrow { left: 0; }
-        .right-arrow { right: 0; }
-
-        /* 5. 音乐播放器插件样式 (保持原样) */
-        .music-player {
-            position: absolute; bottom: 15px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 40;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 8px 16px;
-            border-radius: 30px;
-            display: flex; align-items: center;
+        /* 音乐播放器：居中底部，小巧精致 */
+        .music-player { 
+            position: absolute; bottom: 20px; left: 50%; 
+            transform: translateX(-50%); z-index: 40; 
+            background: rgba(0, 0, 0, 0.4); padding: 8px 15px; 
+            border-radius: 30px; display: flex; align-items: center; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
         }
-        #play-btn {
-            width: 25px; height: 25px;
-            border: none; background: white;
-            border-radius: 50%; cursor: pointer;
+        #play-btn { 
+            width: 22px; height: 22px; border: none; 
+            background: #fff; border-radius: 50%; 
+            cursor: pointer; margin-right: 10px; font-size: 9px; 
             display: flex; align-items: center; justify-content: center;
-            margin-right: 10px; font-size: 12px;
         }
-        .music-info { color: white; font-size: 11px; white-space: nowrap; }
-
-        /* 移动端微调 */
-        @media (max-width: 768px) {
-            .main-card { 
-                width: 70%; 
-                padding: 15px; 
-                bottom: 10px; /* 手机上距离更小 */
-                left: 10px;
-            }
-            .arrow { width: 20%; font-size: 30px; }
-        }
+        .music-info { color: white; font-size: 11px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -99,71 +60,54 @@
         <div id="img1" class="image-layer"></div>
         <div id="img2" class="image-layer"></div>
 
-        <div class="arrow left-arrow" onclick="prevImg()"> < </div>
-        <div class="arrow right-arrow" onclick="nextImg()"> > </div>
-
         <div class="main-card">
             <h1>TuoTuo</h1>
-            <p>生活原本沉闷，但跑起来就有风。</p>
-            <p style="margin-top: 10px; font-size: 11px; opacity: 0.5;">Slide to explore</p>
+            <div class="quote">生活原本沉闷，但跑起来就有风。</div>
         </div>
 
         <div class="music-player">
             <button id="play-btn">▶</button>
-            <div class="music-info">Background Music</div>
+            <div class="music-info">BGM</div>
             <audio id="bgm" src="bgm.mp3" loop></audio>
         </div>
     </div>
 
     <script>
-        // 图片逻辑 (保持原样，假设你已有 1.jpg, 2.jpg 等)
+        // --- 1. 背景轮播配置 ---
         const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg']; 
-        let currentIndex = 0;
-        let isTransitioning = false;
+        let idx = 0;
+        const c1 = document.getElementById('img1'), c2 = document.getElementById('img2');
+        let cur = c1, nxt = c2;
 
-        const container1 = document.getElementById('img1');
-        const container2 = document.getElementById('img2');
-        let currentLayer = container1;
-        let nextLayer = container2;
-
-        function init() {
-            currentLayer.style.backgroundImage = `url('${images[currentIndex]}')`;
-            currentLayer.style.opacity = 1;
-        }
-        init();
-
-        function changeImage(newIndex) {
-            if (isTransitioning) return;
-            isTransitioning = true;
-            nextLayer.style.backgroundImage = `url('${images[newIndex]}')`;
-            currentLayer.style.opacity = 0;
-            nextLayer.style.opacity = 1;
+        function sw() {
+            // 设置下一张图的背景
+            nxt.style.backgroundImage = `url('${images[idx]}')`;
+            // 执行淡入淡出动画：旧的变透明，新的变清晰
+            cur.style.opacity = 0; 
+            nxt.style.opacity = 1;
             
-            setTimeout(() => {
-                let temp = currentLayer;
-                currentLayer = nextLayer;
-                nextLayer = temp;
-                isTransitioning = false;
+            // 动画完成后交换图层引用
+            setTimeout(() => { 
+                let t = cur; cur = nxt; nxt = t; 
             }, 1200);
+            
+            idx = (idx + 1) % images.length;
         }
 
-        function nextImg() { currentIndex = (currentIndex + 1) % images.length; changeImage(currentIndex); }
-        function prevImg() { currentIndex = (currentIndex - 1 + images.length) % images.length; changeImage(currentIndex); }
+        // 页面加载完成后立即启动轮播
+        window.onload = function() {
+            sw(); // 立即显示第一张
+            setInterval(sw, 6000); // 每6秒自动切换
+        };
 
-        // 音乐控制逻辑 (保持原样)
-        const bgm = document.getElementById('bgm');
-        const playBtn = document.getElementById('play-btn');
-        let isPlaying = false;
-
-        playBtn.onclick = function() {
-            if (isPlaying) {
-                bgm.pause();
-                playBtn.innerText = '▶';
-            } else {
-                bgm.play();
-                playBtn.innerText = '⏸';
-            }
-            isPlaying = !isPlaying;
+        // --- 2. 音乐播放逻辑 ---
+        const bgm = document.getElementById('bgm'), p = document.getElementById('play-btn');
+        p.onclick = () => { 
+            if(bgm.paused){ 
+                bgm.play(); p.innerText = '⏸'; 
+            } else { 
+                bgm.pause(); p.innerText = '▶'; 
+            } 
         };
     </script>
 </body>
