@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4 # 升级到 v4，解决那个黄色警告
         with:
           submodules: true
           lfs: false
@@ -30,7 +30,7 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: "/"
-          skip_app_build: true # 告诉微软云跳过复杂的构建过程
+          skip_app_build: true # 纯网页，直接上传
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
