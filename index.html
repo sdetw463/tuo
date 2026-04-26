@@ -10,7 +10,38 @@
             margin: 0; padding: 0; height: 100%; 
             overflow: hidden; background-color: #000; 
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif; 
+
+/* 使用 Base64 编码的粉色爱心 SVG 作为指针 */
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%23FFB6C1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
+}
+
+/* 爱心拖尾的样式 */
+.heart-trail {
+    position: fixed;
+    pointer-events: none; /* 确保爱心不会挡住点击 */
+    color: #FFB6C1; /* 粉红色 */
+    font-size: 15px;
+    z-index: 9999;
+    animation: fadeOutHeart 1.2s forwards;
+    user-select: none;
+}
+
+@keyframes fadeOutHeart {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+}
+
+/* 爱心拖尾的样式 */
+.heart-trail {
+    position: fixed;
+    pointer-events: none; /* 确保爱心不会挡住点击 */
+    color: #FFB6C1; /* 粉红色 */
+    font-size: 15px;
+    z-index: 9999;
+    animation: fadeOutHeart 1.2s forwards;
+    user-select: none;
         }
+
 
         #app { position: relative; width: 100%; height: 100vh; }
 
@@ -74,7 +105,7 @@
 
     <script>
         // --- 1. 背景轮播配置 ---
-        const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+        const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg']; 
         let idx = 0;
         const c1 = document.getElementById('img1'), c2 = document.getElementById('img2');
         let cur = c1, nxt = c2;
@@ -109,6 +140,32 @@
                 bgm.pause(); p.innerText = '▶'; 
             } 
         };
+
+// --- 爱心拖尾特效 ---
+document.addEventListener('mousemove', function(e) {
+    if (Math.random() < 0.15) { 
+        createHeart(e.pageX, e.pageY);
+    }
+});
+
+function createHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.className = 'heart-trail';
+    heart.innerHTML = '❤';
+    
+    const size = Math.random() * 10 + 10 + 'px';
+    heart.style.fontSize = size;
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    
+    heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+    
+    document.body.appendChild(heart);
+    
+    setTimeout(() => {
+        heart.remove();
+    }, 1200);
+}
     </script>
 </body>
 </html>
