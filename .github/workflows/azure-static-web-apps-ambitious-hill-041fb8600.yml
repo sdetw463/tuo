@@ -36,8 +36,15 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_HILL_041FB8600 }}
-          action: "upload"
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_HILL_041FB8600 }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }} # 用于 GitHub 动作令牌
+        action: "upload"
+        
+        # --- 下面是解决黑屏和报错的关键设置 ---
+        app_location: "/"          # 你的代码就在根目录
+        api_location: ""           # 没有后台代码，留空
+        output_location: "/"       # 直接发布根目录的所有内容
+        skip_app_build: true       # 告诉微软云：这是纯网页，直接搬运，不要尝试构建！
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/" # App source code path
