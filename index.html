@@ -114,11 +114,26 @@
         let cur = c1, nxt = c2;
 
         function sw() {
-            // 设置下一张图的背景
-            nxt.style.backgroundImage = `url('${images[idx]}')`;
-            // 执行淡入淡出动画：旧的变透明，新的变清晰
-            cur.style.opacity = 0; 
-            nxt.style.opacity = 1;
+    const imgUrl = images[idx];
+    const tempImg = new Image();
+    
+    // 先在后台悄悄下载图片
+    tempImg.src = imgUrl;
+    
+    tempImg.onload = function() {
+        // 只有图片下载完了，才执行切换动画
+        nxt.style.backgroundImage = `url('${imgUrl}')`;
+        cur.style.opacity = 0;
+        nxt.style.opacity = 1;
+        
+        setTimeout(() => {
+            let t = cur; cur = nxt; nxt = t;
+        }, 1200);
+        
+        idx = (idx + 1) % images.length;
+    };
+}
+
             
             // 动画完成后交换图层引用
             setTimeout(() => { 
