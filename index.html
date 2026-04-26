@@ -3,169 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuoTuo's Dimension </title>
+    <title>KAMI Style Album (TuoTuo Ed.)</title>
     <style>
-        /* ==============================
-           CSS：负责网页的长相和布局
-           ============================== */
+        /* 1. 基础样式 (保持原样) */
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden; /* 禁止出现滚动条 */
-            background-color: black;
-            font-family: Arial, sans-serif;
+            margin: 0; padding: 0; height: 100%;
+            overflow: hidden; background-color: #000;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
         }
 
-        /* 整个相册的应用容器 */
-        #app {
-            position: relative;
-            width: 100%;
-            height: 100vh; /* 使用视口高度，确保手机上也是全屏 */
-        }
+        #app { position: relative; width: 100%; height: 100vh; }
 
-        /* 共同的图片图层样式（用于实现淡入淡出） */
+        /* 2. 全屏背景层 (保持原样) */
         .image-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            transition: opacity 1.2s ease-in-out; opacity: 0;
+        }
+        #img1 { z-index: 1; }
+        #img2 { z-index: 2; }
+
+        /* 3. 修改：中央卡片 -> 左下角卡片 */
+        .main-card {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover; /* 照片充满整个屏幕 */
-            background-position: center center; /* 照片最中间填满屏幕，完美适配手机 */
-            transition: opacity 1s ease-in-out; /* 关键：1秒的淡入淡出动画 */
+            /* ======= 修改：从中间移至左下角 ======= */
+            bottom: 20px; /* 距离底部 20px */
+            left: 20px; /* 距离左侧 20px */
+            transform: none; /* 移除之前的居中偏移 */
+            /* ======================================= */
+            z-index: 20;
+            width: 85%; max-width: 400px;
+            padding: 20px; /* 减小一点 padding，更紧凑 */
+            text-align: left; /* 文字改为左对齐 */
+            /* ======= 修改：增加透明度，降低模糊 ======= */
+            background: rgba(255, 255, 255, 0.08); /* 更加透明 (从 0.15 降到 0.08) */
+            backdrop-filter: blur(5px); /* 降低模糊度 (从 15px 降到 5px) */
+            -webkit-backdrop-filter: blur(5px);
+            /* ======================================= */
+            border: 1px solid rgba(255, 255, 255, 0.15); /* 边框也淡一点 */
+            border-radius: 16px; /* 圆角小一点 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            color: white;
         }
 
-        /* 初始状态：第一层可见，第二层隐藏 */
-        #image-container1 { z-index: 1; opacity: 1; }
-        #image-container2 { z-index: 2; opacity: 0; }
+        h1 { margin: 10px 0; font-size: 22px; font-weight: 300; letter-spacing: 2px; }
+        p { margin: 5px 0; font-size: 13px; opacity: 0.8; line-height: 1.6; }
 
-        /* 箭头遮罩层（放在图片上面，覆盖整个区域） */
-        #arrow-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: space-between; /* 左右两边对齐 */
-            align-items: center; /* 垂直居中 */
-            z-index: 10; /* 确保在图片上方 */
-            pointer-events: none; /* 防止这个大容器遮挡图片层，只有它的子元素可点击 */
-        }
-
-        /* 箭头的基本样式 */
+        /* 4. 左右切换箭头 (保持原样) */
         .arrow {
-            pointer-events: auto; /* 只有箭头本身是可点击的 */
-            width: 100px; /* 增加点击区域 */
-            height: 100%; /* 覆盖整个高度，方便触摸 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.3); /* 初始：半透明白色 */
-            font-size: 50px;
-            cursor: pointer;
-            user-select: none;
-            transition: color 0.3s; /* 颜色变化动画 */
+            position: absolute; top: 0; width: 15%; height: 100%;
+            z-index: 30; display: flex; align-items: center; justify-content: center;
+            color: rgba(255, 255, 255, 0.2); font-size: 40px;
+            cursor: pointer; transition: 0.3s; pointer-events: auto;
         }
+        .arrow:hover { color: rgba(255, 255, 255, 0.7); background: rgba(255,255,255,0.05); }
+        .left-arrow { left: 0; }
+        .right-arrow { right: 0; }
 
-        /* 桌面电脑上：鼠标悬停（Hover）到箭头时的样式 */
-        .arrow:hover {
-            color: rgba(255, 255, 255, 0.8); /* 悬停时变清晰，突出显示箭头本身 */
-            background-color: transparent; /* 移除之前的 hover 区域背景 */
+        /* 5. 音乐播放器插件样式 (保持原样) */
+        .music-player {
+            position: absolute; bottom: 15px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 40;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex; align-items: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        #play-btn {
+            width: 25px; height: 25px;
+            border: none; background: white;
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 10px; font-size: 12px;
+        }
+        .music-info { color: white; font-size: 11px; white-space: nowrap; }
 
-        /* 针对手机浏览器的适配调整 */
+        /* 移动端微调 */
         @media (max-width: 768px) {
-            /* 手机上稍微减小点击区域和字体大小，以适应小屏幕 */
-            .arrow {
-                width: 80px; 
-                color: rgba(255, 255, 255, 0.7); /* 手机上始终保持清晰的半透明白色，因为没有 hover */
-                font-size: 40px; 
+            .main-card { 
+                width: 70%; 
+                padding: 15px; 
+                bottom: 10px; /* 手机上距离更小 */
+                left: 10px;
             }
-            /* 手机上移除 hover 效果，保持固定颜色 */
-            .arrow:hover {
-                color: rgba(255, 255, 255, 0.7); 
-            }
+            .arrow { width: 20%; font-size: 30px; }
         }
     </style>
 </head>
 <body>
 
     <div id="app">
-        <div id="image-container1" class="image-layer"></div>
-        <div id="image-container2" class="image-layer"></div>
+        <div id="img1" class="image-layer"></div>
+        <div id="img2" class="image-layer"></div>
 
-        <div id="arrow-overlay">
-            <div class="arrow left-arrow" onclick="prevImg()"> < </div>
-            <div class="arrow right-arrow" onclick="nextImg()"> > </div>
+        <div class="arrow left-arrow" onclick="prevImg()"> < </div>
+        <div class="arrow right-arrow" onclick="nextImg()"> > </div>
+
+        <div class="main-card">
+            <h1>TuoTuo</h1>
+            <p>生活原本沉闷，但跑起来就有风。</p>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.5;">Slide to explore</p>
+        </div>
+
+        <div class="music-player">
+            <button id="play-btn">▶</button>
+            <div class="music-info">Background Music</div>
+            <audio id="bgm" src="bgm.mp3" loop></audio>
         </div>
     </div>
 
     <script>
-        /* ==============================
-           JavaScript：负责网页的动作核心逻辑
-           ============================== */
-        
-        // 1. 这里填入你的图片文件名
-        const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+        // 图片逻辑 (保持原样，假设你已有 1.jpg, 2.jpg 等)
+        const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg']; 
         let currentIndex = 0;
-        let isTransitioning = false; // 用于防止快速点击导致混乱
+        let isTransitioning = false;
 
-        const container1 = document.getElementById('image-container1');
-        const container2 = document.getElementById('image-container2');
-        
-        // 记录当前显示的是哪一层，以及哪一层准备淡入
+        const container1 = document.getElementById('img1');
+        const container2 = document.getElementById('img2');
         let currentLayer = container1;
         let nextLayer = container2;
 
-        // 初始化显示第一张图
-        function initialize() {
-            container1.style.backgroundImage = `url('${images[currentIndex]}')`;
-            container1.style.opacity = 1;
-            container2.style.opacity = 0;
+        function init() {
+            currentLayer.style.backgroundImage = `url('${images[currentIndex]}')`;
+            currentLayer.style.opacity = 1;
         }
-        initialize();
+        init();
 
-        // 核心：切换图片的逻辑（实现了两层淡入淡出）
         function changeImage(newIndex) {
-            if (isTransitioning) return; // 如果正在动画中，则直接返回
+            if (isTransitioning) return;
             isTransitioning = true;
-
-            const newImage = images[newIndex];
-
-            // 1. 将新图片加载到“准备淡入的图层”（下一层）
-            nextLayer.style.backgroundImage = `url('${newImage}')`;
-
-            // 2. 开始 CSS 淡入淡出动画：当前层变透明，下一层变可见
+            nextLayer.style.backgroundImage = `url('${images[newIndex]}')`;
             currentLayer.style.opacity = 0;
             nextLayer.style.opacity = 1;
-
-            // 3. 在 CSS transition 动画完成后，交换层引用
-            currentLayer.ontransitionend = () => {
-                // 移除旧事件监听器以防止多重触发
-                currentLayer.ontransitionend = null; 
-
-                // 交换层引用：当前层变成下一层，下一层变成当前层
-                const temp = currentLayer;
+            
+            setTimeout(() => {
+                let temp = currentLayer;
                 currentLayer = nextLayer;
                 nextLayer = temp;
-
-                isTransitioning = false; // 允许进行下一次切换
-            };
+                isTransitioning = false;
+            }, 1200);
         }
 
-        // 下一张
-        function nextImg() {
-            currentIndex = (currentIndex + 1) % images.length;
-            changeImage(currentIndex);
-        }
+        function nextImg() { currentIndex = (currentIndex + 1) % images.length; changeImage(currentIndex); }
+        function prevImg() { currentIndex = (currentIndex - 1 + images.length) % images.length; changeImage(currentIndex); }
 
-        // 上一张
-        function prevImg() {
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
-            changeImage(currentIndex);
-        }
+        // 音乐控制逻辑 (保持原样)
+        const bgm = document.getElementById('bgm');
+        const playBtn = document.getElementById('play-btn');
+        let isPlaying = false;
+
+        playBtn.onclick = function() {
+            if (isPlaying) {
+                bgm.pause();
+                playBtn.innerText = '▶';
+            } else {
+                bgm.play();
+                playBtn.innerText = '⏸';
+            }
+            isPlaying = !isPlaying;
+        };
     </script>
 </body>
 </html>
