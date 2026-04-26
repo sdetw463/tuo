@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuoTuo's Dimension</title>
-    
-    <link rel="icon" href="logo.png?v=2" type="image/png">
-    
+    <title>TuoTuo's World</title>
     <style>
         /* 基础样式：确保铺满全屏且无滚动条 */
         body, html { 
@@ -15,7 +12,7 @@
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif; 
 
 /* 使用 Base64 编码的粉色爱心 SVG 作为指针 */
-   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%23FFB6C1" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
+    cursor: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cdefs%3E%3CradialGradient id="g" cx="40%" cy="40%" r="60%"%3E%3Cstop offset="0%" stop-color="%23fff" stop-opacity="0.2"/%3E%3Cstop offset="100%" stop-color="%23FFB6C1" stop-opacity="0.6"/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill="url(%23g)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E'), auto;
 }
 
 /* 爱心拖尾的样式 */
@@ -108,17 +105,31 @@
 
     <script>
         // --- 1. 背景轮播配置 ---
-        const images = ['1.webp', '2.webp', '3.webp', '4.webp', '5.webp']; 
+        const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg']; 
         let idx = 0;
         const c1 = document.getElementById('img1'), c2 = document.getElementById('img2');
         let cur = c1, nxt = c2;
 
        function sw() {
-            // 设置下一张图的背景
-            nxt.style.backgroundImage = `url('${images[idx]}')`;
-            // 执行淡入淡出动画：旧的变透明，新的变清晰
-            cur.style.opacity = 0; 
-            nxt.style.opacity = 1;
+    const imgUrl = images[idx];
+    const tempImg = new Image();
+    
+    // 先在后台悄悄下载图片
+    tempImg.src = imgUrl;
+    
+    tempImg.onload = function() {
+        // 只有图片下载完了，才执行切换动画
+        nxt.style.backgroundImage = `url('${imgUrl}')`;
+        cur.style.opacity = 0;
+        nxt.style.opacity = 1;
+        
+        setTimeout(() => {
+            let t = cur; cur = nxt; nxt = t;
+        }, 1200);
+        
+        idx = (idx + 1) % images.length;
+    };
+}
 
         // 页面加载完成后立即启动轮播
         window.onload = function() {
