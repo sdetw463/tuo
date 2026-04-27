@@ -10,7 +10,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* 1. 把全局背景从黑色(#000)换成温柔的淡粉色(#FFF0F5) */
         body, html { 
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5; 
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -22,13 +21,32 @@
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
         
-        /* 2. 核心修改：将 background-size: cover 改为 contain，并添加 no-repeat */
         .image-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: contain; /* 让图片完整显示，不裁剪 */
+            background-size: contain; 
             background-position: center; 
-            background-repeat: no-repeat; /* 防止图片在空隙处重复铺满 */
+            background-repeat: no-repeat; 
             transition: opacity 1.2s ease-in-out; opacity: 0; 
+        }
+
+        /* ========================================= */
+        /* --- 核心新增：磨砂边缘渐变融合层 --- */
+        /* ========================================= */
+        .frosted-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; /* 盖在图片之上，但在UI按钮之下 */
+            pointer-events: none; /* 防止挡住点击操作 */
+            
+            /* 1. 磨砂玻璃模糊滤镜 */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            
+            /* 2. 遮罩层：控制哪里模糊。中心40%透明(不模糊)，边缘变黑(生效模糊) */
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 40%, black 85%);
+            mask-image: radial-gradient(ellipse at center, transparent 40%, black 85%);
+            
+            /* 3. 背景色：中心透明，边缘叠加淡粉色，完美吃掉生硬边界 */
+            background: radial-gradient(ellipse at center, transparent 40%, #FFF0F5 90%);
         }
 
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
@@ -70,6 +88,8 @@
     <div id="app">
         <div id="img1" class="image-layer"></div>
         <div id="img2" class="image-layer"></div>
+        
+        <div class="frosted-overlay"></div>
         
         <div class="age-selector">
             <div class="age-btn active" data-age="22" onclick="switchAge(22)">22</div>
