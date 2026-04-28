@@ -385,12 +385,18 @@
         }
 
         function connectWebSocket() {
-            if (typeof WebSocket === 'undefined') {
-                addSystemMessage('您的浏览器不支持 WebSocket'); return;
-            }
+    if (typeof WebSocket === 'undefined') {
+        addSystemMessage('您的浏览器不支持 WebSocket'); 
+        return;
+    }
 
-            chatSocket = new WebSocket(`ws://${CHAT_CONFIG.wsHost}:${CHAT_CONFIG.wsPort}/socket/${chatNickname}`);
-
+    // 自动判断协议：如果是 https 访问则使用 wss，否则使用 ws
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    
+    // 核心修改：移除原代码中的端口冒号，直接连接云端域名
+    const socketUrl = `${protocol}://${CHAT_CONFIG.wsHost}/socket/${chatNickname}`;
+    
+    chatSocket = new WebSocket(socketUrl);
             chatSocket.onopen = () => { addSystemMessage('已连接到聊天服务器'); stopReconnect(); };
 
             chatSocket.onmessage = (event) => {
