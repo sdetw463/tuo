@@ -3,20 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TuoTuo's Dimension</title>
+    <title>Talk with TuoTuo</title>
     <link rel="icon" href="logo.png?v=2" type="image/png">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        /* 1. 恢复实心粉色爱心鼠标指针 */
         body, html { 
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5; 
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            cursor: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cdefs%3E%3CradialGradient id="g" cx="40%" cy="40%" r="60%"%3E%3Cstop offset="0%" stop-color="%23fff" stop-opacity="0.2"/%3E%3Cstop offset="100%" stop-color="%23FFB6C1" stop-opacity="0.6"/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill="url(%23g)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E') 16 16, auto;
+            cursor: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cpath fill="%23FF69B4" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E') 16 16, auto;
         }
 
-        .heart-trail { position: fixed; pointer-events: none; z-index: 9999; background-image: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cdefs%3E%3CradialGradient id="g" cx="40%" cy="40%" r="60%"%3E%3Cstop offset="0%" stop-color="%23fff" stop-opacity="0.2"/%3E%3Cstop offset="100%" stop-color="%23FFB6C1" stop-opacity="0.6"/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill="url(%23g)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E'); background-size: cover; width: 18px; height: 18px; animation: fadeOutHeart 1.2s forwards; }
-        @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-40px) scale(1.4); opacity: 0; } }
+        /* 2. 优化后的随机彩色拖尾样式 */
+        .heart-trail { 
+            position: fixed; pointer-events: none; z-index: 9999; 
+            width: 20px; height: 20px; 
+            animation: fadeOutHeart 1s forwards ease-out; 
+        }
+        @keyframes fadeOutHeart { 
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; } 
+            100% { transform: translateY(-40px) scale(1.5) rotate(20deg); opacity: 0; } 
+        }
+
+        /* 3. 新增：互动向上漂浮的泡泡样式 */
+        .floating-bubble {
+            position: absolute;
+            bottom: -60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.4));
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5), 0 0 5px rgba(255, 182, 193, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            pointer-events: auto; /* 必须开启，为了能够被鼠标触碰 */
+            z-index: 10;
+            animation: floatUp linear forwards;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-50vh) translateX(30px) scale(1.1); opacity: 0.6; }
+            100% { transform: translateY(-110vh) translateX(-30px) scale(1.2); opacity: 0; }
+        }
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
         .image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1.2s ease-in-out; opacity: 0; }
@@ -35,34 +62,16 @@
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
 
-        /* ============ 全新高级音乐播放器 ============ */
-        .music-player-pro { 
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; 
-            background: rgba(255, 255, 255, 0.4); padding: 8px 15px; border-radius: 30px; 
-            display: flex; align-items: center; justify-content: space-between; gap: 15px; 
-            border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); 
-            width: 280px; max-width: 90vw; /* 适应手机屏幕 */
-        }
-        
-        .song-marquee-box {
-            flex: 1; overflow: hidden; white-space: nowrap; position: relative; 
-            /* 两端边缘淡出效果，看起来更高级 */
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-        }
-        
-        .song-title-text {
-            display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold;
-            animation: marquee 8s linear infinite;
-        }
+        .music-player-pro { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255, 255, 255, 0.4); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); width: 280px; max-width: 90vw; }
+        .song-marquee-box { flex: 1; overflow: hidden; white-space: nowrap; position: relative; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+        .song-title-text { display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold; animation: marquee 8s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         
         .music-controls { display: flex; align-items: center; gap: 10px; }
         .btn-ctrl { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #FF69B4; transition: all 0.2s; }
         .btn-ctrl:hover { transform: scale(1.2); color: #FF1493; }
         .btn-ctrl svg { width: 16px; height: 16px; fill: currentColor; }
-        .btn-play-pause svg { width: 22px; height: 22px; } /* 播放键稍大一点 */
+        .btn-play-pause svg { width: 22px; height: 22px; }
 
         @media (max-width: 768px) {
             .main-card { bottom: auto; top: 30px; left: 20px; width: 60%; padding: 12px; }
@@ -74,7 +83,6 @@
             .chat-window { width: 90vw !important; height: 75vh !important; right: 5vw !important; bottom: 85px !important; }
         }
 
-        /* ============ 磨砂风格聊天增强样式 ============ */
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
         .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
@@ -171,7 +179,7 @@
         <div class="chat-window" id="chat-window">
             <div class="chat-header">
                 <div class="chat-header-info">
-                    <h3>TuoTuo's Chat Room</h3>
+                    <h3>🐰 Talk with TuoTuo</h3>
                     <span class="online-count"><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
                 </div>
                 <button class="chat-header-close" onclick="toggleChat(event)">
@@ -219,11 +227,10 @@
 
     <script>
         // ============ 全新 BGM 歌单与控制逻辑 ============
-        // 💡 提示：你可以在这里随意添加你上传到 GitHub 的 MP3 文件名和显示的歌名
         const playlist = [
-            { title: "TuoTuo 的专属电台 - Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
-            { title: "TuoTuo 的专属电台 - Oneul-Morning-Peppermint", src: "bgm2.mp3" },  // 如果你想加歌，只需上传文件并在这里添加一行
-            { title: "TuoTuo 的专属电台 - 선샤인(Sunshine) - 圣诞快乐", src: "bgm3.mp3" }
+            { title: "Talk with TuoTuo - Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
+            { title: "Talk with TuoTuo - Oneul-Morning-Peppermint", src: "bgm2.mp3" }, 
+            { title: "Talk with TuoTuo - 선샤인(Sunshine) - 圣诞快乐", src: "bgm3.mp3" }
         ];
         
         let currentSongIdx = 0;
@@ -231,51 +238,37 @@
         const songTitleText = document.getElementById('song-title');
         const playIconSvg = document.getElementById('play-icon-svg');
         
-        // 播放与暂停的 SVG 矢量图形代码
         const svgPlay = '<path d="M8 5v14l11-7z"/>';
         const svgPause = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 
         function loadSong(index) {
             bgm.src = playlist[index].src;
             songTitleText.innerText = playlist[index].title;
-            // 重新触发跑马灯动画以确保从头开始滚动
             songTitleText.style.animation = 'none';
             void songTitleText.offsetWidth; 
             songTitleText.style.animation = 'marquee 8s linear infinite';
         }
 
         function togglePlay() {
-            if (bgm.paused) {
-                bgm.play();
-                playIconSvg.innerHTML = svgPause;
-            } else {
-                bgm.pause();
-                playIconSvg.innerHTML = svgPlay;
-            }
+            if (bgm.paused) { bgm.play(); playIconSvg.innerHTML = svgPause; } 
+            else { bgm.pause(); playIconSvg.innerHTML = svgPlay; }
         }
 
         function nextSong() {
             currentSongIdx = (currentSongIdx + 1) % playlist.length;
-            loadSong(currentSongIdx);
-            bgm.play();
-            playIconSvg.innerHTML = svgPause;
+            loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause;
         }
 
         function prevSong() {
             currentSongIdx = (currentSongIdx - 1 + playlist.length) % playlist.length;
-            loadSong(currentSongIdx);
-            bgm.play();
-            playIconSvg.innerHTML = svgPause;
+            loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause;
         }
 
-        // 监听当前歌曲播放完毕，自动无缝切换下一首
         bgm.addEventListener('ended', nextSong);
-
-        // 页面初始化时加载第一首歌的名称
         loadSong(currentSongIdx);
 
 
-        // ============ 其他原有功能模块 ============
+        // ============ 聊天与交互功能 ============
         const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
         let chatSocket = null, chatNickname = sessionStorage.getItem('chat_nickname') || '';
         let chatAvatar = sessionStorage.getItem('chat_avatar') || '🐰', unreadCount = 0, isChatWindowOpen = false;
@@ -387,6 +380,66 @@
                 overlay.classList.remove('show');
             }
         });
+
+        // ============ 彩色爱心鼠标拖尾特效 ============
+        const colors = ['#FF69B4', '#FFB6C1', '#FF1493', '#DB7093', '#FFA07A', '#FFD700', '#32CD32', '#00FFFF', '#1E90FF', '#9370DB', '#FF4500'];
+        let lastTime = 0;
+        document.addEventListener('mousemove', function(e) {
+            const now = Date.now();
+            if (now - lastTime < 50) return; // 控制生成频率，防止页面卡顿
+            lastTime = now;
+            
+            const heart = document.createElement('div');
+            heart.className = 'heart-trail';
+            heart.style.left = (e.clientX - 10) + 'px';
+            heart.style.top = (e.clientY - 10) + 'px';
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            heart.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="${color}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1000); // 1秒后自动清理
+        });
+
+        // ============ 气泡漂浮与戳破互动特效 ============
+        setInterval(() => {
+            const count = Math.floor(Math.random() * 2) + 1; // 每次吐出 1-2 个泡泡
+            for(let i=0; i<count; i++) {
+                createBubble();
+            }
+        }, 1000); // 每 1 秒执行一次
+
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.className = 'floating-bubble';
+            
+            // 随机大小与初始位置
+            const size = Math.random() * 30 + 15; // 15px 到 45px 之间
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            bubble.style.left = Math.random() * window.innerWidth + 'px';
+            
+            // 随机上升速度
+            const duration = Math.random() * 4 + 6; // 6秒 到 10秒 飘出屏幕
+            bubble.style.animationDuration = duration + 's';
+            
+            // 鼠标触碰时的“爆炸”逻辑
+            bubble.addEventListener('mouseenter', () => {
+                bubble.style.animation = 'none'; // 停止上升动画
+                bubble.style.transition = 'all 0.15s ease-out';
+                bubble.style.transform = 'scale(1.5)'; // 瞬间放大
+                bubble.style.opacity = '0'; // 瞬间透明消失
+                setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, 150);
+            });
+            
+            document.getElementById('app').appendChild(bubble);
+            
+            // 飘出屏幕后自动清理，防止内存溢出
+            setTimeout(() => {
+                if (bubble.parentElement) bubble.remove();
+            }, duration * 1000);
+        }
+
     </script>
 </body>
 </html>
