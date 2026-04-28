@@ -34,12 +34,39 @@
         .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); }
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
-        .music-player { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); }
-        #play-btn { width: 22px; height: 22px; border: none; background: #FFB6C1; border-radius: 50%; cursor: pointer; margin-right: 10px; font-size: 9px; display: flex; align-items: center; justify-content: center; color: white; }
+
+        /* ============ 全新高级音乐播放器 ============ */
+        .music-player-pro { 
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; 
+            background: rgba(255, 255, 255, 0.4); padding: 8px 15px; border-radius: 30px; 
+            display: flex; align-items: center; justify-content: space-between; gap: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); 
+            width: 280px; max-width: 90vw; /* 适应手机屏幕 */
+        }
+        
+        .song-marquee-box {
+            flex: 1; overflow: hidden; white-space: nowrap; position: relative; 
+            /* 两端边缘淡出效果，看起来更高级 */
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+        
+        .song-title-text {
+            display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold;
+            animation: marquee 8s linear infinite;
+        }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .music-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-ctrl { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #FF69B4; transition: all 0.2s; }
+        .btn-ctrl:hover { transform: scale(1.2); color: #FF1493; }
+        .btn-ctrl svg { width: 16px; height: 16px; fill: currentColor; }
+        .btn-play-pause svg { width: 22px; height: 22px; } /* 播放键稍大一点 */
 
         @media (max-width: 768px) {
             .main-card { bottom: auto; top: 30px; left: 20px; width: 60%; padding: 12px; }
-            .music-player { bottom: 30px; left: 20px; transform: none; }
+            .music-player-pro { bottom: 30px; left: 20px; transform: none; width: calc(100vw - 120px); }
             .dots-container { bottom: 90px; }
             .age-selector { bottom: 125px; gap: 10px; }
             .age-btn { padding: 4px 12px; font-size: 13px; }
@@ -51,20 +78,10 @@
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
         .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        
         .chat-bubble-btn .msg-badge { position: absolute; top: -5px; right: -5px; z-index: 10; min-width: 20px; height: 20px; padding: 0 5px; background: #FF4757; border-radius: 10px; color: white; font-size: 11px; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .chat-bubble-btn.active .msg-badge { display: none !important; }
 
-        .chat-window { 
-            position: absolute; bottom: 100px; right: 30px; z-index: 150; 
-            width: 380px; height: 560px; 
-            background: rgba(255, 255, 255, 0.5); 
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 25px 25px 5px 25px; 
-            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2), inset 0 0 0 1px rgba(255,255,255,0.4); 
-            display: none; flex-direction: column; overflow: hidden; 
-            transform-origin: bottom right;
-        }
+        .chat-window { position: absolute; bottom: 100px; right: 30px; z-index: 150; width: 380px; height: 560px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 25px 25px 5px 25px; box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2), inset 0 0 0 1px rgba(255,255,255,0.4); display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; }
         .chat-window.show { display: flex; animation: window-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         
         .chat-header { background: rgba(255, 182, 193, 0.6); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
@@ -86,7 +103,6 @@
         
         .message-image { border-radius: 12px; max-width: 100%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); cursor: zoom-in; transition: transform 0.2s; }
         .message-image:hover { transform: scale(1.02); }
-
         .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
         .image-viewer img { max-width: 95%; max-height: 95%; border-radius: 5px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 
@@ -96,20 +112,12 @@
         .chat-input { flex: 1; border: 1px solid rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; resize: none; max-height: 80px; }
         .chat-send-btn { width: 42px; height: 42px; background: #FFB6C1; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5); }
 
-        /* 核心强化：豪华表情面板的样式，带滚动条 */
-        .emoji-picker { 
-            position: absolute; bottom: 130px; left: 15px; background: white; padding: 10px; 
-            border-radius: 15px; display: none; grid-template-columns: repeat(8, 1fr); gap: 5px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 300px; max-height: 220px; 
-            overflow-y: auto; z-index: 200; border: 1px solid #FFE4E9;
-        }
-        /* 定制滚动条，符合粉色主题 */
+        .emoji-picker { position: absolute; bottom: 130px; left: 15px; background: white; padding: 10px; border-radius: 15px; display: none; grid-template-columns: repeat(8, 1fr); gap: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 300px; max-height: 220px; overflow-y: auto; z-index: 200; border: 1px solid #FFE4E9; }
         .emoji-picker::-webkit-scrollbar { width: 6px; }
         .emoji-picker::-webkit-scrollbar-thumb { background: #FFB6C1; border-radius: 5px; }
 
         .chat-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
         .chat-login-overlay.show { display: flex; }
-        
         .chat-login-box { background: white; border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.1); animation: login-appear 0.3s ease; }
         @keyframes login-appear { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
@@ -117,7 +125,6 @@
         .avatar-opt { font-size: 30px; cursor: pointer; padding: 5px; border-radius: 50%; opacity: 0.5; transition: 0.3s; }
         .avatar-opt:hover { transform: scale(1.1); }
         .avatar-opt.selected { opacity: 1; transform: scale(1.2); background: #FFF0F5; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3); }
-
         .chat-login-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; text-align: center; margin-bottom: 15px; font-size: 15px; outline: none; transition: 0.2s; }
         .chat-login-input:focus { border-color: #FF69B4; }
         .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
@@ -137,7 +144,24 @@
         </div>
         <div class="dots-container" id="dynamic-dots"></div>
         <div class="main-card"><h1>TuoTuo</h1><div class="quote" style="color:#666;">生活原本沉闷，但跑起来就有风。</div></div>
-        <div class="music-player"><button id="play-btn">▶</button><div class="music-info" style="color:#666; font-size:11px">BGM</div><audio id="bgm" src="bgm.mp3" loop></audio></div>
+        
+        <div class="music-player-pro">
+            <div class="song-marquee-box">
+                <div class="song-title-text" id="song-title">准备播放...</div>
+            </div>
+            <div class="music-controls">
+                <button class="btn-ctrl" onclick="prevSong()" title="上一首">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="btn-ctrl btn-play-pause" id="btn-play-pause" onclick="togglePlay()" title="播放/暂停">
+                    <svg viewBox="0 0 24 24" id="play-icon-svg"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="btn-ctrl" onclick="nextSong()" title="下一首">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+            <audio id="bgm" src="bgm.mp3"></audio>
+        </div>
 
         <div class="chat-bubble-btn" id="chat-bubble-btn" onclick="toggleChat(event)">
             <div id="msg-badge" class="msg-badge">0</div>
@@ -147,7 +171,7 @@
         <div class="chat-window" id="chat-window">
             <div class="chat-header">
                 <div class="chat-header-info">
-                    <h3>TuoTuo's Chat Room</h3>
+                    <h3>🐰 Talk with TuoTuo</h3>
                     <span class="online-count"><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
                 </div>
                 <button class="chat-header-close" onclick="toggleChat(event)">
@@ -194,24 +218,78 @@
     </div>
 
     <script>
-        // --- 核心配置 ---
-        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
+        // ============ 全新 BGM 歌单与控制逻辑 ============
+        // 💡 提示：你可以在这里随意添加你上传到 GitHub 的 MP3 文件名和显示的歌名
+        const playlist = [
+            { title: "TuoTuo 的专属电台 - Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
+            { title: "TuoTuo 的专属电台 - Oneul-Morning-Peppermint", src: "bgm2.mp3" },  // 如果你想加歌，只需上传文件并在这里添加一行
+            { title: "TuoTuo 的专属电台 - 선샤인(Sunshine) - 圣诞快乐", src: "bgm3.mp3" }
+            { title: "TuoTuo 的专属电台 - Stella Jang - L’Amour, Les Baguettes, Paris", src: "bgm3.mp3" }
+            { title: "TuoTuo 的专属电台 - ゴンチチ - 歩いても 歩いても -ending version-", src: "bgm3.mp3" }
+            { title: "TuoTuo 的专属电台 - 雷同二友 - 一个人行街", src: "bgm3.mp3" }
+        ];
         
+        let currentSongIdx = 0;
+        const bgm = document.getElementById('bgm');
+        const songTitleText = document.getElementById('song-title');
+        const playIconSvg = document.getElementById('play-icon-svg');
+        
+        // 播放与暂停的 SVG 矢量图形代码
+        const svgPlay = '<path d="M8 5v14l11-7z"/>';
+        const svgPause = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+        function loadSong(index) {
+            bgm.src = playlist[index].src;
+            songTitleText.innerText = playlist[index].title;
+            // 重新触发跑马灯动画以确保从头开始滚动
+            songTitleText.style.animation = 'none';
+            void songTitleText.offsetWidth; 
+            songTitleText.style.animation = 'marquee 8s linear infinite';
+        }
+
+        function togglePlay() {
+            if (bgm.paused) {
+                bgm.play();
+                playIconSvg.innerHTML = svgPause;
+            } else {
+                bgm.pause();
+                playIconSvg.innerHTML = svgPlay;
+            }
+        }
+
+        function nextSong() {
+            currentSongIdx = (currentSongIdx + 1) % playlist.length;
+            loadSong(currentSongIdx);
+            bgm.play();
+            playIconSvg.innerHTML = svgPause;
+        }
+
+        function prevSong() {
+            currentSongIdx = (currentSongIdx - 1 + playlist.length) % playlist.length;
+            loadSong(currentSongIdx);
+            bgm.play();
+            playIconSvg.innerHTML = svgPause;
+        }
+
+        // 监听当前歌曲播放完毕，自动无缝切换下一首
+        bgm.addEventListener('ended', nextSong);
+
+        // 页面初始化时加载第一首歌的名称
+        loadSong(currentSongIdx);
+
+
+        // ============ 其他原有功能模块 ============
+        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
         let chatSocket = null, chatNickname = sessionStorage.getItem('chat_nickname') || '';
         let chatAvatar = sessionStorage.getItem('chat_avatar') || '🐰', unreadCount = 0, isChatWindowOpen = false;
-
         const badge = document.getElementById('msg-badge'), messagesEl = document.getElementById('chat-messages');
 
-        // --- 动态生成豪华表情库 (JS魔法，一行代码变几百个表情) ---
         const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,💋,💌,💘,💝,💖,💗,💓,💞,💕,💟,❣️,💔,❤️,🧡,💛,💚,💙,💜,🖤,🤍,🤎,💯,💢,💥,💫,💦,💨,💬,💭,💤,👋,🤚,🖐,✋,🖖,👌,🤌,🤏,✌️,🤞,🤟,🤘,🤙,👈,👉,👆,🖕,👇,☝️,👍,👎,✊,👊,🤛,🤜,👏,🙌,👐,🤲,🤝,🙏,🐶,🐱,🐭,🐹,🐰,🦊,🐻,🐼,🐨,🐯,🦁,🐮,🐷,🐸,🐵,🐒,🐔,🐧,🐦,🐤,🦆,🦅,🦉,🦇,🐺,🐗,🐴,🦄,🐝,🐛,🦋,🐌,🐞,🐜,🦗,🕷,🦂,🐢,🐍,🦎,🦖,🦕,🐙,🦑,🦐,🦞,🦀,🐡,🐠,🐟,🐬,🐳,🐋,🦈,🐊,🐅,🐆,🦓,🦍,🐘,🦛,🦏,🐪,🐫,🦒,🦘,🐃,🐂,🐄,🐎,🐖,🐏,🐑,🦙,🐐,🦌,🐕,🐩,🐈,🐓,🦃,🦚,🦜,🦢,🦩,🕊,🐇,🦝,🦨,🦡,🦦,🦥,🐁,🐀,🐿,🦔,🐾,🐉,🐲,🌵,🎄,🌲,🌳,🌴,🌱,🌿,☘️,🍀,🎍,🎋,🍃,🍂,🍁,🍄,🌾,💐,🌷,🌹,🥀,🌺,🌸,🌼,🌻".split(',');
         const emojiPicker = document.getElementById('emoji-picker');
         let emojiHtml = '';
-        emojiList.forEach(e => {
-            emojiHtml += `<span style="cursor:pointer; font-size:20px; text-align:center; transition:0.2s;" onclick="insertEmoji('${e}')" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">${e}</span>`;
-        });
+        emojiList.forEach(e => { emojiHtml += `<span style="cursor:pointer; font-size:20px; text-align:center; transition:0.2s;" onclick="insertEmoji('${e}')" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">${e}</span>`; });
         emojiPicker.innerHTML = emojiHtml;
 
-        // --- 轮播逻辑 ---
         const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
         let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
         function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
@@ -221,7 +299,6 @@
         function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
         window.onload = () => { renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); };
 
-        // --- 聊天核心逻辑 ---
         function toggleChat(e) {
             if (e) e.stopPropagation();
             const win = document.getElementById('chat-window');
@@ -232,7 +309,7 @@
                 setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 100);
             } else { 
                 win.classList.remove('show'); isChatWindowOpen = false; 
-                document.getElementById('emoji-picker').style.display='none'; // 关闭窗口时顺便关掉表情板
+                document.getElementById('emoji-picker').style.display='none'; 
             }
         }
 
