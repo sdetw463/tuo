@@ -385,36 +385,57 @@
         }
 
         function connectWebSocket() {
-    if (typeof WebSocket === 'undefined') {
-        addSystemMessage('您的浏览器不支持 WebSocket'); 
-        return;
-    }
+            if (typeof WebSocket === 'undefined') {
+                addSystemMessage('您的浏览器不支持 WebSocket'); 
+                return;
+            }
 
-    // 自动判断协议：如果是 https 访问则使用 wss，否则使用 ws
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    
-    // 核心修改：移除原代码中的端口冒号，直接连接云端域名
-    const socketUrl = `${protocol}://${CHAT_CONFIG.wsHost}/socket/${chatNickname}`;
-    
-    chatSocket = new WebSocket(socketUrl);
-            chatSocket.onopen = () => { addSystemMessage('已连接到聊天服务器'); stopReconnect(); };
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            
+            // 【修复1：使用 encodeURIComponent 转码中文昵称，防止连接崩溃】
+            const socketUrl = `${protocol}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(chatNickname)}`;
+            
+            chatSocket = new WebSocket(socketUrl);
 
-            chatSocket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (data.userlist) {
-                        onlineCountEl.textContent = data.userlist.length;
-                    } else {
-                        addChatMessage(data);
-                        if (!isChatWindowOpen && data.name !== chatNickname) {
-                            unreadCount++; updateBadge();
-                        }
-                    }
-                } catch (e) {}
+            chatSocket.onopen = () => { 
+                addSystemMessage('已连接到聊天服务器'); 
+                stopReconnect(); 
             };
 
-            chatSocket.onclose = () => { addSystemMessage('连接已断开，正在重连...'); startReconnect(); };
-            chatSocket.onerror = () => { addSystemMessage('连接出错，请检查服务器是否启动'); };
+            // 【修复2：适配后端最新的高级数据格式】
+            chatSocket.onmessage = (event) => {
+                try {
+                    const res = JSON.parse(event.data);
+                    
+                    if (res.type === 'history') {
+                        // 批量加载历史记录
+                        res.data.forEach(item => addChatMessage(item));
+                    } 
+                    else if (res.type === 'userlist') {
+                        // 更新在线人数
+                        onlineCountEl.textContent = res.data.length;
+                    } 
+                    else if (res.type === 'message') {
+                        // 收到新消息
+                        addChatMessage(res);
+                        if (!isChatWindowOpen && res.name !== chatNickname) {
+                            unreadCount++; 
+                            updateBadge();
+                        }
+                    }
+                } catch (e) {
+                    console.error("消息解析错误", e);
+                }
+            };
+
+            chatSocket.onclose = () => { 
+                addSystemMessage('连接已断开，正在重连...'); 
+                startReconnect(); 
+            };
+            
+            chatSocket.onerror = () => { 
+                addSystemMessage('连接出错，请检查服务器是否启动'); 
+            };
         }
 
         function startReconnect() {
