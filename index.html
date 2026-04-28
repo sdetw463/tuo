@@ -9,7 +9,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* 1. 整体背景设为淡粉色，配合磨砂层消除硬边界 */
         body, html { 
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5; 
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -20,25 +19,9 @@
         @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-40px) scale(1.4); opacity: 0; } }
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
-        
-        /* 2. 照片层：改回填充全屏 (cover) */
-        .image-layer { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            transition: opacity 1.2s ease-in-out; opacity: 0; 
-        }
+        .image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; transition: opacity 1.2s ease-in-out; opacity: 0; }
+        .frosted-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-mask-image: linear-gradient(to right, black 0%, transparent 10%, transparent 90%, black 100%); mask-image: linear-gradient(to right, black 0%, transparent 10%, transparent 90%, black 100%); background: linear-gradient(to right, #FFF0F5 0%, transparent 10%, transparent 90%, #FFF0F5 100%); }
 
-        /* 3. 新增：左右双侧线性磨砂效果 */
-        .frosted-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 5; pointer-events: none;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            -webkit-mask-image: linear-gradient(to right, black 0%, transparent 10%, transparent 90%, black 100%);
-            mask-image: linear-gradient(to right, black 0%, transparent 10%, transparent 90%, black 100%);
-            background: linear-gradient(to right, #FFF0F5 0%, transparent 10%, transparent 90%, #FFF0F5 100%);
-        }
-
-        /* UI 控件样式 (淡色系优化) */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
         .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255, 182, 193, 0.4); border: 1px solid rgba(255, 182, 193, 0.6); color: rgba(0, 0, 0, 0.6); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s ease; }
         .age-btn:hover { background: rgba(255, 182, 193, 0.6); color: #000; }
@@ -51,7 +34,6 @@
         .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); }
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
-
         .music-player { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); }
         #play-btn { width: 22px; height: 22px; border: none; background: #FFB6C1; border-radius: 50%; cursor: pointer; margin-right: 10px; font-size: 9px; display: flex; align-items: center; justify-content: center; color: white; }
 
@@ -62,111 +44,100 @@
             .age-selector { bottom: 125px; gap: 10px; }
             .age-btn { padding: 4px 12px; font-size: 13px; }
             .chat-bubble-btn { bottom: 25px; right: 20px; width: 50px; height: 50px; }
-            .chat-window { width: 90vw !important; height: 70vh !important; right: 5vw !important; bottom: 85px !important; }
+            .chat-window { width: 90vw !important; height: 75vh !important; right: 5vw !important; bottom: 85px !important; }
         }
 
-        /* ============ 可爱聊天功能样式 ============ */
-        .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); animation: bounce-subtle 2s ease-in-out infinite; padding: 0; overflow: hidden; }
+        /* ============ 聊天功能增强样式 ============ */
+        .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; overflow: hidden; }
         .chat-bubble-btn:hover { transform: scale(1.15); box-shadow: 0 6px 25px rgba(255, 105, 180, 0.7); }
         .chat-bubble-btn.active { animation: none; }
         @keyframes bounce-subtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        
-        .chat-bubble-btn .msg-badge { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: #FF4757; border-radius: 50%; color: white; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255, 71, 87, 0.5); animation: pulse-badge 1s ease-in-out infinite; }
+        .chat-bubble-btn .msg-badge { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: #FF4757; border-radius: 50%; color: white; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255, 71, 87, 0.5); animation: pulse-badge 1s infinite; }
         @keyframes pulse-badge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
-        .chat-window { position: absolute; bottom: 100px; right: 30px; z-index: 150; width: 380px; height: 520px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 25px 25px 25px 5px; box-shadow: 0 15px 50px rgba(255, 105, 180, 0.3), 0 5px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8); display: none; flex-direction: column; overflow: hidden; border: 2px solid rgba(255, 182, 193, 0.5); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom right; }
+        .chat-window { position: absolute; bottom: 100px; right: 30px; z-index: 150; width: 380px; height: 560px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 25px 25px 25px 5px; box-shadow: 0 15px 50px rgba(255, 105, 180, 0.3); display: none; flex-direction: column; overflow: hidden; border: 2px solid rgba(255, 182, 193, 0.5); transform-origin: bottom right; }
         .chat-window.show { display: flex; animation: window-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes window-appear { 0% { transform: scale(0.8) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
         
         .chat-header { background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-        .chat-header-left { display: flex; align-items: center; gap: 10px; }
-        .chat-header-avatar { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .chat-header-avatar svg { width: 28px; height: 28px; }
-        .chat-header-info h3 { color: white; font-size: 16px; font-weight: 600; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-header-info h3 { color: white; font-size: 16px; font-weight: 600; margin: 0; }
         .chat-header-info span { color: rgba(255, 255, 255, 0.9); font-size: 11px; }
-        
         .chat-header-close { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.3); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .chat-header-close:hover { background: rgba(255, 255, 255, 0.5); transform: rotate(90deg); }
         .chat-header-close svg { width: 16px; height: 16px; stroke: white; }
         
         .chat-messages { flex: 1; overflow-y: auto; padding: 15px; background: linear-gradient(180deg, #FFF5F7 0%, #FFF0F5 100%); display: flex; flex-direction: column; gap: 12px; }
         .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-track { background: transparent; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 105, 180, 0.3); border-radius: 3px; }
-        
-        .welcome-message { text-align: center; padding: 20px; color: #FF69B4; }
-        .welcome-message .bunny-icon { font-size: 40px; margin-bottom: 10px; }
-        .welcome-message p { font-size: 13px; color: #999; margin: 5px 0; }
         
         .message-item { display: flex; gap: 10px; animation: message-appear 0.3s ease; }
         .message-item.right { flex-direction: row-reverse; }
         @keyframes message-appear { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         
-        .message-avatar { width: 36px; height: 36px; min-width: 36px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3); }
-        .message-avatar.right { background: linear-gradient(135deg, #87CEEB, #6495ED); }
-        .message-avatar svg { width: 22px; height: 22px; }
+        .message-avatar { width: 36px; height: 36px; min-width: 36px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255, 105, 180, 0.2); font-size: 20px; }
         
         .message-content { max-width: 75%; }
         .message-name { font-size: 11px; color: #FF69B4; margin-bottom: 4px; font-weight: 500; }
         .message-item.right .message-name { text-align: right; color: #6495ED; }
         
+        /* 文字气泡 */
         .message-bubble { background: white; padding: 10px 14px; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); font-size: 14px; color: #333; line-height: 1.5; word-break: break-word; }
         .message-item.right .message-bubble { background: linear-gradient(135deg, #6495ED, #4169E1); color: white; border-radius: 18px 18px 4px 18px; }
         
+        /* 图片气泡 */
+        .message-image { border-radius: 12px; max-width: 100%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); cursor: pointer; }
+        .message-item.right .message-image { border-radius: 12px 12px 4px 12px; }
+
         .message-time { font-size: 10px; color: #CCC; margin-top: 4px; }
         .message-item.right .message-time { text-align: right; }
-        
         .system-message { text-align: center; padding: 8px 0; color: #BBB; font-size: 12px; }
-        .system-message span { background: rgba(0, 0, 0, 0.05); padding: 4px 12px; border-radius: 12px; }
         
-        .chat-input-area { padding: 15px; background: white; border-top: 1px solid #F0F0F0; display: flex; gap: 10px; align-items: flex-end; }
+        /* 输入区增强版 */
+        .chat-bottom-wrapper { background: white; border-top: 1px solid #F0F0F0; display: flex; flex-direction: column; }
+        .chat-toolbar { padding: 8px 15px 0 15px; display: flex; gap: 15px; }
+        .tool-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #999; transition: 0.2s; position: relative; }
+        .tool-btn:hover { transform: scale(1.1); color: #FF69B4; }
+        
+        .chat-input-area { padding: 8px 15px 15px 15px; display: flex; gap: 10px; align-items: flex-end; }
         .chat-input { flex: 1; border: 2px solid #FFE4E9; border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; transition: all 0.2s; resize: none; max-height: 80px; font-family: inherit; }
         .chat-input:focus { border-color: #FF69B4; box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1); }
-        .chat-input::placeholder { color: #CCC; }
+        .chat-send-btn { width: 45px; height: 45px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4); color: white; }
         
-        .chat-send-btn { width: 45px; height: 45px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4); transition: all 0.2s; }
-        .chat-send-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5); }
-        .chat-send-btn:active { transform: scale(0.95); }
-        .chat-send-btn svg { width: 20px; height: 20px; fill: white; margin-left: 2px; }
-        
+        /* 表情面板 */
+        .emoji-picker { position: absolute; bottom: 120px; left: 15px; width: 250px; background: white; border-radius: 15px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; grid-template-columns: repeat(6, 1fr); gap: 5px; border: 1px solid #FFE4E9; z-index: 200;}
+        .emoji-picker.show { display: grid; }
+        .emoji-item { font-size: 22px; text-align: center; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; }
+        .emoji-item:hover { background: #FFF0F5; transform: scale(1.2); }
+
+        /* 登录弹窗增强版 */
         .chat-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .chat-login-overlay.show { display: flex; }
+        .chat-login-box { background: white; border-radius: 25px; padding: 30px; width: 340px; box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3); text-align: center; }
+        .chat-login-box h3 { color: #FF69B4; margin-bottom: 15px; font-size: 20px; }
         
-        .chat-login-box { background: white; border-radius: 25px; padding: 30px; width: 320px; box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3); animation: login-appear 0.3s ease; }
-        @keyframes login-appear { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        
-        .chat-login-box h3 { text-align: center; color: #FF69B4; margin-bottom: 20px; font-size: 20px; }
-        .chat-login-box .bunny-header { text-align: center; margin-bottom: 20px; }
-        .chat-login-box .bunny-header svg { width: 60px; height: 60px; }
-        
-        .chat-login-input { width: 100%; padding: 12px 16px; border: 2px solid #FFE4E9; border-radius: 15px; font-size: 15px; outline: none; margin-bottom: 15px; transition: all 0.2s; text-align: center; }
-        .chat-login-input:focus { border-color: #FF69B4; box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1); }
-        
-        .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .chat-login-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255, 105, 180, 0.4); }
-        
-        .online-count { font-size: 11px; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; gap: 5px; }
-        .online-dot { width: 8px; height: 8px; background: #7CFC00; border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        /* 头像选择器 */
+        .avatar-selection { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .avatar-option { font-size: 32px; cursor: pointer; opacity: 0.4; transition: all 0.3s; padding: 5px; border-radius: 50%; background: #F8F8F8; }
+        .avatar-option:hover { transform: scale(1.1); }
+        .avatar-option.selected { opacity: 1; transform: scale(1.2); background: #FFF0F5; box-shadow: 0 4px 10px rgba(255, 105, 180, 0.2); }
+
+        .chat-login-input { width: 100%; padding: 12px 16px; border: 2px solid #FFE4E9; border-radius: 15px; font-size: 15px; outline: none; margin-bottom: 15px; text-align: center; }
+        .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="app">
         <div id="img1" class="image-layer"></div>
         <div id="img2" class="image-layer"></div>
-        
         <div class="frosted-overlay"></div>
-        
         <div class="age-selector">
             <div class="age-btn active" data-age="22" onclick="switchAge(22)">22</div>
             <div class="age-btn" data-age="21" onclick="switchAge(21)">21</div>
             <div class="age-btn" data-age="20" onclick="switchAge(20)">20</div>
             <div class="age-btn" data-age="19" onclick="switchAge(19)">19</div>
         </div>
-
         <div class="dots-container" id="dynamic-dots"></div>
-        
         <div class="main-card"><h1>TuoTuo</h1><div class="quote" style="color:#666;">生活原本沉闷，但跑起来就有风。</div></div>
         <div class="music-player"><button id="play-btn">▶</button><div class="music-info" style="color:#666; font-size:11px">BGM</div><audio id="bgm" src="bgm.mp3" loop></audio></div>
 
@@ -176,299 +147,266 @@
 
         <div class="chat-window" id="chat-window">
             <div class="chat-header">
-                <div class="chat-header-left">
-                    <div class="chat-header-avatar">
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M8 6C8 3 9.5 1 11 1" stroke="#FF69B4" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16 6C16 3 14.5 1 13 1" stroke="#FF69B4" stroke-width="2" stroke-linecap="round"/>
-                            <circle cx="12" cy="13" r="7" fill="#FFB6C1"/>
-                            <circle cx="10" cy="12" r="1" fill="#333"/>
-                            <circle cx="14" cy="12" r="1" fill="#333"/>
-                            <ellipse cx="12" cy="14.5" rx="1.5" ry="1" fill="#FF69B4"/>
-                        </svg>
-                    </div>
-                    <div class="chat-header-info">
-                        <h3>🐰 聊天小屋</h3>
-                        <span class="online-count"><span class="online-dot"></span> <span id="online-count">0</span> 人在线</span>
-                    </div>
+                <div class="chat-header-info">
+                    <h3>🐰 聊天小屋</h3>
+                    <span class="online-count"><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
                 </div>
                 <button class="chat-header-close" onclick="toggleChat(event)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
        
             <div class="chat-messages" id="chat-messages">
-                <div class="welcome-message">
-                    <div class="bunny-icon">🐰</div>
-                    <p>欢迎来到聊天小屋~</p>
-                    <p>在这里可以和大家聊天哦</p>
-                </div>
+                <div class="system-message"><span>欢迎来到 TuoTuo 的次元聊天室</span></div>
             </div>
-            <div class="chat-input-area">
-                <textarea class="chat-input" id="chat-input" placeholder="说点什么吧..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
-                <button class="chat-send-btn" onclick="sendMessage()">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-                    </svg>
-                </button>
+
+            <div id="emoji-picker" class="emoji-picker">
+                <div class="emoji-item" onclick="insertEmoji('😊')">😊</div>
+                <div class="emoji-item" onclick="insertEmoji('😂')">😂</div>
+                <div class="emoji-item" onclick="insertEmoji('🥰')">🥰</div>
+                <div class="emoji-item" onclick="insertEmoji('😍')">😍</div>
+                <div class="emoji-item" onclick="insertEmoji('😎')">😎</div>
+                <div class="emoji-item" onclick="insertEmoji('😭')">😭</div>
+                <div class="emoji-item" onclick="insertEmoji('🥺')">🥺</div>
+                <div class="emoji-item" onclick="insertEmoji('✨')">✨</div>
+                <div class="emoji-item" onclick="insertEmoji('❤️')">❤️</div>
+                <div class="emoji-item" onclick="insertEmoji('🎉')">🎉</div>
+                <div class="emoji-item" onclick="insertEmoji('🎁')">🎁</div>
+                <div class="emoji-item" onclick="insertEmoji('🐱')">🐱</div>
+            </div>
+
+            <div class="chat-bottom-wrapper">
+                <div class="chat-toolbar">
+                    <button class="tool-btn" onclick="toggleEmojiPicker()" title="表情">😀</button>
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <button class="tool-btn" onclick="document.getElementById('image-upload').click()" title="发送图片">🖼️</button>
+                </div>
+                <div class="chat-input-area">
+                    <textarea class="chat-input" id="chat-input" placeholder="说点什么吧..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
+                    <button class="chat-send-btn" onclick="sendTextMessage()">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
         <div class="chat-login-overlay" id="chat-login-overlay">
             <div class="chat-login-box">
-                <div class="bunny-header">
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M8 6C8 3 9.5 1 11 1" stroke="#FF69B4" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M16 6C16 3 14.5 1 13 1" stroke="#FF69B4" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="12" cy="13" r="8" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>
-                        <circle cx="9.5" cy="12" r="1.5" fill="#333"/>
-                        <circle cx="14.5" cy="12" r="1.5" fill="#333"/>
-                        <ellipse cx="12" cy="15" rx="2" ry="1.2" fill="#FF69B4"/>
-                        <path d="M9 17Q12 20 15 17" stroke="#FF69B4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <circle cx="7" cy="14" r="1.5" fill="#FF69B4" opacity="0.5"/>
-                        <circle cx="17" cy="14" r="1.5" fill="#FF69B4" opacity="0.5"/>
-                    </svg>
+                <h3>选择你的专属形象</h3>
+                <div class="avatar-selection" id="avatar-selection">
+                    <div class="avatar-option selected" onclick="selectAvatar(this, '🐰')">🐰</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🐱')">🐱</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🐶')">🐶</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🐻')">🐻</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🦊')">🦊</div>
                 </div>
-                <h3>🐰 加入聊天</h3>
-                <input type="text" class="chat-login-input" id="nickname-input" placeholder="给自己起个昵称吧~" maxlength="10" onkeydown="handleLoginKey(event)">
-                <button class="chat-login-btn" onclick="enterChat()">开始聊天 ✨</button>
+                <input type="text" class="chat-login-input" id="nickname-input" placeholder="给自己起个好听的名字~" maxlength="10" onkeydown="handleLoginKey(event)">
+                <button class="chat-login-btn" onclick="enterChat()">进入房间 ✨</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============ 照片轮播与状态控制 ============
-        const albums = {
-            22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'],
-            21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'],
-            20: ['20-1.webp', '20-2.webp'],
-            19: ['19-1.webp']
-        };
-        let currentAge = 22; 
-        let currentImages = albums[currentAge]; 
-        let idx = 0; 
-        
-        const c1 = document.getElementById('img1'), c2 = document.getElementById('img2');
-        const dotsContainer = document.getElementById('dynamic-dots');
+        // ============ 轮播图逻辑 (保留原样) ============
+        const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
+        let currentAge = 22, currentImages = albums[currentAge], idx = 0; 
+        const c1 = document.getElementById('img1'), c2 = document.getElementById('img2'), dotsContainer = document.getElementById('dynamic-dots');
         let cur = c1, nxt = c2, slideTimer;
 
         function renderDots() {
             dotsContainer.innerHTML = '';
-            if (currentImages.length <= 1) {
-                dotsContainer.style.display = 'none';
-            } else {
+            if (currentImages.length > 1) {
                 dotsContainer.style.display = 'flex';
                 for (let i = 0; i < currentImages.length; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-                    dot.onclick = () => goTo(i);
-                    dotsContainer.appendChild(dot);
+                    const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goTo(i); dotsContainer.appendChild(dot);
                 }
-            }
+            } else dotsContainer.style.display = 'none';
         }
 
-        function updateDots(activeIdx) { 
-            const dots = document.querySelectorAll('.dot');
-            if(dots.length > 0) {
-                dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
-            }
-        }
-
-        function switchAge(age) {
-            if(currentAge === age) return;
-            currentAge = age; 
-            currentImages = albums[age];
-            document.querySelectorAll('.age-btn').forEach(btn => { btn.classList.toggle('active', parseInt(btn.dataset.age) === age); });
-            
-            clearInterval(slideTimer); 
-            idx = 0; 
-            renderDots();
-            sw();
-            if(currentImages.length > 1) {
-                slideTimer = setInterval(sw, 6000);
-            }
-        }
-
-        function sw() { 
-            nxt.style.backgroundImage = `url('${currentImages[idx]}')`;
-            cur.style.opacity = 0; nxt.style.opacity = 1; 
-            updateDots(idx); 
-            setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200);
-            if(currentImages.length > 1) {
-                idx = (idx + 1) % currentImages.length;
-            }
-        }
-        
-        function goTo(n) { 
-            clearInterval(slideTimer);
-            idx = n; sw(); 
-            if(currentImages.length > 1) {
-                slideTimer = setInterval(sw, 6000);
-            }
-        }
-        
-        window.onload = function() { 
-            renderDots();
-            sw();
-            if(currentImages.length > 1) {
-                slideTimer = setInterval(sw, 6000);
-            }
-        };
+        function updateDots(activeIdx) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === activeIdx)); }
+        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(btn => { btn.classList.toggle('active', parseInt(btn.dataset.age) === age); }); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
+        function sw() { nxt.style.backgroundImage = `url('${currentImages[idx]}')`; cur.style.opacity = 0; nxt.style.opacity = 1; updateDots(idx); setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200); if(currentImages.length > 1) idx = (idx + 1) % currentImages.length; }
+        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
+        window.onload = function() { renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); };
         
         const bgm = document.getElementById('bgm'), p = document.getElementById('play-btn');
         p.onclick = () => { if(bgm.paused){ bgm.play(); p.innerText = '⏸'; } else { bgm.pause(); p.innerText = '▶'; } };
 
-        const isMobile = window.matchMedia("(max-width: 768px)").matches;
-        if (!isMobile) {
-            document.addEventListener('mousemove', function(e) {
-                if (Math.random() < 0.15) { 
-                    const heart = document.createElement('div'); heart.className = 'heart-trail';
-                    const s = Math.random() * 10 + 10; heart.style.width = s + 'px'; heart.style.height = s + 'px';
-                    heart.style.left = (e.pageX - s/2) + 'px'; heart.style.top = (e.pageY - s/2) + 'px';
-                    heart.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    document.body.appendChild(heart); setTimeout(() => heart.remove(), 1200);
-                }
-            });
-        }
 
-        // ============ 可爱聊天功能逻辑 ============
+        // ============ 增强版聊天功能逻辑 ============
+        // ⚠️ 请确保这里是你自己的 Azure 域名
+        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', wsPort: '', reconnectInterval: 3000 };
         
-        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', 
-    // 2. Azure 自动处理端口，这里留空字符串即可
-    wsPort: '', 
-    reconnectInterval: 3000 };
         let chatSocket = null;
         let chatNickname = sessionStorage.getItem('chat_nickname') || '';
+        let chatAvatar = sessionStorage.getItem('chat_avatar') || '🐰'; // 新增：保存头像
         let unreadCount = 0;
         let isChatWindowOpen = false;
-        let reconnectTimer = null;
 
-        const chatBubbleBtn = document.getElementById('chat-bubble-btn');
-        const chatWindow = document.getElementById('chat-window');
-        const chatMessagesEl = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatLoginOverlay = document.getElementById('chat-login-overlay');
-        const nicknameInput = document.getElementById('nickname-input');
-        const onlineCountEl = document.getElementById('online-count');
+        const chatBubbleBtn = document.getElementById('chat-bubble-btn'), chatWindow = document.getElementById('chat-window');
+        const chatMessagesEl = document.getElementById('chat-messages'), chatInput = document.getElementById('chat-input');
+        const chatLoginOverlay = document.getElementById('chat-login-overlay'), nicknameInput = document.getElementById('nickname-input');
+        const onlineCountEl = document.getElementById('online-count'), emojiPicker = document.getElementById('emoji-picker');
 
-        // 控制窗口开关的核心函数
+        // 1. 登录功能增强 (选头像)
+        let selectedAvatar = '🐰';
+        function selectAvatar(element, icon) {
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAvatar = icon;
+        }
+
+        function enterChat() {
+            const nickname = nicknameInput.value.trim();
+            if (!nickname) { nicknameInput.style.borderColor = '#FF4757'; setTimeout(() => nicknameInput.style.borderColor = '#FFE4E9', 1000); return; }
+            if (nickname.length > 10) { alert('昵称太长啦~'); return; }
+
+            chatNickname = nickname;
+            chatAvatar = selectedAvatar;
+            sessionStorage.setItem('chat_nickname', chatNickname);
+            sessionStorage.setItem('chat_avatar', chatAvatar);
+            
+            chatLoginOverlay.classList.remove('show');
+            openChat();
+        }
+
         function toggleChat(e) {
-            if (e) e.stopPropagation(); // 阻止点击事件向上冒泡
-            
-            const isHidden = !chatWindow.classList.contains('show');
-            
-            if (isHidden) {
-                if (!chatNickname) {
-                    chatLoginOverlay.classList.add('show');
-                    nicknameInput.focus();
-                    return;
-                }
-                
-                chatWindow.classList.add('show');
-                chatBubbleBtn.classList.add('active');
-                isChatWindowOpen = true;
-                
-                if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-                    connectWebSocket();
-                }
-                
-                unreadCount = 0;
-                updateBadge();
-                scrollToBottom();
+            if (e) e.stopPropagation();
+            if (!chatWindow.classList.contains('show')) {
+                if (!chatNickname) { chatLoginOverlay.classList.add('show'); nicknameInput.focus(); return; }
+                openChat();
             } else {
                 chatWindow.classList.remove('show');
                 chatBubbleBtn.classList.remove('active');
                 isChatWindowOpen = false;
+                emojiPicker.classList.remove('show');
             }
         }
 
-        function connectWebSocket() {
-            if (typeof WebSocket === 'undefined') {
-                addSystemMessage('您的浏览器不支持 WebSocket'); 
-                return;
-            }
+        function openChat() {
+            chatWindow.classList.add('show');
+            chatBubbleBtn.classList.add('active');
+            isChatWindowOpen = true;
+            unreadCount = 0; updateBadge();
+            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) connectWebSocket();
+            setTimeout(scrollToBottom, 100);
+        }
 
+        // 2. 表情包功能
+        function toggleEmojiPicker() { emojiPicker.classList.toggle('show'); }
+        function insertEmoji(emoji) {
+            chatInput.value += emoji;
+            emojiPicker.classList.remove('show');
+            chatInput.focus();
+        }
+
+        // 3. 图片发送功能 (核心：前端智能压缩 Base64)
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // 提示用户正在处理
+            addSystemMessage('正在发送图片...');
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    // 核心压缩逻辑：限制图片最大宽度为 300 像素，防止撑爆服务器 JSON 文件
+                    const MAX_WIDTH = 300; 
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.floor(height * (MAX_WIDTH / width));
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 压缩为 JPEG 格式，质量 0.8
+                    const base64Data = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // 调用发送中心
+                    sendWsPayload({ type: 'image', content: base64Data });
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+            e.target.value = ''; // 清空选择
+        }
+
+        // 4. WebSocket 核心连接与解析
+        function connectWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-            
-            // 【修复1：使用 encodeURIComponent 转码中文昵称，防止连接崩溃】
             const socketUrl = `${protocol}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(chatNickname)}`;
-            
             chatSocket = new WebSocket(socketUrl);
 
-            chatSocket.onopen = () => { 
-                addSystemMessage('已连接到聊天服务器'); 
-                stopReconnect(); 
-            };
-
-            // 【修复2：适配后端最新的高级数据格式】
+            chatSocket.onopen = () => addSystemMessage('已连接到聊天服务器');
             chatSocket.onmessage = (event) => {
                 try {
                     const res = JSON.parse(event.data);
-                    
-                    if (res.type === 'history') {
-                        // 批量加载历史记录
-                        res.data.forEach(item => addChatMessage(item));
-                    } 
-                    else if (res.type === 'userlist') {
-                        // 更新在线人数
-                        onlineCountEl.textContent = res.data.length;
-                    } 
+                    if (res.type === 'history') res.data.forEach(item => addChatMessage(item));
+                    else if (res.type === 'userlist') onlineCountEl.textContent = res.data.length;
                     else if (res.type === 'message') {
-                        // 收到新消息
                         addChatMessage(res);
-                        if (!isChatWindowOpen && res.name !== chatNickname) {
-                            unreadCount++; 
-                            updateBadge();
-                        }
+                        if (!isChatWindowOpen && res.name !== chatNickname) { unreadCount++; updateBadge(); }
                     }
-                } catch (e) {
-                    console.error("消息解析错误", e);
-                }
+                } catch (e) { console.error(e); }
             };
-
-            chatSocket.onclose = () => { 
-                addSystemMessage('连接已断开，正在重连...'); 
-                startReconnect(); 
-            };
-            
-            chatSocket.onerror = () => { 
-                addSystemMessage('连接出错，请检查服务器是否启动'); 
-            };
+            chatSocket.onclose = () => { addSystemMessage('断开了...尝试重连'); setTimeout(connectWebSocket, 3000); };
         }
 
-        function startReconnect() {
-            if (reconnectTimer) return;
-            reconnectTimer = setInterval(() => {
-                if (chatNickname && (!chatSocket || chatSocket.readyState === WebSocket.CLOSED)) connectWebSocket();
-            }, CHAT_CONFIG.reconnectInterval);
+        // 5. 统一消息发送模块
+        function sendTextMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            sendWsPayload({ type: 'text', content: msg });
+            chatInput.value = ''; autoResize(chatInput);
+            emojiPicker.classList.remove('show');
         }
 
-        function stopReconnect() {
-            if (reconnectTimer) { clearInterval(reconnectTimer); reconnectTimer = null; }
+        function sendWsPayload(payload) {
+            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+                addSystemMessage('连接不可用，请稍后再试'); return;
+            }
+            const message = {
+                name: chatNickname,
+                avatar: chatAvatar, // 携带自定义头像
+                time: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
+                msgType: payload.type, // 'text' 或 'image'
+                msg: payload.content
+            };
+            chatSocket.send(JSON.stringify(message));
         }
 
+        // 6. UI 渲染增强
         function addChatMessage(data) {
             const isMe = data.name === chatNickname;
+            const displayAvatar = data.avatar || '🐰'; // 兼容旧数据
+            
+            // 判断是渲染文字还是渲染图片
+            let contentHtml = '';
+            if (data.msgType === 'image') {
+                contentHtml = `<img src="${data.msg}" class="message-image" alt="图片">`;
+            } else {
+                contentHtml = `<div class="message-bubble">${escapeHtml(data.msg)}</div>`;
+            }
+
             const messageHtml = `
                 <div class="message-item ${isMe ? 'right' : ''}">
-                    <div class="message-avatar ${isMe ? 'right' : ''}">
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="10" r="5" fill="white"/>
-                            <path d="M10 7C10 5 10.5 4 11 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M14 7C14 5 13.5 4 13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                    </div>
+                    <div class="message-avatar">${displayAvatar}</div>
                     <div class="message-content">
                         <div class="message-name">${escapeHtml(data.name)}</div>
-                        <div class="message-bubble">${escapeHtml(data.msg)}</div>
+                        ${contentHtml}
                         <div class="message-time">${data.time || ''}</div>
                     </div>
                 </div>
             `;
-            const welcome = chatMessagesEl.querySelector('.welcome-message');
-            if (welcome) welcome.remove();
             chatMessagesEl.insertAdjacentHTML('beforeend', messageHtml);
             scrollToBottom();
         }
@@ -479,77 +417,22 @@
         }
 
         function scrollToBottom() { chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div'); div.textContent = text; return div.innerHTML;
-        }
-
-        function sendMessage() {
-            const msg = chatInput.value.trim();
-            if (!msg || !chatNickname) return;
-
-            const message = { name: chatNickname, time: formatTime(new Date()), msg: msg };
-            if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-                chatSocket.send(JSON.stringify(message));
-                chatInput.value = ''; chatInput.style.height = 'auto';
-            } else {
-                addSystemMessage('连接不可用，请刷新重试');
-            }
-        }
-
-        function formatTime(date) {
-            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-        }
-
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 80) + 'px'; }
-
-        function handleInputKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-        }
+        function handleInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } }
+        function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
 
         function updateBadge() {
             let badge = chatBubbleBtn.querySelector('.msg-badge');
             if (unreadCount > 0) {
-                if (!badge) {
-                    badge = document.createElement('div'); badge.className = 'msg-badge';
-                    chatBubbleBtn.appendChild(badge);
-                }
+                if (!badge) { badge = document.createElement('div'); badge.className = 'msg-badge'; chatBubbleBtn.appendChild(badge); }
                 badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
             } else if (badge) badge.remove();
         }
 
-        function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
-
-        function enterChat() {
-            const nickname = nicknameInput.value.trim();
-            if (!nickname) {
-                nicknameInput.style.borderColor = '#FF4757';
-                setTimeout(() => { nicknameInput.style.borderColor = '#FFE4E9'; }, 1000);
-                return;
-            }
-            if (nickname.length > 10) { alert('昵称最多10个字符哦~'); return; }
-
-            chatNickname = nickname;
-            sessionStorage.setItem('chat_nickname', chatNickname);
-            chatLoginOverlay.classList.remove('show');
-            
-            chatWindow.classList.add('show');
-            chatBubbleBtn.classList.add('active');
-            isChatWindowOpen = true;
-            connectWebSocket();
-            chatInput.focus();
-        }
-
-        // 全局点击事件优化
         document.addEventListener('click', (e) => {
-            if (chatLoginOverlay.classList.contains('show') &&
-                !e.target.closest('.chat-login-box') &&
-                !chatBubbleBtn.contains(e.target)) {
-                chatLoginOverlay.classList.remove('show');
-            }
+            if (chatLoginOverlay.classList.contains('show') && !e.target.closest('.chat-login-box')) chatLoginOverlay.classList.remove('show');
         });
-
-        window.addEventListener('beforeunload', () => { if (chatSocket) chatSocket.close(); });
     </script>
 </body>
 </html>
