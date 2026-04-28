@@ -335,7 +335,10 @@
 
         // ============ 可爱聊天功能逻辑 ============
         
-        const CHAT_CONFIG = { wsHost: 'localhost', wsPort: '8888', reconnectInterval: 3000 };
+        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', 
+    // 2. Azure 自动处理端口，这里留空字符串即可
+    wsPort: '', 
+    reconnectInterval: 3000 };
         let chatSocket = null;
         let chatNickname = sessionStorage.getItem('chat_nickname') || '';
         let unreadCount = 0;
