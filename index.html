@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TuoTuo's Dimension</title>
+    <title>Talk with TuoTuo</title>
     <link rel="icon" href="logo.png?v=2" type="image/png">
     
     <style>
@@ -36,7 +36,6 @@
         .star-wish:hover { transform: scale(2.5); z-index: 100; }
         @keyframes star-twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
         
-        /* 星星提示框 */
         .star-tooltip {
             position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
@@ -46,7 +45,6 @@
         }
         .star-wish:hover .star-tooltip { opacity: 1; visibility: visible; bottom: 20px; }
 
-        /* 星空许愿按钮 */
         .star-trigger-btn {
             position: absolute; bottom: 30px; left: 270px; z-index: 100;
             width: 45px; height: 45px; border-radius: 50%; background: rgba(255, 255, 255, 0.4);
@@ -56,7 +54,6 @@
         }
         .star-trigger-btn:hover { transform: scale(1.1); background: white; }
 
-        /* 许愿弹窗 */
         .wish-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);
@@ -68,7 +65,17 @@
         }
         .wish-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; margin: 15px 0; outline: none; resize: none; font-family: inherit; }
 
-        /* 原有 UI 样式 */
+        /* ============ 新增：星空专属名字弹窗 ============ */
+        .star-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .star-login-overlay.show { display: flex; }
+        .star-login-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3); animation: login-appear 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+        .star-login-input { width: 100%; padding: 12px; border: 1px solid rgba(255, 215, 0, 0.5); border-radius: 15px; text-align: center; margin-bottom: 20px; font-size: 15px; outline: none; transition: 0.2s; background: rgba(255,255,255,0.8); color: #333; }
+        .star-login-input:focus { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.4); background: #fff; }
+        .star-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,215,0,0.3); }
+        .star-login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
+
+
+        /* ============ 原有 UI 样式 ============ */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
         .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s ease; }
         .age-btn:hover { background: rgba(255, 255, 255, 0.3); color: #fff; }
@@ -96,7 +103,7 @@
             .age-btn { padding: 4px 12px; font-size: 13px; }
             .chat-bubble-btn { bottom: 25px; right: 20px; width: 50px; height: 50px; }
             .chat-window { width: 90vw !important; height: 75vh !important; right: 5vw !important; bottom: 85px !important; }
-            .star-trigger-btn { left: auto; right: 80px; bottom: 25px; } 
+            .star-trigger-btn { left: auto; right: 80px; bottom: 25px; }
         }
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
@@ -157,6 +164,14 @@
                 <button class="chat-login-btn" onclick="sendStarWish()">放飞心愿</button>
             </div>
         </div>
+
+        <div class="star-login-overlay" id="star-login-overlay">
+            <div class="star-login-box">
+                <h3 style="color:#FFD700; margin-bottom:20px;">✨ 留下你的署名</h3>
+                <input type="text" id="star-nickname-input" class="star-login-input" placeholder="输入你的名字..." maxlength="10" onkeydown="if(event.key==='Enter') enterStarName()">
+                <button class="star-login-btn" onclick="enterStarName()">下一步</button>
+            </div>
+        </div>
         
         <div class="age-selector">
             <div class="age-btn active" data-age="22" onclick="switchAge(22)">22</div>
@@ -193,7 +208,7 @@
         <div class="chat-window" id="chat-window">
             <div class="chat-header">
                 <div class="chat-header-info">
-                    <h3>TuoTuo's Chat Room</h3>
+                    <h3>Talk with TuoTuo</h3>
                     <span class="online-count"><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
                 </div>
                 <button class="chat-header-close" onclick="toggleChat(event)">
@@ -240,9 +255,8 @@
         // --- 核心配置 ---
         const CHAT_CONFIG = { wsHost: 'chat.tuotuo.love', reconnectInterval: 3000 };
         let chatSocket = null, chatNickname = sessionStorage.getItem('chat_nickname') || '';
-        let chatAvatar = sessionStorage.getItem('chat_avatar') || '🐰', unreadCount = 0, isChatWindowOpen = false;
+        let chatAvatar = sessionStorage.getItem('chat_avatar') || '', unreadCount = 0, isChatWindowOpen = false;
         const badge = document.getElementById('msg-badge'), messagesEl = document.getElementById('chat-messages');
-        let pendingAction = null; // 新增：记忆当前想打开的窗口功能
 
         // --- 音乐控制 ---
         const playlist = [
@@ -259,8 +273,13 @@
         function prevSong() { currentSongIdx = (currentSongIdx - 1 + playlist.length) % playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause; }
         bgm.addEventListener('ended', nextSong); loadSong(currentSongIdx);
 
-        // --- 聊天连接 ---
+        // --- 聊天连接核心（修复断线Bug） ---
         function connectWebSocket() {
+            // 如果还没名字，绝对不去乱连接
+            if (!chatNickname) return; 
+            // 如果已经在连接中或者已经连上了，就不重复连
+            if (chatSocket && (chatSocket.readyState === WebSocket.CONNECTING || chatSocket.readyState === WebSocket.OPEN)) return;
+            
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
             chatSocket = new WebSocket(`${protocol}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(chatNickname)}`);
             chatSocket.onmessage = (event) => {
@@ -274,15 +293,29 @@
             };
         }
 
-        // --- 星空愿望核心逻辑 ---
+        // --- 星空愿望逻辑 ---
         function toggleWishModal() {
             if(!chatNickname) { 
-                pendingAction = 'star'; // 记住当前动作是：打开星星留言框
-                document.getElementById('chat-login-overlay').classList.add('show'); 
+                // 没有名字时，呼叫全新的星空专属弹窗
+                document.getElementById('star-login-overlay').classList.add('show'); 
                 return; 
             }
             const m = document.getElementById('wish-modal');
             m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enterStarName() {
+            const n = document.getElementById('star-nickname-input').value.trim();
+            if(n) {
+                chatNickname = n;
+                sessionStorage.setItem('chat_nickname', n);
+                // 默认给星空许愿的玩家一个闪耀的星星做临时头像
+                if(!chatAvatar) { chatAvatar = '✨'; sessionStorage.setItem('chat_avatar', chatAvatar); }
+                
+                document.getElementById('star-login-overlay').classList.remove('show');
+                connectWebSocket(); 
+                toggleWishModal(); // 弹出许愿框
+            }
         }
 
         function sendStarWish() {
@@ -290,11 +323,21 @@
             const content = input.value.trim();
             if(!content) return;
             const payload = { name: chatNickname, avatar: chatAvatar, msgType: 'star', msg: content };
+            
+            // 安全检查：如果没连上，赶紧重新连
+            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN && chatSocket.readyState !== WebSocket.CONNECTING) {
+                connectWebSocket();
+            }
+
             if(chatSocket?.readyState === WebSocket.OPEN) {
                 chatSocket.send(JSON.stringify(payload));
                 input.value = '';
                 toggleWishModal();
-            } else { alert("正在连接服务器，请稍候..."); }
+            } else if (chatSocket?.readyState === WebSocket.CONNECTING) {
+                alert("星星正在连接夜空，请等一秒钟再试哦~");
+            } else { 
+                alert("网络好像开小差了，正在重新连接..."); 
+            }
         }
 
         function addStar(data) {
@@ -308,26 +351,12 @@
             setTimeout(() => star.remove(), 300000);
         }
 
-        // --- 其他原有逻辑 ---
-        const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
-        const emojiPicker = document.getElementById('emoji-picker');
-        emojiList.forEach(e => { const s = document.createElement('span'); s.style.cursor='pointer'; s.style.fontSize='20px'; s.innerText=e; s.onclick=()=>insertEmoji(e); emojiPicker.appendChild(s); });
-
-        const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
-        let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
-        function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
-        function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
-        function sw() { nxt.style.backgroundImage = `url('${currentImages[idx]}')`; cur.style.opacity = 0; nxt.style.opacity = 1; updateDots(idx); setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200); if(currentImages.length > 1) idx = (idx+1)%currentImages.length; }
-        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
-        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
-        window.onload = () => { renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); connectWebSocket(); };
-
+        // --- 聊天室逻辑 ---
         function toggleChat(e) { 
             if (e) e.stopPropagation(); 
             const win = document.getElementById('chat-window'); 
             if (!win.classList.contains('show')) { 
                 if (!chatNickname) { 
-                    pendingAction = 'chat'; // 记住当前动作是：打开聊天窗
                     document.getElementById('chat-login-overlay').classList.add('show'); 
                     return; 
                 } 
@@ -343,37 +372,55 @@
             } 
         }
 
-        function updateBadgeDisplay() { if (unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount > 99 ? '99+' : unreadCount; } else { badge.style.display = 'none'; } }
-        function insertEmoji(e) { document.getElementById('chat-input').value += e; document.getElementById('emoji-picker').style.display='none'; }
-        function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
-        function selAv(el, icon) { document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); chatAvatar = icon; }
-        
         function enterChat() { 
             const n = document.getElementById('nickname-input').value.trim(); 
             if(n) { 
                 chatNickname = n; 
                 sessionStorage.setItem('chat_nickname', n); 
-                sessionStorage.setItem('chat_avatar', chatAvatar); 
+                sessionStorage.setItem('chat_avatar', chatAvatar || '🐰'); // 默认防错
                 document.getElementById('chat-login-overlay').classList.remove('show'); 
-                if(!chatSocket) connectWebSocket(); 
-
-                // 核心修复：根据点击的按钮来源，智能弹窗
-                if (pendingAction === 'star') {
-                    toggleWishModal();
-                } else {
-                    toggleChat(); 
-                }
-                pendingAction = null; // 执行完毕后清空记忆
+                connectWebSocket(); 
+                toggleChat(); 
             } 
         }
 
+        function selAv(el, icon) { document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); chatAvatar = icon; }
+
+        // --- 初始化与其他原功能 ---
+        const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
+        const emojiPicker = document.getElementById('emoji-picker');
+        emojiList.forEach(e => { const s = document.createElement('span'); s.style.cursor='pointer'; s.style.fontSize='20px'; s.innerText=e; s.onclick=()=>insertEmoji(e); emojiPicker.appendChild(s); });
+
+        const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
+        let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
+        function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
+        function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
+        function sw() { nxt.style.backgroundImage = `url('${currentImages[idx]}')`; cur.style.opacity = 0; nxt.style.opacity = 1; updateDots(idx); setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200); if(currentImages.length > 1) idx = (idx+1)%currentImages.length; }
+        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
+        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
+        
+        window.onload = () => { 
+            renderDots(); sw(); 
+            if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); 
+            // 修复关键：只有以前留过名字的人，页面加载时才去连接网络！
+            if(chatNickname) connectWebSocket(); 
+        };
+
+        function updateBadgeDisplay() { if (unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount > 99 ? '99+' : unreadCount; } else { badge.style.display = 'none'; } }
+        function insertEmoji(e) { document.getElementById('chat-input').value += e; document.getElementById('emoji-picker').style.display='none'; }
+        function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
         function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
         function handleInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } }
         function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
         function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         function openFull(src) { const v = document.getElementById('image-viewer'); document.getElementById('full-image').src = src; v.style.display = 'flex'; }
+        
         function sendTextMessage() { const i = document.getElementById('chat-input'); if(i.value.trim()){ sendPayload({ type: 'text', content: i.value }); i.value = ''; i.style.height = 'auto'; } }
-        function sendPayload(p) { const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; if(chatSocket?.readyState === WebSocket.OPEN) chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content })); }
+        function sendPayload(p) { 
+            const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; 
+            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN && chatSocket.readyState !== WebSocket.CONNECTING) connectWebSocket();
+            if(chatSocket?.readyState === WebSocket.OPEN) chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content })); 
+        }
         function addChatMessage(data) { const isMe = data.name === chatNickname; const safeName = escapeHtml(data.name); const content = data.msgType === 'image' ? `<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">` : `<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const timeHtml = data.time ? `<div style="font-size:10px; color:#bbb; margin-top:4px; padding:0 4px; text-align:${isMe?'right':'left'};">${escapeHtml(data.time)}</div>` : ''; const html = `<div class="message-item ${isMe ? 'right' : ''}"><div class="message-avatar">${data.avatar || '🐰'}</div><div class="message-content"><div class="message-name">${safeName}</div>${content}${timeHtml}</div></div>`; messagesEl.insertAdjacentHTML('beforeend', html); messagesEl.scrollTop = messagesEl.scrollHeight; }
 
         function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if (w > MAX) { h *= (MAX/w); w = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); sendPayload({ type: 'image', content: canvas.toDataURL('image/jpeg', 0.9) }); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }
