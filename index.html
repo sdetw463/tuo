@@ -348,7 +348,7 @@
             star.style.top = (Math.random() * 60 + 5) + '%';
             star.innerHTML = `<div class="star-tooltip"><b>${escapeHtml(data.name)}:</b> ${escapeHtml(data.msg)}</div>`;
             field.appendChild(star);
-            setTimeout(() => star.remove(), 300000);
+            // setTimeout(() => star.remove(), 300000);
         }
 
         // --- 聊天室逻辑 ---
