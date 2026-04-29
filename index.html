@@ -152,16 +152,16 @@
 
         <div id="star-field"></div>
 
-        <div class="star-trigger-btn" onclick="toggleWishModal()" title="在星空中留下你的足迹">
+        <div class="star-trigger-btn" onclick="toggleWishModal()" title="留下你想说的话">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
         </div>
 
         <div class="wish-modal" id="wish-modal" onclick="event.target===this && toggleWishModal()">
             <div class="wish-box">
                 <h3 style="color:#FFB6C1;">✨ 星空寄语</h3>
-                <p style="font-size:12px; color:#999; margin-top:5px;">你的愿望将化作繁星闪烁在 TuoTuo 的星空</p>
+                <p style="font-size:12px; color:#999; margin-top:5px;">Your words will be shining in the dimension~</p>
                 <textarea id="wish-input" class="wish-input" placeholder="输入你想说的话..." rows="3" maxlength="30"></textarea>
-                <button class="chat-login-btn" onclick="sendStarWish()">放飞心愿</button>
+                <button class="chat-login-btn" onclick="sendStarWish()">Send it out</button>
             </div>
         </div>
 
