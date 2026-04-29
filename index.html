@@ -96,7 +96,7 @@
             .age-btn { padding: 4px 12px; font-size: 13px; }
             .chat-bubble-btn { bottom: 25px; right: 20px; width: 50px; height: 50px; }
             .chat-window { width: 90vw !important; height: 75vh !important; right: 5vw !important; bottom: 85px !important; }
-            .star-trigger-btn { left: auto; right: 80px; bottom: 25px; } /* 手机端挪动位置 */
+            .star-trigger-btn { left: auto; right: 80px; bottom: 25px; } 
         }
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
@@ -242,6 +242,7 @@
         let chatSocket = null, chatNickname = sessionStorage.getItem('chat_nickname') || '';
         let chatAvatar = sessionStorage.getItem('chat_avatar') || '🐰', unreadCount = 0, isChatWindowOpen = false;
         const badge = document.getElementById('msg-badge'), messagesEl = document.getElementById('chat-messages');
+        let pendingAction = null; // 新增：记忆当前想打开的窗口功能
 
         // --- 音乐控制 ---
         const playlist = [
@@ -275,7 +276,11 @@
 
         // --- 星空愿望核心逻辑 ---
         function toggleWishModal() {
-            if(!chatNickname) { document.getElementById('chat-login-overlay').classList.add('show'); return; }
+            if(!chatNickname) { 
+                pendingAction = 'star'; // 记住当前动作是：打开星星留言框
+                document.getElementById('chat-login-overlay').classList.add('show'); 
+                return; 
+            }
             const m = document.getElementById('wish-modal');
             m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
@@ -296,15 +301,10 @@
             const field = document.getElementById('star-field');
             const star = document.createElement('div');
             star.className = 'star-wish';
-            // 随机位置 (避开底部 UI 区域)
             star.style.left = (Math.random() * 90 + 5) + '%';
             star.style.top = (Math.random() * 60 + 5) + '%';
-            
-            // 内容气泡
             star.innerHTML = `<div class="star-tooltip"><b>${escapeHtml(data.name)}:</b> ${escapeHtml(data.msg)}</div>`;
             field.appendChild(star);
-
-            // 自动清理旧星星，保持星空整洁 (可选，此处设置存活时间 5 分钟)
             setTimeout(() => star.remove(), 300000);
         }
 
@@ -322,12 +322,51 @@
         function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
         window.onload = () => { renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); connectWebSocket(); };
 
-        function toggleChat(e) { if (e) e.stopPropagation(); const win = document.getElementById('chat-window'); if (!win.classList.contains('show')) { if (!chatNickname) { document.getElementById('chat-login-overlay').classList.add('show'); return; } win.classList.add('show'); isChatWindowOpen = true; unreadCount = 0; updateBadgeDisplay(); setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 100); } else { win.classList.remove('show'); isChatWindowOpen = false; document.getElementById('emoji-picker').style.display='none'; } }
+        function toggleChat(e) { 
+            if (e) e.stopPropagation(); 
+            const win = document.getElementById('chat-window'); 
+            if (!win.classList.contains('show')) { 
+                if (!chatNickname) { 
+                    pendingAction = 'chat'; // 记住当前动作是：打开聊天窗
+                    document.getElementById('chat-login-overlay').classList.add('show'); 
+                    return; 
+                } 
+                win.classList.add('show'); 
+                isChatWindowOpen = true; 
+                unreadCount = 0; 
+                updateBadgeDisplay(); 
+                setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 100); 
+            } else { 
+                win.classList.remove('show'); 
+                isChatWindowOpen = false; 
+                document.getElementById('emoji-picker').style.display='none'; 
+            } 
+        }
+
         function updateBadgeDisplay() { if (unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount > 99 ? '99+' : unreadCount; } else { badge.style.display = 'none'; } }
         function insertEmoji(e) { document.getElementById('chat-input').value += e; document.getElementById('emoji-picker').style.display='none'; }
         function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
         function selAv(el, icon) { document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); chatAvatar = icon; }
-        function enterChat() { const n = document.getElementById('nickname-input').value.trim(); if(n) { chatNickname = n; sessionStorage.setItem('chat_nickname', n); sessionStorage.setItem('chat_avatar', chatAvatar); document.getElementById('chat-login-overlay').classList.remove('show'); if(!chatSocket) connectWebSocket(); toggleChat(); } }
+        
+        function enterChat() { 
+            const n = document.getElementById('nickname-input').value.trim(); 
+            if(n) { 
+                chatNickname = n; 
+                sessionStorage.setItem('chat_nickname', n); 
+                sessionStorage.setItem('chat_avatar', chatAvatar); 
+                document.getElementById('chat-login-overlay').classList.remove('show'); 
+                if(!chatSocket) connectWebSocket(); 
+
+                // 核心修复：根据点击的按钮来源，智能弹窗
+                if (pendingAction === 'star') {
+                    toggleWishModal();
+                } else {
+                    toggleChat(); 
+                }
+                pendingAction = null; // 执行完毕后清空记忆
+            } 
+        }
+
         function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
         function handleInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } }
         function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
@@ -339,7 +378,7 @@
 
         function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if (w > MAX) { h *= (MAX/w); w = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); sendPayload({ type: 'image', content: canvas.toDataURL('image/jpeg', 0.9) }); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }
 
-        // 鼠标特效与泡泡逻辑 (已保留)
+        // 鼠标特效与泡泡逻辑 
         const colors = ['#FF69B4', '#FFB6C1', '#FF1493', '#DB7093', '#FFA07A', '#FFD700', '#32CD32', '#00FFFF', '#1E90FF', '#9370DB', '#FF4500'];
         let lastTime = 0;
         document.addEventListener('mousemove', function(e) {
