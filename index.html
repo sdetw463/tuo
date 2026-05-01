@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TuoTuo's Dimension</title>
+    <title>Talk with TuoTuo</title>
     <link rel="icon" href="logo.png?v=2" type="image/png">
     
     <style>
@@ -114,7 +114,6 @@
         .album-close:hover { transform: scale(1.2); color: #FFB6C1; }
         .album-grid { flex: 1; overflow-y: auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; align-content: start; }
         
-        /* 自定义滚动条 */
         .album-grid::-webkit-scrollbar { width: 6px; }
         .album-grid::-webkit-scrollbar-thumb { background: rgba(255,182,193,0.8); border-radius: 10px; }
         
@@ -221,7 +220,7 @@
             <svg viewBox="0 0 24 24" width="24" height="24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
         </div>
 
-        <!-- ============ 新增：照片相册弹窗 ============ -->
+        <!-- 照片相册弹窗 -->
         <div class="album-modal" id="album-modal" onclick="if(event.target===this) closeAlbum()">
             <div class="album-container">
                 <div class="album-header">
@@ -261,11 +260,11 @@
         <div class="dots-container" id="dynamic-dots"></div>
         
         <div class="main-card">
-            <!-- ============ 新增：三大相册导航入口 ============ -->
+            <!-- 三大相册导航入口 -->
             <div class="album-nav">
-                <div class="album-nav-btn" onclick="openAlbum('album_food', '人间烟火')">美食</div>
-                <div class="album-nav-btn" onclick="openAlbum('album_scenery', '山川湖海')">美景</div>
-                <div class="album-nav-btn" onclick="openAlbum('album_portrait', '此刻最美')">美人</div>
+                <div class="album-nav-btn" onclick="openAlbum('album_food', '🍡 人间烟火')">🍡 烟火</div>
+                <div class="album-nav-btn" onclick="openAlbum('album_scenery', '🌄 山川湖海')">🌄 星野</div>
+                <div class="album-nav-btn" onclick="openAlbum('album_portrait', '🦋 岁月惊鸿')">🦋 惊鸿</div>
             </div>
 
             <h1>TuoTuo</h1>
@@ -362,18 +361,18 @@
         let unreadCount = 0, isChatWindowOpen = false;
         let reconnectTimer = null;
 
+        const albumData = { 'album_food': [], 'album_scenery': [], 'album_portrait': [] };
+        let currentOpenAlbumType = '';
+
         const badge = document.getElementById('msg-badge');
         const messagesEl = document.getElementById('chat-messages');
         const wsStatusEl = document.getElementById('ws-status');
         const wsStatusTextEl = document.getElementById('ws-status-text');
 
-        // ============ 新增：相册本地缓存存储器 ============
-        const albumData = { 'album_food': [], 'album_scenery': [], 'album_portrait': [] };
-        let currentOpenAlbumType = '';
-
         function getConnectName() { return chatNickname || ('guest_' + Math.random().toString(36).slice(2, 7)); }
         function setWsStatus(state, text) { wsStatusEl.className = state; wsStatusTextEl.textContent = text; }
 
+        // ============ 核心修复与黑科技合并 ============
         function connectWebSocket(isGuestConnect) {
             if (chatSocket && (chatSocket.readyState === WebSocket.CONNECTING || chatSocket.readyState === WebSocket.OPEN)) return;
             clearTimeout(reconnectTimer);
@@ -385,22 +384,39 @@
             chatSocket.onopen = () => {
                 setWsStatus('connected', '已连接');
                 setTimeout(() => { wsStatusEl.style.opacity = '0'; wsStatusEl.style.pointerEvents = 'none'; }, 3000);
+                
+                // 恢复排队发送逻辑
+                if (window.pendingStarWish) {
+                    chatSocket.send(window.pendingStarWish);
+                    window.pendingStarWish = null;
+                    document.getElementById('wish-input').value = '';
+                    const btn = document.getElementById('star-send-btn');
+                    if(btn) btn.innerText = "放飞心愿";
+                    toggleWishModal();
+                }
+                if (window.pendingChatMessage) {
+                    chatSocket.send(window.pendingChatMessage);
+                    window.pendingChatMessage = null;
+                }
+                if (window.pendingAlbumImage) {
+                    chatSocket.send(window.pendingAlbumImage);
+                    window.pendingAlbumImage = null;
+                }
             };
 
-            // 核心魔法修改：拦截后端发来的相册数据，分类装入相册列表中！
             chatSocket.onmessage = (event) => {
                 const res = JSON.parse(event.data);
                 if (res.type === 'history') {
                     res.data.forEach(m => { 
                         if (m.msgType === 'star') addStar(m); 
-                        else if (m.msgType && m.msgType.startsWith('album_')) addAlbumImage(m); // 识别相册照片
+                        else if (m.msgType && m.msgType.startsWith('album_')) addAlbumImage(m); 
                         else addChatMessage(m); 
                     });
                 } else if (res.type === 'userlist') {
                     document.getElementById('online-count').innerText = res.data.length;
                 } else if (res.type === 'message') {
                     if (res.msgType === 'star') addStar(res);
-                    else if (res.msgType && res.msgType.startsWith('album_')) addAlbumImage(res); // 识别最新照片
+                    else if (res.msgType && res.msgType.startsWith('album_')) addAlbumImage(res); 
                     else {
                         addChatMessage(res);
                         if (!isChatWindowOpen && res.name !== chatNickname) { unreadCount++; updateBadgeDisplay(); }
@@ -411,11 +427,13 @@
             chatSocket.onclose = () => {
                 setWsStatus('disconnected', '已断线，重连中...');
                 wsStatusEl.style.opacity = '1'; wsStatusEl.style.pointerEvents = 'auto';
-                reconnectTimer = setTimeout(() => connectWebSocket(false), CHAT_CONFIG.reconnectInterval);
+                const btn = document.getElementById('star-send-btn');
+                if(btn && btn.innerText !== "放飞心愿") btn.innerText = "放飞心愿";
+                reconnectTimer = setTimeout(() => connectWebSocket(isGuestConnect), CHAT_CONFIG.reconnectInterval);
             };
         }
 
-        // ============ 新增：相册前台交互逻辑 ============
+        // --- 相册前台交互逻辑 ---
         function openAlbum(type, title) {
             currentOpenAlbumType = type;
             document.getElementById('album-title').innerText = title;
@@ -432,14 +450,12 @@
             const grid = document.getElementById('album-grid');
             grid.innerHTML = '';
             
-            // 1. 每次渲染，永远在第一个位置保留“上传照片”的专属格子
             const uploadDiv = document.createElement('div');
             uploadDiv.className = 'album-item upload-card';
             uploadDiv.onclick = () => document.getElementById('album-file-input').click();
             uploadDiv.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span style="font-size:12px; color:white; font-weight:bold;">上传照片</span>`;
             grid.appendChild(uploadDiv);
 
-            // 2. 依次渲染对应相册的图片
             const images = albumData[currentOpenAlbumType] || [];
             images.forEach(img => {
                 const div = document.createElement('div');
@@ -450,18 +466,15 @@
             });
         }
 
-        // 接收到网络新照片时，将它压入对应的相册中（最新的永远在最前面）
         function addAlbumImage(data) {
             const type = data.msgType;
             if (!albumData[type]) albumData[type] = [];
-            // unshift 保证新上传的照片出现在第一位
             albumData[type].unshift({ src: data.msg, date: data.time || '刚刚' }); 
             if (currentOpenAlbumType === type) {
                 renderAlbumGrid();
             }
         }
 
-        // 上传与图片压缩逻辑
         function handleAlbumUpload(e) {
             const file = e.target.files[0]; 
             if (!file) return;
@@ -470,7 +483,7 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX = 1000; // 控制画质和体积
+                    const MAX = 1000; 
                     let w = img.width, h = img.height;
                     if (w > MAX || h > MAX) {
                         if (w > h) { h *= (MAX/w); w = MAX; } 
@@ -484,27 +497,22 @@
                 img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
-            e.target.value = ''; // 清空输入框以便重复上传
+            e.target.value = ''; 
         }
 
         function sendAlbumImage(base64) {
-            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
-                alert("网络不佳，相册通道未开启，请稍后再试哦~");
-                connectWebSocket(false);
-                return;
-            }
-            // 获取并生成上传当天的纯净日期（不需要人名）
             const t = new Date();
             const dateStr = `${t.getFullYear()}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getDate().toString().padStart(2,'0')}`;
-            
-            const payloadStr = JSON.stringify({ 
-                name: '', // 不留名
-                avatar: '',
-                time: dateStr, // 直接用时间字段装载日期标签
-                msgType: currentOpenAlbumType, 
-                msg: base64 
-            });
-            chatSocket.send(payloadStr);
+            const payloadStr = JSON.stringify({ name: '', avatar: '', time: dateStr, msgType: currentOpenAlbumType, msg: base64 });
+
+            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
+                window.pendingAlbumImage = payloadStr;
+                connectWebSocket(false);
+            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
+                window.pendingAlbumImage = payloadStr;
+            } else if (chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(payloadStr); 
+            }
         }
 
         const playlist = [
@@ -542,11 +550,26 @@
         function sendStarWish() {
             const input = document.getElementById('wish-input');
             const content = input.value.trim();
-            if (!content || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+            const btn = document.getElementById('star-send-btn');
+            if (!content) return;
+            
             const t = new Date();
             const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`;
-            chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: 'star', msg: content }));
-            input.value = ''; toggleWishModal();
+            const payload = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: 'star', msg: content });
+
+            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
+                window.pendingStarWish = payload;
+                if(btn) btn.innerText = "唤醒星空中...";
+                connectWebSocket(false);
+            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
+                window.pendingStarWish = payload;
+                if(btn) btn.innerText = "正在飞向星空...";
+            } else if (chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(payload);
+                input.value = ''; 
+                if(btn) btn.innerText = "放飞心愿";
+                toggleWishModal();
+            }
         }
 
         function getHashPos(str) {
@@ -639,7 +662,7 @@
         window.onload = () => { 
             renderDots(); sw(); 
             if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
-            // 这里至关重要：作为访客立刻建立静默网络连接，确保网页一打开相册图片和星星就加载出来
+            // 完美保留访客静默连接，全网同步
             connectWebSocket(true);
         };
 
@@ -651,12 +674,26 @@
         function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
         function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         
-        // 我们甚至直接复用了之前的放大镜功能，点相册图片也会放大
         function openFull(src) { const v = document.getElementById('image-viewer'); document.getElementById('full-image').src = src; v.style.display = 'flex'; }
         
         function sendTextMessage() { const i = document.getElementById('chat-input'); if(i.value.trim()){ sendPayload({ type: 'text', content: i.value }); i.value = ''; i.style.height = 'auto'; } }
-        function sendPayload(p) { if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) return; const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content })); }
+        
+        function sendPayload(p) { 
+            const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; 
+            const payloadStr = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content });
+            
+            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
+                window.pendingChatMessage = payloadStr;
+                connectWebSocket(false);
+            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
+                window.pendingChatMessage = payloadStr;
+            } else if (chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(payloadStr); 
+            }
+        }
+        
         function addChatMessage(data) { const isMe = data.name === chatNickname; const content = data.msgType === 'image' ? `<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">` : `<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const html = `<div class="message-item ${isMe ? 'right' : ''}"><div class="message-avatar">${data.avatar || '🐰'}</div><div class="message-content"><div class="message-name">${escapeHtml(data.name)}</div>${content}</div></div>`; messagesEl.insertAdjacentHTML('beforeend', html); messagesEl.scrollTop = messagesEl.scrollHeight; }
+
         function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if (w > MAX) { h *= (MAX/w); w = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); sendPayload({ type: 'image', content: canvas.toDataURL('image/jpeg', 0.9) }); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }
 
         const colors = ['#FF69B4', '#FFB6C1', '#FF1493', '#DB7093', '#FFA07A', '#FFD700', '#32CD32', '#00FFFF', '#1E90FF', '#9370DB', '#FF4500'];
