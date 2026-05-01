@@ -23,7 +23,6 @@
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
         
-        /* 优化点：移除 infinite，增加 forwards 保持状态 */
         .image-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background-size: cover; background-position: center; 
@@ -298,7 +297,7 @@
                 <h3 style="color:#FFB6C1;">✨ 星空寄语</h3>
                 <p style="font-size:12px; color:#999; margin-top:5px;">Your words will be shining in the dimension~</p>
                 <textarea id="wish-input" class="wish-input" placeholder="输入你想说的话..." rows="3" maxlength="30"></textarea>
-                <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()">变成一颗小星星</button>
+                <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()">放飞心愿</button>
             </div>
         </div>
 
@@ -854,39 +853,46 @@
         emojiList.forEach(e => { const s = document.createElement('span'); s.style.cursor='pointer'; s.style.fontSize='20px'; s.innerText=e; s.onclick=()=>insertEmoji(e); emojiPicker.appendChild(s); });
 
         const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
-        let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
+        // 核心修复点 1：在这里新增 fadeTimer 变量
+        let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer, fadeTimer = null;
         
-        // 核心优化：定义轮播间隔[cite: 2]
         const SLIDE_INTERVAL = 9000; 
 
         function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
         function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
         
-        // 核心优化：滑顺切换函数与缩放动画应用[cite: 2]
         function sw() { 
             nxt.style.backgroundImage = `url('${currentImages[idx]}')`; 
             
-            // 切换瞬间，先移除动画强制归位[cite: 2]
+            // 切换瞬间，先移除动画强制归位
             nxt.style.animation = 'none'; 
             void nxt.offsetWidth; 
             
-            // 设置动画时长略大于切换间隔，并移除 infinite 避免闪烁[cite: 2]
+            // 设置动画时长略大于切换间隔，并移除 infinite 避免闪烁
             nxt.style.animation = `imageZoom ${SLIDE_INTERVAL + 500}ms ease-out forwards`;
             
             cur.style.opacity = 0; 
             nxt.style.opacity = 1; 
             updateDots(idx); 
             
-            setTimeout(() => { 
-                let t = cur; cur = nxt; nxt = t; 
-                // 彻底清除旧图背景，减少内存占用并防止层级重叠导致的闪烁[cite: 2]
-                nxt.style.backgroundImage = 'none';
+            // ============================================
+            // 核心修复点 2：修复快速切换导致的粉色背景 Bug
+            // ============================================
+            if (fadeTimer) clearTimeout(fadeTimer); // 如果还有旧的清理任务，直接取消
+            
+            const oldLayer = cur; // 锁定【目前需要被隐藏的层】
+            
+            fadeTimer = setTimeout(() => { 
+                oldLayer.style.backgroundImage = 'none'; // 1.5秒后只清空被锁定的旧层
             }, 1500); 
+            
+            // 身份互换必须马上、同步执行！绝不能放进 setTimeout 里面！
+            let t = cur; cur = nxt; nxt = t; 
+            // ============================================
             
             if(currentImages.length > 1) idx = (idx+1)%currentImages.length; 
         }
 
-        // 统一修改定时器的时间常量为 SLIDE_INTERVAL[cite: 2]
         function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
         function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
         
