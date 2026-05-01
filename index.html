@@ -22,7 +22,20 @@
         @keyframes floatUp { 0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; } 50% { transform: translateY(-50vh) translateX(30px) scale(1.1); opacity: 0.6; } 100% { transform: translateY(-110vh) translateX(-30px) scale(1.2); opacity: 0; } }
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
-        .image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1.2s ease-in-out; opacity: 0; }
+        
+        /* 优化点：移除 infinite，增加 forwards 保持状态 */
+        .image-layer { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            transition: opacity 1.5s ease-in-out; opacity: 0;
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+
+        @keyframes imageZoom {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
 
         /* ============ 星空墙核心样式 ============ */
         #star-field { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
@@ -65,7 +78,6 @@
         }
         .wish-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; margin: 15px 0; outline: none; resize: none; font-family: inherit; }
 
-        /* ============ 星空专属署名弹窗 ============ */
         .star-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
         .star-login-overlay.show { display: flex; }
         .star-login-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3); animation: login-appear 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
@@ -74,7 +86,6 @@
         .star-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,215,0,0.3); }
         .star-login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
 
-        /* ============ 连接状态指示器 ============ */
         #ws-status {
             position: absolute; top: 15px; right: 15px; z-index: 200;
             display: flex; align-items: center; gap: 6px;
@@ -89,7 +100,6 @@
         #ws-status.disconnected .dot-indicator { background: #FF6B6B; }
         @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* ============ 原有 UI 样式 ============ */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
         .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s ease; }
         .age-btn:hover { background: rgba(255, 255, 255, 0.3); color: #fff; }
@@ -161,18 +171,6 @@
         .chat-login-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; text-align: center; margin-bottom: 15px; font-size: 15px; outline: none; transition: 0.2s; }
         .chat-login-input:focus { border-color: #FF69B4; }
         .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-
-        /* 聊天窗口连接中占位提示 */
-        .chat-connecting-hint {
-            text-align: center; padding: 20px; color: #bbb; font-size: 13px;
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-        }
-        .chat-connecting-hint .spin {
-            width: 22px; height: 22px; border: 2px solid #FFE4E9;
-            border-top-color: #FF69B4; border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -182,7 +180,6 @@
 
         <div id="star-field"></div>
 
-        <!-- 连接状态指示器（页面右上角） -->
         <div id="ws-status" class="connecting">
             <div class="dot-indicator"></div>
             <span id="ws-status-text">连接中...</span>
@@ -302,116 +299,58 @@
     </div>
 
     <script>
+        (function(){ const s=new Date('2026-04-11'); const d=Math.floor((new Date()-s)/86400000); document.getElementById('love-days').textContent=d; })();
 
-(function(){ const s=new Date('2026-04-11'); const d=Math.floor((new Date()-s)/86400000); document.getElementById('love-days').textContent=d; })();
-
-        // --- 核心配置 ---
         const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
         let chatSocket = null;
         let chatNickname = sessionStorage.getItem('chat_nickname') || '';
         let chatAvatar = sessionStorage.getItem('chat_avatar') || '';
         let unreadCount = 0, isChatWindowOpen = false;
         let reconnectTimer = null;
-        let isConnectedOnce = false; // 是否已成功连接过（用于区分首次连接和重连）
 
         const badge = document.getElementById('msg-badge');
         const messagesEl = document.getElementById('chat-messages');
         const wsStatusEl = document.getElementById('ws-status');
         const wsStatusTextEl = document.getElementById('ws-status-text');
 
-        // ============ 【修复1】WebSocket 连接不再依赖 nickname ============
-        // 使用访客身份自动连接，确保星星历史在页面加载后立即显示
-        // 若已有 nickname 则用真实身份连接；若没有则用访客身份（仅接收数据，发送时才要求登录）
-        function getConnectName() {
-            return chatNickname || ('guest_' + Math.random().toString(36).slice(2, 7));
-        }
+        function getConnectName() { return chatNickname || ('guest_' + Math.random().toString(36).slice(2, 7)); }
+        function setWsStatus(state, text) { wsStatusEl.className = state; wsStatusTextEl.textContent = text; }
 
-        function setWsStatus(state, text) {
-            wsStatusEl.className = state; // connecting / connected / disconnected
-            wsStatusTextEl.textContent = text;
-        }
-
-        // ============ 【修复2】连接函数重构：支持访客连接 + 重连 ============
         function connectWebSocket(isGuestConnect) {
-            // 如果已经在连接中或已连接，不重复发起
             if (chatSocket && (chatSocket.readyState === WebSocket.CONNECTING || chatSocket.readyState === WebSocket.OPEN)) return;
-            
             clearTimeout(reconnectTimer);
             const name = isGuestConnect ? getConnectName() : (chatNickname || getConnectName());
-            
             setWsStatus('connecting', '连接中...');
-            
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
             chatSocket = new WebSocket(`${protocol}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(name)}`);
             
             chatSocket.onopen = () => {
-                isConnectedOnce = true;
                 setWsStatus('connected', '已连接');
-
-                // 【修复3】连接成功后淡出状态指示器（3秒后）
-                setTimeout(() => {
-                    wsStatusEl.style.opacity = '0';
-                    wsStatusEl.style.pointerEvents = 'none';
-                }, 3000);
-
-                // 处理待发送的消息
-                if (window.pendingStarWish) {
-                    chatSocket.send(window.pendingStarWish);
-                    window.pendingStarWish = null;
-                    document.getElementById('wish-input').value = '';
-                    document.getElementById('star-send-btn').innerText = '放飞心愿';
-                    toggleWishModal();
-                }
-                if (window.pendingChatMessage) {
-                    chatSocket.send(window.pendingChatMessage);
-                    window.pendingChatMessage = null;
-                }
+                setTimeout(() => { wsStatusEl.style.opacity = '0'; wsStatusEl.style.pointerEvents = 'none'; }, 3000);
             };
 
             chatSocket.onmessage = (event) => {
                 const res = JSON.parse(event.data);
                 if (res.type === 'history') {
-                    // 【修复4】历史记录：星星立即渲染，聊天记录也同步写入
-                    res.data.forEach(m => {
-                        if (m.msgType === 'star') addStar(m);
-                        else addChatMessage(m);
-                    });
+                    res.data.forEach(m => { if (m.msgType === 'star') addStar(m); else addChatMessage(m); });
                 } else if (res.type === 'userlist') {
                     document.getElementById('online-count').innerText = res.data.length;
                 } else if (res.type === 'message') {
-                    if (res.msgType === 'star') {
-                        addStar(res);
-                    } else {
+                    if (res.msgType === 'star') addStar(res);
+                    else {
                         addChatMessage(res);
-                        if (!isChatWindowOpen && res.name !== chatNickname) {
-                            unreadCount++;
-                            updateBadgeDisplay();
-                        }
+                        if (!isChatWindowOpen && res.name !== chatNickname) { unreadCount++; updateBadgeDisplay(); }
                     }
                 }
             };
 
             chatSocket.onclose = () => {
-                const btn = document.getElementById('star-send-btn');
-                if (btn && btn.innerText !== '放飞心愿') btn.innerText = '放飞心愿';
-
-                // 显示断线状态，并在 3 秒后自动重连
                 setWsStatus('disconnected', '已断线，重连中...');
-                wsStatusEl.style.opacity = '1';
-                wsStatusEl.style.pointerEvents = 'auto';
-                reconnectTimer = setTimeout(() => {
-                    connectWebSocket(false);
-                }, CHAT_CONFIG.reconnectInterval);
-            };
-
-            chatSocket.onerror = () => {
-                setWsStatus('disconnected', '连接失败');
-                wsStatusEl.style.opacity = '1';
-                wsStatusEl.style.pointerEvents = 'auto';
+                wsStatusEl.style.opacity = '1'; wsStatusEl.style.pointerEvents = 'auto';
+                reconnectTimer = setTimeout(() => connectWebSocket(false), CHAT_CONFIG.reconnectInterval);
             };
         }
 
-        // --- 音乐控制 ---
         const playlist = [
             { title: "Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
             { title: "Oneul-Morning-Peppermint", src: "bgm2.mp3" }, 
@@ -426,12 +365,8 @@
         function prevSong() { currentSongIdx = (currentSongIdx - 1 + playlist.length) % playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause; }
         bgm.addEventListener('ended', nextSong); loadSong(currentSongIdx);
 
-        // --- 星空愿望逻辑 ---
         function toggleWishModal() {
-            if (!chatNickname) { 
-                document.getElementById('star-login-overlay').classList.add('show'); 
-                return; 
-            }
+            if (!chatNickname) { document.getElementById('star-login-overlay').classList.add('show'); return; }
             const m = document.getElementById('wish-modal');
             m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
@@ -439,16 +374,11 @@
         function enterStarName() {
             const n = document.getElementById('star-nickname-input').value.trim();
             if (n) {
-                chatNickname = n;
-                sessionStorage.setItem('chat_nickname', n);
+                chatNickname = n; sessionStorage.setItem('chat_nickname', n);
                 if (!chatAvatar) { chatAvatar = '✨'; sessionStorage.setItem('chat_avatar', chatAvatar); }
-                
                 document.getElementById('star-login-overlay').classList.remove('show');
-                
-                // 用真实名字重新建立连接（断开访客连接）
                 if (chatSocket) chatSocket.close();
                 connectWebSocket(false);
-                
                 toggleWishModal(); 
             }
         }
@@ -456,115 +386,110 @@
         function sendStarWish() {
             const input = document.getElementById('wish-input');
             const content = input.value.trim();
-            const btn = document.getElementById('star-send-btn');
-            if (!content) return;
-            
+            if (!content || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
             const t = new Date();
             const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`;
-            const payload = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: 'star', msg: content });
-            
-            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-                window.pendingStarWish = payload;
-                btn.innerText = '唤醒星空中...';
-                connectWebSocket(false);
-            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
-                window.pendingStarWish = payload;
-                btn.innerText = '正在飞向星空...';
-            } else if (chatSocket.readyState === WebSocket.OPEN) {
-                chatSocket.send(payload);
-                input.value = '';
-                btn.innerText = '放飞心愿';
-                toggleWishModal();
-            }
+            chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: 'star', msg: content }));
+            input.value = ''; toggleWishModal();
         }
 
-        // ============ 通过留言内容生成固定的位置坐标 ============
         function getHashPos(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const left = 5 + Math.abs(hash % 90);
-            const top = 5 + Math.abs((hash >> 8) % 60);
-            return { left, top };
+            let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            return { left: 5 + Math.abs(hash % 90), top: 5 + Math.abs((hash >> 8) % 60) };
         }
 
         function addStar(data) {
             const field = document.getElementById('star-field');
-            const star = document.createElement('div');
-            star.className = 'star-wish';
-            
-            const uniqueStr = (data.name || '') + (data.msg || '') + (data.time || '');
-            const pos = getHashPos(uniqueStr);
-            star.style.left = pos.left + '%';
-            star.style.top = pos.top + '%';
-            
+            const star = document.createElement('div'); star.className = 'star-wish';
+            const pos = getHashPos((data.name || '') + (data.msg || '') + (data.time || ''));
+            star.style.left = pos.left + '%'; star.style.top = pos.top + '%';
             star.innerHTML = `<div class="star-tooltip"><b>${escapeHtml(data.name)}:</b> ${escapeHtml(data.msg)}</div>`;
             field.appendChild(star);
-            
             const stars = field.getElementsByClassName('star-wish');
-            if (stars.length > 50) {
-                field.removeChild(stars[0]);
-            }
+            if (stars.length > 50) field.removeChild(stars[0]);
         }
 
-        // --- 聊天室逻辑 ---
         function toggleChat(e) { 
             if (e) e.stopPropagation(); 
             const win = document.getElementById('chat-window'); 
             if (!win.classList.contains('show')) { 
-                if (!chatNickname) { 
-                    document.getElementById('chat-login-overlay').classList.add('show'); 
-                    return; 
-                } 
-                win.classList.add('show'); 
-                isChatWindowOpen = true; 
-                unreadCount = 0; 
-                updateBadgeDisplay(); 
+                if (!chatNickname) { document.getElementById('chat-login-overlay').classList.add('show'); return; } 
+                win.classList.add('show'); isChatWindowOpen = true; unreadCount = 0; updateBadgeDisplay(); 
                 setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 100); 
-            } else { 
-                win.classList.remove('show'); 
-                isChatWindowOpen = false; 
-                document.getElementById('emoji-picker').style.display = 'none'; 
-            } 
+            } else { win.classList.remove('show'); isChatWindowOpen = false; } 
         }
 
         function enterChat() { 
             const n = document.getElementById('nickname-input').value.trim(); 
             if (n) { 
-                chatNickname = n; 
-                sessionStorage.setItem('chat_nickname', n); 
+                chatNickname = n; sessionStorage.setItem('chat_nickname', n); 
                 sessionStorage.setItem('chat_avatar', chatAvatar || '🐰');
                 document.getElementById('chat-login-overlay').classList.remove('show'); 
-                
-                // 用真实名字重新建立连接（断开访客连接）
-                if (chatSocket) chatSocket.close();
-                connectWebSocket(false);
-                
+                if (chatSocket) chatSocket.close(); connectWebSocket(false);
                 toggleChat(); 
             } 
         }
 
         function selAv(el, icon) { document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); chatAvatar = icon; }
 
-        // --- 初始化与其他原功能 ---
         const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
         const emojiPicker = document.getElementById('emoji-picker');
         emojiList.forEach(e => { const s = document.createElement('span'); s.style.cursor='pointer'; s.style.fontSize='20px'; s.innerText=e; s.onclick=()=>insertEmoji(e); emojiPicker.appendChild(s); });
 
         const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
         let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
-        function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
-        function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
-        function sw() { nxt.style.backgroundImage = `url('${currentImages[idx]}')`; cur.style.opacity = 0; nxt.style.opacity = 1; updateDots(idx); setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200); if(currentImages.length > 1) idx = (idx+1)%currentImages.length; }
-        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
-        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
         
-        // ============ 【修复5】window.onload：页面加载后立即建立 WebSocket 连接 ============
+        const SLIDE_INTERVAL = 9000; 
+
+        function renderDots() { 
+            const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; 
+            if (currentImages.length > 1) { 
+                dc.style.display='flex'; 
+                for (let i=0; i<currentImages.length; i++) { 
+                    const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); 
+                } 
+            } else dc.style.display='none'; 
+        }
+        function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
+        
+        // ============ 核心优化：滑顺切换函数 ============
+        function sw() { 
+            nxt.style.backgroundImage = `url('${currentImages[idx]}')`; 
+            
+            // 优化点 1：切换瞬间，先移除动画强制归位
+            nxt.style.animation = 'none'; 
+            void nxt.offsetWidth; 
+            
+            // 优化点 2：设置动画时长略大于切换间隔，并移除 infinite 避免闪烁
+            // 使用 forwards 保持在 1.0 比例，不再跳回 1.1
+            nxt.style.animation = `imageZoom ${SLIDE_INTERVAL + 500}ms ease-out forwards`;
+            
+            cur.style.opacity = 0; 
+            nxt.style.opacity = 1; 
+            updateDots(idx); 
+            
+            setTimeout(() => { 
+                let t = cur; cur = nxt; nxt = t; 
+                // 彻底清除旧图背景，减少内存占用并防止层级重叠导致的闪烁
+                nxt.style.backgroundImage = 'none';
+            }, 1500); // 略晚于 CSS transition
+            
+            if(currentImages.length > 1) idx = (idx+1)%currentImages.length; 
+        }
+
+        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
+        
+        function switchAge(age) { 
+            if(currentAge === age) return; 
+            currentAge = age; currentImages = albums[age]; 
+            document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); 
+            clearInterval(slideTimer); idx = 0; renderDots(); sw(); 
+            if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); 
+        }
+        
         window.onload = () => { 
             renderDots(); sw(); 
-            if (currentImages.length > 1) slideTimer = setInterval(sw, 6000);
-            // 无论是否已登录，立即连接 WebSocket，确保星星历史数据马上加载
+            if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
             connectWebSocket(false);
         };
 
@@ -576,28 +501,11 @@
         function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
         function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         function openFull(src) { const v = document.getElementById('image-viewer'); document.getElementById('full-image').src = src; v.style.display = 'flex'; }
-        
         function sendTextMessage() { const i = document.getElementById('chat-input'); if(i.value.trim()){ sendPayload({ type: 'text', content: i.value }); i.value = ''; i.style.height = 'auto'; } }
-        
-        function sendPayload(p) { 
-            const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; 
-            const payloadStr = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content });
-            
-            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-                window.pendingChatMessage = payloadStr;
-                connectWebSocket(false);
-            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
-                window.pendingChatMessage = payloadStr;
-            } else if (chatSocket.readyState === WebSocket.OPEN) {
-                chatSocket.send(payloadStr); 
-            }
-        }
-        
-        function addChatMessage(data) { const isMe = data.name === chatNickname; const safeName = escapeHtml(data.name); const content = data.msgType === 'image' ? `<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">` : `<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const timeHtml = data.time ? `<div style="font-size:10px; color:#bbb; margin-top:4px; padding:0 4px; text-align:${isMe?'right':'left'};">${escapeHtml(data.time)}</div>` : ''; const html = `<div class="message-item ${isMe ? 'right' : ''}"><div class="message-avatar">${data.avatar || '🐰'}</div><div class="message-content"><div class="message-name">${safeName}</div>${content}${timeHtml}</div></div>`; messagesEl.insertAdjacentHTML('beforeend', html); messagesEl.scrollTop = messagesEl.scrollHeight; }
-
+        function sendPayload(p) { if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) return; const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; chatSocket.send(JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content })); }
+        function addChatMessage(data) { const isMe = data.name === chatNickname; const content = data.msgType === 'image' ? `<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">` : `<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const html = `<div class="message-item ${isMe ? 'right' : ''}"><div class="message-avatar">${data.avatar || '🐰'}</div><div class="message-content"><div class="message-name">${escapeHtml(data.name)}</div>${content}</div></div>`; messagesEl.insertAdjacentHTML('beforeend', html); messagesEl.scrollTop = messagesEl.scrollHeight; }
         function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if (w > MAX) { h *= (MAX/w); w = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); sendPayload({ type: 'image', content: canvas.toDataURL('image/jpeg', 0.9) }); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }
 
-        // 鼠标特效与泡泡逻辑 
         const colors = ['#FF69B4', '#FFB6C1', '#FF1493', '#DB7093', '#FFA07A', '#FFD700', '#32CD32', '#00FFFF', '#1E90FF', '#9370DB', '#FF4500'];
         let lastTime = 0;
         document.addEventListener('mousemove', function(e) {
