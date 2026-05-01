@@ -123,16 +123,17 @@
         .album-item:hover img { transform: scale(1.05); }
         .album-date { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: rgba(255,255,255,0.9); font-size: 11px; padding: 25px 8px 8px; text-align: left; letter-spacing: 1px; pointer-events: none;}
         
-        /* 悬浮爱心按钮 */
+        /* 修改后的点赞悬浮爱心按钮 */
         .heart-icon {
             position: absolute; bottom: 10px; right: 10px; background: rgba(255, 255, 255, 0.85);
-            color: #aaa; border-radius: 50%; width: 32px; height: 32px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
+            color: #aaa; border-radius: 20px; padding: 0 10px; min-width: 44px; height: 32px; display: flex;
+            align-items: center; justify-content: center; gap: 4px; cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 5; backdrop-filter: blur(4px);
         }
         .heart-icon:hover { transform: scale(1.1); }
         .heart-icon.liked { background: #ff4d4f; color: white; border-color: #ff4d4f; }
         .heart-icon svg { width: 18px; height: 18px; }
+        .heart-count { font-size: 12px; font-weight: bold; }
 
         /* 左右导航按钮 */
         .nav-btn {
@@ -418,6 +419,17 @@
             return chatNickname || ('guest_' + Math.random().toString(36).slice(2, 7));
         }
 
+        // 用于为长 base64 图片生成唯一极简 ID
+        function getImgId(src) {
+            let hash = 0;
+            if (src.length === 0) return 'img_0';
+            for (let i = 0; i < src.length; i++) {
+                hash = ((hash << 5) - hash) + src.charCodeAt(i);
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return 'img_' + Math.abs(hash);
+        }
+
         function setWsStatus(state, text) {
             wsStatusEl.className = state; 
             wsStatusTextEl.textContent = text;
@@ -461,6 +473,7 @@
                 if (res.type === 'history') {
                     res.data.forEach(m => {
                         if (m.msgType === 'star') addStar(m);
+                        else if (m.msgType === 'album_like') handleAlbumLike(m);
                         else if (m.msgType && m.msgType.startsWith('album_')) addAlbumImage(m); 
                         else addChatMessage(m);
                     });
@@ -469,6 +482,8 @@
                 } else if (res.type === 'message') {
                     if (res.msgType === 'star') {
                         addStar(res);
+                    } else if (res.msgType === 'album_like') {
+                        handleAlbumLike(res);
                     } else if (res.msgType && res.msgType.startsWith('album_')) { 
                         addAlbumImage(res);
                     } else {
@@ -520,16 +535,68 @@
             wrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
 
-        // 爱心点赞动画效果
-        function toggleHeart(e, el) {
-            e.stopPropagation(); // 阻止冒泡，避免触发大图预览
-            el.classList.toggle('liked');
-            const svg = el.querySelector('svg');
-            if(el.classList.contains('liked')) {
-                svg.setAttribute('fill', 'currentColor');
-                // 这里可以后续添加将点赞状态发给服务器的 websocket 逻辑
+        // 全新：发送并处理爱心点赞逻辑
+        function toggleHeart(e, imgId, albumType) {
+            e.stopPropagation(); 
+            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+                alert("网络断开啦，请稍后再试哦~");
+                return;
+            }
+
+            const imgObj = albumData[albumType].find(img => img.id === imgId);
+            if (!imgObj) return;
+
+            const myName = chatNickname || getConnectName();
+            if (!imgObj.likedBy) imgObj.likedBy = new Set();
+
+            // 本地切换点赞状态
+            if (imgObj.likedBy.has(myName)) {
+                imgObj.likedBy.delete(myName);
+                imgObj.myLike = false;
             } else {
-                svg.setAttribute('fill', 'none');
+                imgObj.likedBy.add(myName);
+                imgObj.myLike = true;
+            }
+            
+            // 实时更新本地数量并渲染
+            imgObj.likes = imgObj.likedBy.size;
+            renderAlbumGrid();
+
+            // 发送给服务器广播
+            const payloadStr = JSON.stringify({
+                name: myName,
+                msgType: 'album_like',
+                albumType: albumType,
+                imgId: imgId,
+                isLike: imgObj.myLike
+            });
+            chatSocket.send(payloadStr);
+        }
+
+        // 全新：接收服务器的点赞广播/历史数据重建
+        function handleAlbumLike(data) {
+            if (!albumData[data.albumType]) return;
+            const imgObj = albumData[data.albumType].find(img => img.id === data.imgId);
+            if (imgObj) {
+                if (!imgObj.likedBy) imgObj.likedBy = new Set();
+                const userKey = data.name;
+
+                if (data.isLike) {
+                    imgObj.likedBy.add(userKey);
+                } else {
+                    imgObj.likedBy.delete(userKey);
+                }
+
+                // 依靠 Set 自动去重计算真实点赞总数
+                imgObj.likes = imgObj.likedBy.size;
+
+                // 判断是否是自己点过赞的
+                const myName = chatNickname || getConnectName();
+                imgObj.myLike = imgObj.likedBy.has(myName);
+
+                if (currentOpenAlbumType === data.albumType) {
+                    renderAlbumGrid();
+                }
             }
         }
 
@@ -549,13 +616,19 @@
             images.forEach(img => {
                 const div = document.createElement('div');
                 div.className = 'album-item';
+                
+                const likesCount = img.likes || 0;
+                const likedClass = img.myLike ? 'liked' : '';
+                const fillAttr = img.myLike ? 'currentColor' : 'none';
+
                 div.innerHTML = `
                     <img src="${img.src}" onclick="openFull('${img.src}')">
                     <div class="album-date">${img.date}</div>
-                    <div class="heart-icon" onclick="toggleHeart(event, this)">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                    <div class="heart-icon ${likedClass}" onclick="toggleHeart(event, '${img.id}', '${currentOpenAlbumType}')">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="${fillAttr}">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                         </svg>
+                        <span class="heart-count">${likesCount > 0 ? likesCount : '赞'}</span>
                     </div>
                 `;
                 grid.appendChild(div);
@@ -565,7 +638,20 @@
         function addAlbumImage(data) {
             const type = data.msgType;
             if (!albumData[type]) albumData[type] = [];
-            albumData[type].unshift({ src: data.msg, date: data.time || '刚刚' }); 
+            
+            const imgId = data.id || getImgId(data.msg);
+            
+            // 避免重复加载同一张图片
+            if (albumData[type].find(img => img.id === imgId)) return;
+
+            albumData[type].unshift({ 
+                id: imgId,
+                src: data.msg, 
+                date: data.time || '刚刚',
+                likes: 0,
+                myLike: false,
+                likedBy: new Set()
+            }); 
             if (currentOpenAlbumType === type) {
                 renderAlbumGrid();
             }
@@ -607,8 +693,8 @@
             const dateStr = `${t.getFullYear()}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getDate().toString().padStart(2,'0')}`;
             
             const payloadStr = JSON.stringify({ 
-                name: '', 
-                avatar: '',
+                name: chatNickname || getConnectName(), 
+                avatar: chatAvatar,
                 time: dateStr, 
                 msgType: currentOpenAlbumType, 
                 msg: base64 
