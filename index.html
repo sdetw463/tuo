@@ -22,7 +22,20 @@
         @keyframes floatUp { 0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; } 50% { transform: translateY(-50vh) translateX(30px) scale(1.1); opacity: 0.6; } 100% { transform: translateY(-110vh) translateX(-30px) scale(1.2); opacity: 0; } }
 
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
-        .image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1.2s ease-in-out; opacity: 0; }
+        
+        /* 优化点：移除 infinite，增加 forwards 保持状态 */
+        .image-layer { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            transition: opacity 1.5s ease-in-out; opacity: 0;
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+
+        @keyframes imageZoom {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
 
         /* ============ 星空墙核心样式 ============ */
         #star-field { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
@@ -123,7 +136,7 @@
         .album-item:hover img { transform: scale(1.05); }
         .album-date { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: rgba(255,255,255,0.9); font-size: 11px; padding: 25px 8px 8px; text-align: left; letter-spacing: 1px; pointer-events: none;}
         
-        /* 修改后的点赞悬浮爱心按钮 */
+        /* 点赞悬浮爱心按钮 */
         .heart-icon {
             position: absolute; bottom: 10px; right: 10px; background: rgba(255, 255, 255, 0.85);
             color: #aaa; border-radius: 20px; padding: 0 10px; min-width: 44px; height: 32px; display: flex;
@@ -185,7 +198,7 @@
             
             /* 移动端相册横向滑动适配 */
             .album-item { flex: 0 0 160px; height: 160px; }
-            .nav-btn { display: none; } /* 移动端隐藏导航箭头，原生手指滑动体验更好 */
+            .nav-btn { display: none; } 
             .gallery-container { padding: 0 10px; }
             .album-grid { padding: 15px 0; gap: 12px; }
         }
@@ -535,7 +548,7 @@
             wrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
 
-        // 全新：发送并处理爱心点赞逻辑
+        // 发送并处理爱心点赞逻辑
         function toggleHeart(e, imgId, albumType) {
             e.stopPropagation(); 
             if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
@@ -573,7 +586,7 @@
             chatSocket.send(payloadStr);
         }
 
-        // 全新：接收服务器的点赞广播/历史数据重建
+        // 接收服务器的点赞广播/历史数据重建
         function handleAlbumLike(data) {
             if (!albumData[data.albumType]) return;
             const imgObj = albumData[data.albumType].find(img => img.id === data.imgId);
@@ -842,15 +855,44 @@
 
         const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
         let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer;
+        
+        // 核心优化：定义轮播间隔[cite: 2]
+        const SLIDE_INTERVAL = 9000; 
+
         function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
         function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
-        function sw() { nxt.style.backgroundImage = `url('${currentImages[idx]}')`; cur.style.opacity = 0; nxt.style.opacity = 1; updateDots(idx); setTimeout(() => { let t = cur; cur = nxt; nxt = t; }, 1200); if(currentImages.length > 1) idx = (idx+1)%currentImages.length; }
-        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
-        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, 6000); }
+        
+        // 核心优化：滑顺切换函数与缩放动画应用[cite: 2]
+        function sw() { 
+            nxt.style.backgroundImage = `url('${currentImages[idx]}')`; 
+            
+            // 切换瞬间，先移除动画强制归位[cite: 2]
+            nxt.style.animation = 'none'; 
+            void nxt.offsetWidth; 
+            
+            // 设置动画时长略大于切换间隔，并移除 infinite 避免闪烁[cite: 2]
+            nxt.style.animation = `imageZoom ${SLIDE_INTERVAL + 500}ms ease-out forwards`;
+            
+            cur.style.opacity = 0; 
+            nxt.style.opacity = 1; 
+            updateDots(idx); 
+            
+            setTimeout(() => { 
+                let t = cur; cur = nxt; nxt = t; 
+                // 彻底清除旧图背景，减少内存占用并防止层级重叠导致的闪烁[cite: 2]
+                nxt.style.backgroundImage = 'none';
+            }, 1500); 
+            
+            if(currentImages.length > 1) idx = (idx+1)%currentImages.length; 
+        }
+
+        // 统一修改定时器的时间常量为 SLIDE_INTERVAL[cite: 2]
+        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
+        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
         
         window.onload = () => { 
             renderDots(); sw(); 
-            if (currentImages.length > 1) slideTimer = setInterval(sw, 6000);
+            if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
             connectWebSocket(false);
         };
 
