@@ -158,7 +158,6 @@
             box-shadow: 0 4px 15px rgba(255,182,193,0.2);
             overflow: hidden;
         }
-        /* 日历卡片顶部：年份 + 月份导航 */
         .diary-cal-header {
             background: rgba(255,182,193,0.35); padding: 8px 10px 6px;
             display: flex; flex-direction: column; gap: 4px;
@@ -179,7 +178,6 @@
             display: flex; align-items: center;
         }
         .diary-cal-nav:hover { color: #FF1493; transform: scale(1.2); }
-        /* 星期标题行 */
         .diary-cal-weekdays {
             display: grid; grid-template-columns: repeat(7, 1fr);
             padding: 4px 8px 2px; gap: 0;
@@ -190,7 +188,6 @@
         }
         .diary-cal-wd:first-child { color: rgba(220,80,80,0.7); }
         .diary-cal-wd:last-child { color: rgba(80,130,220,0.7); }
-        /* 日期格子 */
         .diary-cal-days {
             display: grid; grid-template-columns: repeat(7, 1fr);
             padding: 2px 8px 8px; gap: 2px;
@@ -204,27 +201,22 @@
         .diary-day:hover { background: rgba(255,105,180,0.12); }
         .diary-day.empty { cursor: default; }
         .diary-day.empty:hover { background: none; }
-        /* 无日记 → 灰色 */
         .diary-day-num {
             font-size: 11px; color: rgba(160,130,140,0.65); line-height: 1;
         }
-        /* 有日记 → 黑色加粗 */
         .diary-day.has-diary .diary-day-num {
             color: #2a1520; font-weight: 700;
         }
-        /* 今天 → 粉色圆圈 */
         .diary-day.today .diary-day-num {
             background: #FF69B4; color: white; border-radius: 50%;
             width: 18px; height: 18px; display: flex; align-items: center;
             justify-content: center; font-weight: bold;
         }
-        /* 日记条数小角标 */
         .diary-day-dot {
             width: 4px; height: 4px; background: #FF69B4; border-radius: 50%;
             margin-top: 1px; display: none;
         }
         .diary-day.has-diary .diary-day-dot { display: block; }
-        /* 周末颜色 */
         .diary-day.sun .diary-day-num { color: rgba(200,60,60,0.55); }
         .diary-day.sun.has-diary .diary-day-num { color: #c0392b; }
         .diary-day.sat .diary-day-num { color: rgba(60,100,200,0.55); }
@@ -246,7 +238,6 @@
             display: flex; flex-direction: column; overflow: hidden;
             animation: login-appear 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
-        /* 弹窗顶栏 */
         .diary-modal-header {
             background: linear-gradient(135deg, rgba(255,182,193,0.6), rgba(255,105,180,0.3));
             padding: 14px 18px; display: flex; align-items: center;
@@ -262,10 +253,10 @@
         }
         .diary-modal-close:hover { background: rgba(255,105,180,0.2); color: #FF69B4; }
 
-        /* 发布区（推文风格） */
+        /* 发布区 */
         .diary-compose {
             padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,182,193,0.2);
-            flex-shrink: 0; background: rgba(255,250,252,0.8);
+            flex-shrink: 0; background: rgba(255,250,252,0.8); position: relative;
         }
         .diary-compose-name-row {
             display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
@@ -289,6 +280,7 @@
             line-height: 1.6; color: #333; background: white;
         }
         .diary-compose-text:focus { border-color: #FF69B4; }
+
         /* 工具栏 */
         .diary-compose-toolbar {
             display: flex; align-items: center; justify-content: space-between;
@@ -308,18 +300,24 @@
         }
         .diary-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,105,180,0.4); }
         .diary-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        /* 图片预览 */
+
+        /* ===== 修改：日记多图预览网格 ===== */
         .diary-img-preview {
-            margin-top: 8px; display: none; position: relative;
-            border-radius: 10px; overflow: hidden; max-height: 120px;
+            margin-top: 8px; display: none; gap: 8px; flex-wrap: wrap;
         }
-        .diary-img-preview img { width: 100%; height: 120px; object-fit: cover; display: block; }
+        .diary-preview-item {
+            position: relative; width: 64px; height: 64px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .diary-preview-item img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block;
+        }
         .diary-img-remove {
-            position: absolute; top: 5px; right: 5px; width: 22px; height: 22px;
-            background: rgba(0,0,0,0.5); border: none; border-radius: 50%; cursor: pointer;
-            color: white; font-size: 13px; display: flex; align-items: center; justify-content: center;
+            position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
+            background: rgba(0,0,0,0.6); border: none; border-radius: 50%; cursor: pointer;
+            color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
-        /* 表情选择器（日记专用）*/
+        .diary-img-remove:hover { background: #ff4d4f; }
+
         .diary-emoji-picker {
             position: absolute; bottom: 44px; left: 0; background: white;
             padding: 8px; border-radius: 12px; display: none;
@@ -328,24 +326,19 @@
             max-height: 180px; overflow-y: auto; z-index: 10;
             border: 1px solid #FFE4E9;
         }
-        .diary-compose { position: relative; }
 
         /* 日记列表 */
         .diary-entries { flex: 1; overflow-y: auto; padding: 0; }
         .diary-entries-inner { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
-        .diary-empty {
-            text-align: center; padding: 40px 20px; color: #ccc; font-size: 13px;
-        }
+        .diary-empty { text-align: center; padding: 40px 20px; color: #ccc; font-size: 13px; }
         .diary-empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
-        /* 单条日记 */
+        
         .diary-entry {
             border-radius: 14px; background: rgba(255,240,245,0.6);
             border: 1px solid rgba(255,182,193,0.25);
             padding: 12px 14px; animation: fadeIn 0.3s ease;
         }
-        .diary-entry-header {
-            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-        }
+        .diary-entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         .diary-entry-avatar {
             width: 28px; height: 28px; border-radius: 50%;
             background: linear-gradient(135deg, #FFD6E0, #FFB6C1);
@@ -356,9 +349,16 @@
         .diary-entry-name { font-size: 12px; font-weight: 600; color: #c94f82; }
         .diary-entry-time { font-size: 10px; color: #bbb; margin-top: 1px; }
         .diary-entry-body { font-size: 13px; color: #444; line-height: 1.7; word-break: break-word; white-space: pre-wrap; }
-        .diary-entry-img { margin-top: 8px; border-radius: 10px; overflow: hidden; }
-        .diary-entry-img img { width: 100%; border-radius: 10px; cursor: zoom-in; max-height: 240px; object-fit: cover; }
-        /* 日记点赞 */
+
+        /* ===== 修改：日记图片正方形网格展示 ===== */
+        .diary-entry-imgs { 
+            margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; 
+        }
+        .diary-entry-imgs img { 
+            width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; cursor: zoom-in; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: transform 0.2s; 
+        }
+        .diary-entry-imgs img:hover { transform: scale(1.03); }
+
         .diary-entry-footer { margin-top: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
         .diary-like-btn {
             display: flex; align-items: center; gap: 4px; background: none; border: none;
@@ -442,9 +442,6 @@
     </div>
     <div class="dots-container" id="dynamic-dots"></div>
 
-    <!-- ============================================================
-         日记本日历卡片（main-card 正上方）
-    ============================================================ -->
     <div class="diary-card" id="diary-card">
         <div class="diary-cal-header">
             <div class="diary-cal-year" id="diary-cal-year">2026年</div>
@@ -541,13 +538,12 @@
         </div>
     </div>
 
+    <!-- 全局大图预览 -->
     <div id="image-viewer" class="image-viewer" onclick="this.style.display='none'">
         <img id="full-image" src="" alt="预览">
     </div>
 
-    <!-- ============================================================
-         日记弹窗（点击日期后出现）
-    ============================================================ -->
+    <!-- 日记弹窗 -->
     <div class="diary-overlay" id="diary-overlay" onclick="if(event.target===this) closeDiaryModal()">
         <div class="diary-modal">
             <!-- 顶栏 -->
@@ -571,15 +567,16 @@
                 <textarea id="diary-text-input" class="diary-compose-text"
                           placeholder="今天发生了什么有趣的事呢～" maxlength="500"
                           oninput="updateDiaryCharCount(this)"></textarea>
-                <div class="diary-img-preview" id="diary-img-preview">
-                    <img id="diary-preview-img" src="" alt="">
-                    <button class="diary-img-remove" onclick="removeDiaryImg()">✕</button>
-                </div>
+                
+                <!-- ===== 修改：新增的动态网格多图预览区 ===== -->
+                <div class="diary-img-preview" id="diary-img-preview"></div>
+
                 <div class="diary-compose-toolbar">
                     <div class="diary-tool-left" style="position:relative;">
                         <button class="diary-tool-btn" onclick="toggleDiaryEmoji()" title="表情">😊</button>
                         <button class="diary-tool-btn" onclick="document.getElementById('diary-img-input').click()" title="添加图片">🖼️</button>
-                        <input type="file" id="diary-img-input" accept="image/*" style="display:none;" onchange="handleDiaryImgSelect(event)">
+                        <!-- ===== 修改：加入 multiple 属性支持多图 ===== -->
+                        <input type="file" id="diary-img-input" accept="image/*" multiple style="display:none;" onchange="handleDiaryImgSelect(event)">
                         <span class="diary-char-count" id="diary-char-count">0 / 500</span>
                         <div class="diary-emoji-picker" id="diary-emoji-picker"></div>
                     </div>
@@ -803,16 +800,14 @@ function addChatMessage(data) { const isMe=data.name===chatNickname; const conte
 function handleImageUpload(e) { const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(ev)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=800;let w=img.width,h=img.height;if(w>MAX){h*=(MAX/w);w=MAX;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);sendChatPayload({type:'image',content:canvas.toDataURL('image/jpeg',0.9)});};img.src=ev.target.result;};reader.readAsDataURL(file); }
 
 /* ============================================================
-   ★★★ 日记本核心逻辑 ★★★
+   ★★★ 日记本核心逻辑 (多图更新版) ★★★
 ============================================================ */
-// 内存存储：{ 'YYYY-MM-DD': [ {id,author,text,img,time,likes,likedBy:[]} ] }
 const diaryStore = {};
-let diaryCurrentDateKey = '';   // 当前打开弹窗的日期
+let diaryCurrentDateKey = '';
 let diaryViewYear = 0;
-let diaryViewMonth = 0;         // 0-based
-let diaryPendingImg = null;     // 待发布的图片 base64
+let diaryViewMonth = 0;
+let diaryPendingImgs = []; // ===== 修改：改为数组形式存储多张图片 =====
 
-// 初始化日历视图为当前月
 function initDiaryCalendar() {
     const now = new Date();
     diaryViewYear = now.getFullYear();
@@ -821,7 +816,6 @@ function initDiaryCalendar() {
     positionDiaryCard();
 }
 
-// 根据 main-card 位置动态设置日历卡片位置
 function positionDiaryCard() {
     const mainCard = document.querySelector('.main-card');
     const diaryCard = document.getElementById('diary-card');
@@ -834,7 +828,6 @@ function positionDiaryCard() {
     diaryCard.style.left = mainCard.style.left || '30px';
 }
 
-// 渲染日历格子
 function renderDiaryCalendar() {
     const MONTHS_CN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
     document.getElementById('diary-cal-year').textContent = diaryViewYear + '年';
@@ -846,12 +839,9 @@ function renderDiaryCalendar() {
     const today = new Date();
     const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
-    // 该月第一天是星期几
     const firstDay = new Date(diaryViewYear, diaryViewMonth, 1).getDay();
-    // 该月天数
     const daysInMonth = new Date(diaryViewYear, diaryViewMonth + 1, 0).getDate();
 
-    // 填充前置空格
     for (let i = 0; i < firstDay; i++) {
         const empty = document.createElement('div');
         empty.className = 'diary-day empty';
@@ -880,9 +870,7 @@ function renderDiaryCalendar() {
     }
 }
 
-function dateKey(y, m, d) {
-    return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-}
+function dateKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
 function diaryNavMonth(dir) {
     diaryViewMonth += dir;
@@ -891,7 +879,6 @@ function diaryNavMonth(dir) {
     renderDiaryCalendar();
 }
 
-// 打开某天的日记弹窗
 function openDiaryModal(key, day) {
     diaryCurrentDateKey = key;
     const [y, m, d_] = key.split('-');
@@ -899,12 +886,14 @@ function openDiaryModal(key, day) {
     document.getElementById('diary-modal-title').textContent = `📖 ${y}年${MONTHS_CN[parseInt(m)-1]} ${parseInt(d_)}日`;
     document.getElementById('diary-modal-date').textContent = `${y}.${m}.${d_}`;
 
-    // 恢复之前保存的作者名
     const savedAuthor = localStorage.getItem('diary_author') || '';
     document.getElementById('diary-author-input').value = savedAuthor;
     document.getElementById('diary-text-input').value = '';
     updateDiaryCharCount(document.getElementById('diary-text-input'));
-    removeDiaryImg();
+    
+    // 清除可能存在的上次未发布的图片
+    diaryPendingImgs = [];
+    renderDiaryImgPreview();
 
     renderDiaryEntries(key);
     document.getElementById('diary-overlay').classList.add('show');
@@ -912,37 +901,30 @@ function openDiaryModal(key, day) {
 
 function closeDiaryModal() {
     document.getElementById('diary-overlay').classList.remove('show');
-    // 关闭时关掉表情选择器
     document.getElementById('diary-emoji-picker').style.display = 'none';
 }
 
-// 渲染当天日记列表
 function renderDiaryEntries(key) {
     const inner = document.getElementById('diary-entries-inner');
     const empty = document.getElementById('diary-empty');
     const entries = diaryStore[key] || [];
 
-    // 保留 empty 节点，清空其余
     inner.innerHTML = '';
     inner.appendChild(empty);
 
-    if (entries.length === 0) {
-        empty.style.display = 'block';
-        return;
-    }
+    if (entries.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
 
-    // 按时间正序渲染
     entries.forEach(entry => {
         const el = buildDiaryEntryEl(entry, key);
         inner.appendChild(el);
     });
 
-    // 滚到底部看最新
     const diaryEntriesEl = document.getElementById('diary-entries');
     setTimeout(() => { diaryEntriesEl.scrollTop = diaryEntriesEl.scrollHeight; }, 50);
 }
 
+// ===== 修改：支持多图的新版渲染器 =====
 function buildDiaryEntryEl(entry, key) {
     const div = document.createElement('div');
     div.className = 'diary-entry';
@@ -952,11 +934,21 @@ function buildDiaryEntryEl(entry, key) {
     const likedByMe = entry.likedBy && entry.likedBy.includes(myName);
     const likeCount = entry.likes || 0;
 
-    const imgHtml = entry.img
-        ? `<div class="diary-entry-img"><img src="${entry.img}" onclick="openFull('${entry.img}')"></div>`
-        : '';
+    let imagesHtml = '';
+    let imgList = entry.imgs || [];
+    // 兼容历史旧数据的单图形式
+    if (imgList.length === 0 && entry.img) {
+        imgList = [entry.img];
+    }
 
-    // 作者首字母头像
+    if (imgList.length > 0) {
+        imagesHtml = '<div class="diary-entry-imgs">';
+        imgList.forEach(src => {
+            imagesHtml += `<img src="${src}" onclick="openFull('${src}')">`;
+        });
+        imagesHtml += '</div>';
+    }
+
     const firstChar = (entry.author || '?').charAt(0).toUpperCase();
 
     div.innerHTML = `
@@ -968,7 +960,7 @@ function buildDiaryEntryEl(entry, key) {
             </div>
         </div>
         <div class="diary-entry-body">${escapeHtml(entry.text)}</div>
-        ${imgHtml}
+        ${imagesHtml}
         <div class="diary-entry-footer">
             <button class="diary-like-btn ${likedByMe?'liked':''}"
                     onclick="toggleDiaryLike('${key}','${entry.id}',this)">
@@ -980,12 +972,13 @@ function buildDiaryEntryEl(entry, key) {
     return div;
 }
 
-// 发布日记
 function submitDiaryEntry() {
     const author = document.getElementById('diary-author-input').value.trim();
     const text = document.getElementById('diary-text-input').value.trim();
     if (!author) { alert('请先输入你的名字哦~'); document.getElementById('diary-author-input').focus(); return; }
-    if (!text && !diaryPendingImg) { alert('写点什么再发布吧~'); document.getElementById('diary-text-input').focus(); return; }
+    
+    // 改为检查图片数组长度
+    if (!text && diaryPendingImgs.length === 0) { alert('写点什么再发布吧~'); document.getElementById('diary-text-input').focus(); return; }
 
     const btn = document.getElementById('diary-submit-btn');
     btn.disabled = true; btn.textContent = '发布中...';
@@ -1000,7 +993,7 @@ function submitDiaryEntry() {
         id: entryId,
         author: author,
         text: text,
-        img: diaryPendingImg || null,
+        imgs: [...diaryPendingImgs], // 使用数组承载多图
         time: timeStr,
         likes: 0,
         likedBy: []
@@ -1009,39 +1002,38 @@ function submitDiaryEntry() {
     wsSend(payload);
     localStorage.setItem('diary_author', author);
 
-    // 乐观更新：先本地显示
     receiveDiaryEntry(payload);
     renderDiaryCalendar();
 
-    // 重置输入区
     document.getElementById('diary-text-input').value = '';
     updateDiaryCharCount(document.getElementById('diary-text-input'));
-    removeDiaryImg();
+    
+    // 发布后清空图片区
+    diaryPendingImgs = [];
+    renderDiaryImgPreview();
+
     btn.disabled = false; btn.textContent = '发布';
 }
 
-// 接收（来自 WS）一条日记
 function receiveDiaryEntry(data) {
     const key = data.dateKey;
     if (!key) return;
     if (!diaryStore[key]) diaryStore[key] = [];
-    // 去重
     if (diaryStore[key].find(e => e.id === data.id)) return;
     diaryStore[key].push({
         id: data.id, author: data.author, text: data.text,
-        img: data.img || null, time: data.time,
+        img: data.img || null,
+        imgs: data.imgs || [],
+        time: data.time,
         likes: data.likes || 0,
         likedBy: data.likedBy || []
     });
-    // 如果当前弹窗就在这一天，追加渲染
     if (diaryCurrentDateKey === key && document.getElementById('diary-overlay').classList.contains('show')) {
         renderDiaryEntries(key);
     }
-    // 更新日历（有日记的日期加粗）
     renderDiaryCalendar();
 }
 
-// 点赞日记
 function toggleDiaryLike(key, entryId, btn) {
     const entries = diaryStore[key];
     if (!entries) return;
@@ -1060,7 +1052,6 @@ function toggleDiaryLike(key, entryId, btn) {
         entry.likes = (entry.likes||0) + 1;
     }
 
-    // 更新按钮 UI
     const isLiked = !alreadyLiked;
     btn.className = 'diary-like-btn' + (isLiked ? ' liked' : '');
     btn.querySelector('.like-heart').textContent = isLiked ? '❤️' : '🤍';
@@ -1069,7 +1060,6 @@ function toggleDiaryLike(key, entryId, btn) {
     wsSend({ msgType: 'diary_like', dateKey: key, entryId: entryId, name: myName, isLike: isLiked });
 }
 
-// 接收点赞广播
 function receiveDiaryLike(data) {
     const entries = diaryStore[data.dateKey];
     if (!entries) return;
@@ -1083,7 +1073,6 @@ function receiveDiaryLike(data) {
     }
     entry.likes = entry.likedBy.length;
 
-    // 如果弹窗打开在这天，更新对应条目
     if (diaryCurrentDateKey === data.dateKey && document.getElementById('diary-overlay').classList.contains('show')) {
         const entryEl = document.getElementById('diary-entry-' + data.entryId);
         if (entryEl) {
@@ -1099,7 +1088,6 @@ function receiveDiaryLike(data) {
     }
 }
 
-// 字数统计
 function updateDiaryCharCount(el) {
     const count = el.value.length;
     document.getElementById('diary-char-count').textContent = `${count} / 500`;
@@ -1107,37 +1095,73 @@ function updateDiaryCharCount(el) {
     el.style.height = Math.min(el.scrollHeight, 140) + 'px';
 }
 
-// 作者名持久化
 function saveDiaryAuthor(val) { localStorage.setItem('diary_author', val.trim()); }
 
-// 图片选择
+// ===== 修改：支持多图上传的处理逻辑 =====
 function handleDiaryImgSelect(e) {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX = 1000; let w = img.width, h = img.height;
-            if (w > MAX || h > MAX) { if(w>h){h*=(MAX/w);w=MAX;}else{w*=(MAX/h);h=MAX;} }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            diaryPendingImg = canvas.toDataURL('image/jpeg', 0.82);
-            document.getElementById('diary-preview-img').src = diaryPendingImg;
-            document.getElementById('diary-img-preview').style.display = 'block';
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    if (diaryPendingImgs.length + files.length > 10) {
+        alert('最多只能上传 10 张图片哦~');
+        files.splice(10 - diaryPendingImgs.length); // 截取掉超出名额的图片
+    }
+
+    let loadedCount = 0;
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 1000; let w = img.width, h = img.height;
+                if (w > MAX || h > MAX) { if(w>h){h*=(MAX/w);w=MAX;}else{w*=(MAX/h);h=MAX;} }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                
+                diaryPendingImgs.push(canvas.toDataURL('image/jpeg', 0.82));
+                loadedCount++;
+                if (loadedCount === files.length) {
+                    renderDiaryImgPreview();
+                }
+            };
+            img.src = ev.target.result;
         };
-        img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+    });
+    // 清空，以便再次选中同一张图时能触发
     e.target.value = '';
 }
-function removeDiaryImg() {
-    diaryPendingImg = null;
-    document.getElementById('diary-img-preview').style.display = 'none';
-    document.getElementById('diary-preview-img').src = '';
+
+// 渲染图片预览区
+function renderDiaryImgPreview() {
+    const container = document.getElementById('diary-img-preview');
+    container.innerHTML = '';
+    if (diaryPendingImgs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    container.style.display = 'flex';
+    diaryPendingImgs.forEach((src, idx) => {
+        const div = document.createElement('div');
+        div.className = 'diary-preview-item';
+        div.innerHTML = `
+            <img src="${src}" alt="预览" onclick="openFull('${src}')">
+            <button class="diary-img-remove" onclick="removeDiaryImg(${idx})">✕</button>
+        `;
+        container.appendChild(div);
+    });
 }
 
-// 日记专属表情选择器
+function removeDiaryImg(index) {
+    if (index !== undefined) {
+        diaryPendingImgs.splice(index, 1);
+    } else {
+        diaryPendingImgs = []; // 兼容兜底清除
+    }
+    renderDiaryImgPreview();
+}
+
 const diaryEmojiList = "😀,😂,🥰,😍,🤩,😘,😋,😎,🥳,😭,😱,🤔,🤗,😴,🥺,😤,🙄,💀,🔥,✨,💕,❤️,🌸,🌙,⭐,🎉,🎊,🍜,🍦,🎂,🍰,☕,🌈,🐱,🐰,🐶,🌷,🌻,💐,🎵,📷,✈️,🏖️,🌅,🌃,🎬,📚,🎮,🌿".split(',');
 const diaryEmojiPicker = document.getElementById('diary-emoji-picker');
 diaryEmojiList.forEach(em => {
@@ -1154,7 +1178,6 @@ function toggleDiaryEmoji() {
     p.style.display = p.style.display === 'grid' ? 'none' : 'grid';
 }
 
-// 点击弹窗外关闭表情
 document.addEventListener('click', (e) => {
     const ep = document.getElementById('diary-emoji-picker');
     if (ep.style.display === 'grid' && !ep.contains(e.target) && !e.target.closest('.diary-tool-btn')) {
@@ -1170,7 +1193,24 @@ let currentAge=22, currentImages=albums2[currentAge], idx=0, cur=document.getEle
 const SLIDE_INTERVAL=9000;
 function renderDots() { const dc=document.getElementById('dynamic-dots');dc.innerHTML='';if(currentImages.length>1){dc.style.display='flex';for(let i=0;i<currentImages.length;i++){const d=document.createElement('div');d.className='dot';d.onclick=()=>goTo(i);dc.appendChild(d);}}else dc.style.display='none'; }
 function updateDots(ai) { document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===ai)); }
-function sw() { nxt.style.backgroundImage=`url('${currentImages[idx]}')`; nxt.style.animation='none'; void nxt.offsetWidth; nxt.style.animation=`imageZoom ${SLIDE_INTERVAL+500}ms ease-out forwards`; cur.style.opacity=0; nxt.style.opacity=1; updateDots(idx); if(fadeTimer)clearTimeout(fadeTimer); const old=cur; fadeTimer=setTimeout(()=>{old.style.backgroundImage='none';},1500); let t=cur;cur=nxt;nxt=t; if(currentImages.length>1)idx=(idx+1)%currentImages.length; }
+function sw() { 
+    nxt.style.backgroundImage=`url('${currentImages[idx]}')`; 
+    nxt.style.animation='none'; 
+    void nxt.offsetWidth; 
+    nxt.style.animation=`imageZoom ${SLIDE_INTERVAL+500}ms ease-out forwards`; 
+    cur.style.opacity=0; 
+    nxt.style.opacity=1; 
+    updateDots(idx); 
+    if(fadeTimer)clearTimeout(fadeTimer); 
+    const old=cur; 
+    // 平滑修复点：在旧图彻底淡出后再清除其动画状态，避免在循环交替中偶尔闪回
+    fadeTimer=setTimeout(()=>{
+        old.style.backgroundImage='none';
+        old.style.animation='none'; 
+    },1500); 
+    let t=cur;cur=nxt;nxt=t; 
+    if(currentImages.length>1)idx=(idx+1)%currentImages.length; 
+}
 function goTo(n) { clearInterval(slideTimer);idx=n;sw();if(currentImages.length>1)slideTimer=setInterval(sw,SLIDE_INTERVAL); }
 function switchAge(age) { if(currentAge===age)return;currentAge=age;currentImages=albums2[age];document.querySelectorAll('.age-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.age)===age));clearInterval(slideTimer);idx=0;renderDots();sw();if(currentImages.length>1)slideTimer=setInterval(sw,SLIDE_INTERVAL); }
 
@@ -1214,7 +1254,6 @@ window.onload = () => {
     if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
     connectWebSocket(false);
     initDiaryCalendar();
-    // 延迟一帧等 main-card 渲染好再定位
     requestAnimationFrame(() => { requestAnimationFrame(positionDiaryCard); });
 };
 window.addEventListener('resize', positionDiaryCard);
