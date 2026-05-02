@@ -5,178 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TuoTuo's Dimension</title>
     <link rel="icon" href="logo.png?v=2" type="image/png">
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body, html { 
-            width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5; 
+        body, html {
+            width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             cursor: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cpath fill="%23FF69B4" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E') 16 16, auto;
         }
-
         .heart-trail { position: fixed; pointer-events: none; z-index: 9999; width: 20px; height: 20px; animation: fadeOutHeart 1s forwards ease-out; }
         @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(-40px) scale(1.5) rotate(20deg); opacity: 0; } }
-
-        .floating-bubble { position: absolute; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0.4)); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5), 0 0 5px rgba(255, 182, 193, 0.3); border: 1px solid rgba(255, 255, 255, 0.4); pointer-events: auto; z-index: 10; animation: floatUp linear forwards; }
-        @keyframes floatUp { 0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; } 50% { transform: translateY(-50vh) translateX(30px) scale(1.1); opacity: 0.6; } 100% { transform: translateY(-110vh) translateX(-30px) scale(1.2); opacity: 0; } }
-
+        .floating-bubble { position: absolute; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1) 60%, rgba(255,255,255,0.4)); box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 5px rgba(255,182,193,0.3); border: 1px solid rgba(255,255,255,0.4); pointer-events: auto; z-index: 10; animation: floatUp linear forwards; }
+        @keyframes floatUp { 0% { opacity: 0.8; } 50% { transform: translateY(-50vh) translateX(30px) scale(1.1); opacity: 0.6; } 100% { transform: translateY(-110vh) translateX(-30px) scale(1.2); opacity: 0; } }
         #app { position: relative; width: 100%; height: 100%; overflow: hidden; }
-        
-        .image-layer { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: cover; background-position: center; 
-            transition: opacity 1.5s ease-in-out; opacity: 0;
-            transform-origin: center center;
-            will-change: transform, opacity;
-        }
+        .image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1.5s ease-in-out; opacity: 0; transform-origin: center center; will-change: transform, opacity; }
+        @keyframes imageZoom { 0% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        @keyframes imageZoom {
-            0% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* ============ 星空墙核心样式 ============ */
+        /* ===== 星空 ===== */
         #star-field { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
-        .star-wish {
-            position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%;
-            box-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5);
-            cursor: pointer; pointer-events: auto;
-            animation: star-twinkle 2s infinite alternate;
-            transition: transform 0.3s ease;
-        }
+        .star-wish { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; box-shadow: 0 0 10px white, 0 0 20px rgba(255,255,255,0.5); cursor: pointer; pointer-events: auto; animation: star-twinkle 2s infinite alternate; transition: transform 0.3s ease; }
         .star-wish:hover { transform: scale(2.5); z-index: 100; }
         @keyframes star-twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
-        
-        .star-tooltip {
-            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-            padding: 8px 12px; border-radius: 12px; font-size: 12px; color: #444;
-            white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none;
-        }
+        .star-tooltip { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 12px; font-size: 12px; color: #444; white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none; }
         .star-wish:hover .star-tooltip { opacity: 1; visibility: visible; bottom: 20px; }
-
-        .star-trigger-btn {
-            position: absolute; bottom: 30px; left: 270px; z-index: 100;
-            width: 45px; height: 45px; border-radius: 50%; background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s;
-        }
+        .star-trigger-btn { position: absolute; bottom: 30px; left: 270px; z-index: 100; width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
         .star-trigger-btn:hover { transform: scale(1.1); background: white; }
-
-        .wish-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-        }
-        .wish-box {
-            background: white; border-radius: 25px; padding: 25px; width: 320px;
-            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: login-appear 0.3s ease;
-        }
+        .wish-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .wish-box { background: white; border-radius: 25px; padding: 25px; width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: login-appear 0.3s ease; }
         .wish-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; margin: 15px 0; outline: none; resize: none; font-family: inherit; }
-
-        /* ============ 星空专属署名弹窗 ============ */
-        .star-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .star-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 600; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .star-login-overlay.show { display: flex; }
-        .star-login-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3); animation: login-appear 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .star-login-input { width: 100%; padding: 12px; border: 1px solid rgba(255, 215, 0, 0.5); border-radius: 15px; text-align: center; margin-bottom: 20px; font-size: 15px; outline: none; transition: 0.2s; background: rgba(255,255,255,0.8); color: #333; }
+        .star-login-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3); animation: login-appear 0.3s ease; backdrop-filter: blur(15px); }
+        .star-login-input { width: 100%; padding: 12px; border: 1px solid rgba(255,215,0,0.5); border-radius: 15px; text-align: center; margin-bottom: 20px; font-size: 15px; outline: none; transition: 0.2s; background: rgba(255,255,255,0.8); color: #333; }
         .star-login-input:focus { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.4); background: #fff; }
         .star-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,215,0,0.3); }
-        .star-login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
+        .star-login-btn:hover { transform: translateY(-2px); }
 
-        /* ============ 连接状态指示器 ============ */
-        #ws-status {
-            position: absolute; top: 15px; right: 15px; z-index: 200;
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.25); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.4); border-radius: 20px;
-            padding: 5px 12px; font-size: 11px; color: rgba(255,255,255,0.9);
-            transition: opacity 0.5s ease;
-        }
+        /* ===== WS状态 ===== */
+        #ws-status { position: absolute; top: 15px; right: 15px; z-index: 200; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 5px 12px; font-size: 11px; color: rgba(255,255,255,0.9); transition: opacity 0.5s ease; }
         #ws-status .dot-indicator { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; transition: background 0.4s; }
         #ws-status.connecting .dot-indicator { background: #FFD700; animation: pulse-dot 1s infinite; }
         #ws-status.connected .dot-indicator { background: #7CFC00; }
         #ws-status.disconnected .dot-indicator { background: #FF6B6B; }
         @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* ============ 新增相册导航样式 ============ */
+        /* ===== 相册 ===== */
         .album-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,182,193,0.4); padding-bottom: 12px; }
         .album-nav-btn { flex: 1; padding: 6px 0; text-align: center; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 10px; font-size: 11px; color: #555; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        .album-nav-btn:hover { background: rgba(255,182,193,0.7); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255,182,193,0.3);}
-        
-        /* ============ 优化后的滑动相册弹窗样式 ============ */
-        .album-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .album-nav-btn:hover { background: rgba(255,182,193,0.7); color: white; border-color: transparent; transform: translateY(-2px); }
+        .album-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .album-modal.show { display: flex; opacity: 1; }
         .album-container { width: 95%; max-width: 900px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         .album-header { padding: 15px 20px; background: rgba(255,255,255,0.25); border-bottom: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .album-header h3 { color: #fff; font-size: 18px; margin: 0; text-shadow: 0 2px 5px rgba(0,0,0,0.2); letter-spacing: 1px;}
-        .album-close { background: none; border: none; font-size: 26px; color: white; cursor: pointer; transition: 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .album-header h3 { color: #fff; font-size: 18px; margin: 0; letter-spacing: 1px; }
+        .album-close { background: none; border: none; font-size: 26px; color: white; cursor: pointer; transition: 0.2s; }
         .album-close:hover { transform: scale(1.2); color: #FFB6C1; }
-        
-        /* 核心滚动容器样式 */
         .gallery-container { position: relative; width: 100%; display: flex; align-items: center; padding: 0 20px; }
-        .album-grid { 
-            display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; 
-            padding: 30px 0; width: 100%; align-items: center;
-            -ms-overflow-style: none; scrollbar-width: none; 
-        }
+        .album-grid { display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; padding: 30px 0; width: 100%; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
         .album-grid::-webkit-scrollbar { display: none; }
-        
-        /* 单个图片卡片样式 */
-        .album-item { 
-            position: relative; flex: 0 0 240px; height: 240px; border-radius: 16px; 
-            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: 0.3s; 
-            background: rgba(255,255,255,0.2); 
-        }
+        .album-item { position: relative; flex: 0 0 240px; height: 240px; border-radius: 16px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: 0.3s; background: rgba(255,255,255,0.2); }
         .album-item:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 2; }
         .album-item img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; transition: transform 0.4s ease; }
         .album-item:hover img { transform: scale(1.05); }
-        .album-date { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: rgba(255,255,255,0.9); font-size: 11px; padding: 25px 8px 8px; text-align: left; letter-spacing: 1px; pointer-events: none;}
-        
-        /* 点赞悬浮爱心按钮 */
-        .heart-icon {
-            position: absolute; bottom: 10px; right: 10px; background: rgba(255, 255, 255, 0.85);
-            color: #aaa; border-radius: 20px; padding: 0 10px; min-width: 44px; height: 32px; display: flex;
-            align-items: center; justify-content: center; gap: 4px; cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 5; backdrop-filter: blur(4px);
-        }
+        .album-date { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: rgba(255,255,255,0.9); font-size: 11px; padding: 25px 8px 8px; pointer-events: none; }
+        .heart-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.85); color: #aaa; border-radius: 20px; padding: 0 10px; min-width: 44px; height: 32px; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 5; backdrop-filter: blur(4px); }
         .heart-icon:hover { transform: scale(1.1); }
-        .heart-icon.liked { background: #ff4d4f; color: white; border-color: #ff4d4f; }
+        .heart-icon.liked { background: #ff4d4f; color: white; }
         .heart-icon svg { width: 18px; height: 18px; }
         .heart-count { font-size: 12px; font-weight: bold; }
-
-        /* 左右导航按钮 */
-        .nav-btn {
-            position: absolute; z-index: 10; background: rgba(255, 255, 255, 0.25); color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%; width: 44px; height: 44px;
-            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px); transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        .nav-btn:hover { background: rgba(255, 182, 193, 0.9); transform: scale(1.1); border-color: transparent; }
+        .nav-btn { position: absolute; z-index: 10; background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: 0.3s; }
+        .nav-btn:hover { background: rgba(255,182,193,0.9); transform: scale(1.1); }
         .left-btn { left: 15px; }
         .right-btn { right: 15px; }
-
-        /* 上传卡片样式 */
         .upload-card { border: 2px dashed rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
         .upload-card:hover { background: rgba(255,255,255,0.3); border-color: #FFB6C1; transform: translateY(-5px); }
         .upload-card svg { width: 36px; height: 36px; fill: white; margin-bottom: 8px; transition: 0.3s; }
-        .upload-card:hover svg { fill: #FFB6C1; transform: scale(1.1); }
+        .upload-card:hover svg { fill: #FFB6C1; }
 
-        /* ============ 原有 UI 样式 ============ */
+        /* ===== 主布局 ===== */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
-        .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s ease; }
-        .age-btn:hover { background: rgba(255, 255, 255, 0.3); color: #fff; }
-        .age-btn.active { background: rgba(255, 255, 255, 0.8); color: #333; border-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); transform: scale(1.1); }
+        .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; }
+        .age-btn:hover { background: rgba(255,255,255,0.3); }
+        .age-btn.active { background: rgba(255,255,255,0.8); color: #333; border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.5); transform: scale(1.1); }
         .dots-container { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 12px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-        .dot.active { background: #fff; transform: scale(1.3); box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); border-color: #fff; }
-        .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); }
+        .dot.active { background: #fff; transform: scale(1.3); box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+        .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,182,193,0.2); }
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
-        .music-player-pro { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255, 255, 255, 0.4); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); width: 280px; max-width: 90vw; }
-        .song-marquee-box { flex: 1; overflow: hidden; white-space: nowrap; position: relative; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+        .music-player-pro { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255,182,193,0.2); width: 280px; max-width: 90vw; }
+        .song-marquee-box { flex: 1; overflow: hidden; white-space: nowrap; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
         .song-title-text { display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold; animation: marquee 8s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .music-controls { display: flex; align-items: center; gap: 10px; }
@@ -184,8 +101,278 @@
         .btn-ctrl:hover { transform: scale(1.2); color: #FF1493; }
         .btn-ctrl svg { width: 16px; height: 16px; fill: currentColor; }
         .btn-play-pause svg { width: 22px; height: 22px; }
+
+        /* ===== 聊天 ===== */
+        .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255,105,180,0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
+        .chat-bubble-btn:hover { transform: scale(1.15); }
+        .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .chat-bubble-btn .msg-badge { position: absolute; top: -5px; right: -5px; z-index: 10; min-width: 20px; height: 20px; padding: 0 5px; background: #FF4757; border-radius: 10px; color: white; font-size: 11px; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid white; }
+        .chat-window { position: absolute; bottom: 100px; right: 30px; z-index: 150; width: 380px; height: 560px; background: rgba(255,255,255,0.5); backdrop-filter: blur(25px); border-radius: 25px 25px 5px 25px; box-shadow: 0 15px 50px rgba(255,105,180,0.2), inset 0 0 0 1px rgba(255,255,255,0.4); display: none; flex-direction: column; overflow: hidden; }
+        .chat-window.show { display: flex; animation: window-appear 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        .chat-header { background: rgba(255,182,193,0.6); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .chat-header-info h3 { color: #333; font-size: 16px; font-weight: 600; margin: 0; }
+        .chat-header-info span { color: #666; font-size: 11px; }
+        .chat-header-close { width: 32px; height: 32px; background: rgba(255,255,255,0.4); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .message-item { display: flex; gap: 10px; animation: message-appear 0.3s ease; }
+        .message-item.right { flex-direction: row-reverse; }
+        .message-avatar { width: 36px; height: 36px; min-width: 36px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .message-content { max-width: 75%; }
+        .message-name { font-size: 11px; color: #888; margin-bottom: 4px; padding: 0 4px; font-weight: 500; }
+        .message-item.right .message-name { text-align: right; color: #FF69B4; }
+        .message-bubble { background: rgba(255,255,255,0.8); padding: 10px 14px; border-radius: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; color: #444; line-height: 1.5; word-break: break-word; }
+        .message-item.right .message-bubble { background: #FFB6C1; color: white; }
+        .message-image { border-radius: 12px; max-width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: zoom-in; }
+        .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
+        .image-viewer img { max-width: 95%; max-height: 95%; border-radius: 5px; }
+        .chat-bottom-wrapper { background: rgba(255,255,255,0.4); padding: 10px; border-top: 1px solid rgba(255,255,255,0.2); position: relative; }
+        .chat-toolbar { padding: 0 10px 8px 10px; display: flex; gap: 15px; }
+        .chat-input-area { display: flex; gap: 10px; align-items: flex-end; }
+        .chat-input { flex: 1; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.8); border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; resize: none; max-height: 80px; font-family: inherit; }
+        .chat-send-btn { width: 42px; height: 42px; background: #FFB6C1; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-picker { position: absolute; bottom: 130px; left: 15px; background: white; padding: 10px; border-radius: 15px; display: none; grid-template-columns: repeat(8, 1fr); gap: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 300px; max-height: 220px; overflow-y: auto; z-index: 200; border: 1px solid #FFE4E9; }
+        .chat-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .chat-login-overlay.show { display: flex; }
+        .chat-login-box { background: white; border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: login-appear 0.3s ease; }
+        .avatar-selection { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .avatar-opt { font-size: 30px; cursor: pointer; padding: 5px; border-radius: 50%; opacity: 0.5; transition: 0.3s; }
+        .avatar-opt.selected { opacity: 1; transform: scale(1.2); background: #FFF0F5; }
+        .chat-login-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; text-align: center; margin-bottom: 15px; font-size: 15px; outline: none; transition: 0.2s; font-family: inherit; }
+        .chat-login-input:focus { border-color: #FF69B4; }
+        .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+        @keyframes login-appear { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes window-appear { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes bounce-subtle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes message-appear { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===================================================================
+           日记本 — 日历卡片（左侧）
+        =================================================================== */
+        .diary-card {
+            position: absolute; left: 30px; z-index: 20; width: 220px;
+            background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5); border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(255,182,193,0.2);
+            overflow: hidden;
+        }
+        /* 日历卡片顶部：年份 + 月份导航 */
+        .diary-cal-header {
+            background: rgba(255,182,193,0.35); padding: 8px 10px 6px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .diary-cal-year {
+            font-size: 11px; color: rgba(255,80,140,0.8); font-weight: 600;
+            letter-spacing: 0.05em; text-align: center;
+        }
+        .diary-cal-month-row {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .diary-cal-month-name {
+            font-size: 17px; font-weight: bold; color: #c94f82; letter-spacing: 0.03em;
+        }
+        .diary-cal-nav {
+            background: none; border: none; cursor: pointer; color: #c94f82;
+            font-size: 16px; padding: 0 4px; line-height: 1; transition: 0.2s;
+            display: flex; align-items: center;
+        }
+        .diary-cal-nav:hover { color: #FF1493; transform: scale(1.2); }
+        /* 星期标题行 */
+        .diary-cal-weekdays {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            padding: 4px 8px 2px; gap: 0;
+        }
+        .diary-cal-wd {
+            text-align: center; font-size: 9px; color: rgba(180,80,130,0.7);
+            font-weight: 600; padding: 2px 0; letter-spacing: 0.03em;
+        }
+        .diary-cal-wd:first-child { color: rgba(220,80,80,0.7); }
+        .diary-cal-wd:last-child { color: rgba(80,130,220,0.7); }
+        /* 日期格子 */
+        .diary-cal-days {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            padding: 2px 8px 8px; gap: 2px;
+        }
+        .diary-day {
+            position: relative; text-align: center; padding: 3px 0;
+            border-radius: 7px; cursor: pointer; transition: background 0.2s;
+            min-height: 26px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .diary-day:hover { background: rgba(255,105,180,0.12); }
+        .diary-day.empty { cursor: default; }
+        .diary-day.empty:hover { background: none; }
+        /* 无日记 → 灰色 */
+        .diary-day-num {
+            font-size: 11px; color: rgba(160,130,140,0.65); line-height: 1;
+        }
+        /* 有日记 → 黑色加粗 */
+        .diary-day.has-diary .diary-day-num {
+            color: #2a1520; font-weight: 700;
+        }
+        /* 今天 → 粉色圆圈 */
+        .diary-day.today .diary-day-num {
+            background: #FF69B4; color: white; border-radius: 50%;
+            width: 18px; height: 18px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold;
+        }
+        /* 日记条数小角标 */
+        .diary-day-dot {
+            width: 4px; height: 4px; background: #FF69B4; border-radius: 50%;
+            margin-top: 1px; display: none;
+        }
+        .diary-day.has-diary .diary-day-dot { display: block; }
+        /* 周末颜色 */
+        .diary-day.sun .diary-day-num { color: rgba(200,60,60,0.55); }
+        .diary-day.sun.has-diary .diary-day-num { color: #c0392b; }
+        .diary-day.sat .diary-day-num { color: rgba(60,100,200,0.55); }
+        .diary-day.sat.has-diary .diary-day-num { color: #2962be; }
+
+        /* ===================================================================
+           日记弹窗（全屏覆盖 + 中央卡片）
+        =================================================================== */
+        .diary-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45); backdrop-filter: blur(10px);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+        }
+        .diary-overlay.show { display: flex; }
+        .diary-modal {
+            width: min(94vw, 520px); max-height: 85vh;
+            background: rgba(255,255,255,0.96); border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(255,105,180,0.25);
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: login-appear 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        /* 弹窗顶栏 */
+        .diary-modal-header {
+            background: linear-gradient(135deg, rgba(255,182,193,0.6), rgba(255,105,180,0.3));
+            padding: 14px 18px; display: flex; align-items: center;
+            justify-content: space-between; flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,182,193,0.3);
+        }
+        .diary-modal-title { font-size: 15px; font-weight: bold; color: #c94f82; }
+        .diary-modal-date { font-size: 11px; color: rgba(180,80,130,0.7); margin-top: 2px; }
+        .diary-modal-close {
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.5);
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; color: #999;
+        }
+        .diary-modal-close:hover { background: rgba(255,105,180,0.2); color: #FF69B4; }
+
+        /* 发布区（推文风格） */
+        .diary-compose {
+            padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,182,193,0.2);
+            flex-shrink: 0; background: rgba(255,250,252,0.8);
+        }
+        .diary-compose-name-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+        }
+        .diary-compose-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1, #FF69B4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .diary-compose-name-input {
+            flex: 1; padding: 5px 10px; border: 1.5px solid #FFE4E9;
+            border-radius: 20px; font-size: 13px; outline: none; background: white;
+            color: #444; font-family: inherit;
+        }
+        .diary-compose-name-input:focus { border-color: #FF69B4; }
+        .diary-compose-text {
+            width: 100%; min-height: 70px; max-height: 140px;
+            border: 1.5px solid #FFE4E9; border-radius: 12px; padding: 10px 12px;
+            font-size: 14px; outline: none; resize: none; font-family: inherit;
+            line-height: 1.6; color: #333; background: white;
+        }
+        .diary-compose-text:focus { border-color: #FF69B4; }
+        /* 工具栏 */
+        .diary-compose-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 8px;
+        }
+        .diary-tool-left { display: flex; gap: 6px; align-items: center; }
+        .diary-tool-btn {
+            background: none; border: none; cursor: pointer; font-size: 18px;
+            padding: 4px; border-radius: 8px; transition: 0.15s; line-height: 1;
+        }
+        .diary-tool-btn:hover { background: rgba(255,105,180,0.1); transform: scale(1.1); }
+        .diary-char-count { font-size: 10px; color: #ccc; }
+        .diary-submit-btn {
+            padding: 7px 18px; background: linear-gradient(135deg, #FFB6C1, #FF69B4);
+            border: none; border-radius: 20px; color: white; font-size: 13px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 10px rgba(255,105,180,0.3);
+        }
+        .diary-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,105,180,0.4); }
+        .diary-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        /* 图片预览 */
+        .diary-img-preview {
+            margin-top: 8px; display: none; position: relative;
+            border-radius: 10px; overflow: hidden; max-height: 120px;
+        }
+        .diary-img-preview img { width: 100%; height: 120px; object-fit: cover; display: block; }
+        .diary-img-remove {
+            position: absolute; top: 5px; right: 5px; width: 22px; height: 22px;
+            background: rgba(0,0,0,0.5); border: none; border-radius: 50%; cursor: pointer;
+            color: white; font-size: 13px; display: flex; align-items: center; justify-content: center;
+        }
+        /* 表情选择器（日记专用）*/
+        .diary-emoji-picker {
+            position: absolute; bottom: 44px; left: 0; background: white;
+            padding: 8px; border-radius: 12px; display: none;
+            grid-template-columns: repeat(8, 1fr); gap: 4px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12); width: 280px;
+            max-height: 180px; overflow-y: auto; z-index: 10;
+            border: 1px solid #FFE4E9;
+        }
+        .diary-compose { position: relative; }
+
+        /* 日记列表 */
+        .diary-entries { flex: 1; overflow-y: auto; padding: 0; }
+        .diary-entries-inner { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+        .diary-empty {
+            text-align: center; padding: 40px 20px; color: #ccc; font-size: 13px;
+        }
+        .diary-empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+        /* 单条日记 */
+        .diary-entry {
+            border-radius: 14px; background: rgba(255,240,245,0.6);
+            border: 1px solid rgba(255,182,193,0.25);
+            padding: 12px 14px; animation: fadeIn 0.3s ease;
+        }
+        .diary-entry-header {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+        }
+        .diary-entry-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFD6E0, #FFB6C1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; color: #c94f82; flex-shrink: 0;
+        }
+        .diary-entry-meta { flex: 1; }
+        .diary-entry-name { font-size: 12px; font-weight: 600; color: #c94f82; }
+        .diary-entry-time { font-size: 10px; color: #bbb; margin-top: 1px; }
+        .diary-entry-body { font-size: 13px; color: #444; line-height: 1.7; word-break: break-word; white-space: pre-wrap; }
+        .diary-entry-img { margin-top: 8px; border-radius: 10px; overflow: hidden; }
+        .diary-entry-img img { width: 100%; border-radius: 10px; cursor: zoom-in; max-height: 240px; object-fit: cover; }
+        /* 日记点赞 */
+        .diary-entry-footer { margin-top: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .diary-like-btn {
+            display: flex; align-items: center; gap: 4px; background: none; border: none;
+            cursor: pointer; font-size: 12px; color: #ccc; padding: 3px 8px;
+            border-radius: 12px; transition: 0.2s;
+        }
+        .diary-like-btn:hover { background: rgba(255,105,180,0.1); color: #FF69B4; }
+        .diary-like-btn.liked { color: #FF69B4; }
+        .diary-like-btn .like-heart { font-size: 13px; }
+
+        /* ===== 响应式 ===== */
         @media (max-width: 768px) {
-            .main-card { bottom: auto; top: 30px; left: 20px; width: 60%; padding: 15px 15px 14px;; }
+            .main-card { bottom: auto; top: 30px; left: 20px; width: 60%; }
+            .diary-card { display: none; }
             .music-player-pro { bottom: 30px; left: 20px; transform: none; width: calc(100vw - 120px); }
             .dots-container { bottom: 90px; }
             .age-selector { bottom: 125px; gap: 10px; }
@@ -194,769 +381,843 @@
             .chat-window { width: 90vw !important; height: 75vh !important; right: 5vw !important; bottom: 85px !important; }
             .star-trigger-btn { left: auto; right: 80px; bottom: 25px; }
             #ws-status { top: 8px; right: 8px; padding: 4px 8px; }
-            
-            /* 移动端相册横向滑动适配 */
             .album-item { flex: 0 0 160px; height: 160px; }
-            .nav-btn { display: none; } 
-            .gallery-container { padding: 0 10px; }
-            .album-grid { padding: 15px 0; gap: 12px; }
+            .nav-btn { display: none; }
         }
-        .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
-        .chat-bubble-btn:hover { transform: scale(1.15); }
-        .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .chat-bubble-btn .msg-badge { position: absolute; top: -5px; right: -5px; z-index: 10; min-width: 20px; height: 20px; padding: 0 5px; background: #FF4757; border-radius: 10px; color: white; font-size: 11px; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .chat-window { position: absolute; bottom: 100px; right: 30px; z-index: 150; width: 380px; height: 560px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 25px 25px 5px 25px; box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2), inset 0 0 0 1px rgba(255,255,255,0.4); display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; }
-        .chat-window.show { display: flex; animation: window-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .chat-header { background: rgba(255, 182, 193, 0.6); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-        .chat-header-info h3 { color: #333; font-size: 16px; font-weight: 600; margin: 0; }
-        .chat-header-info span { color: #666; font-size: 11px; }
-        .chat-header-close { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.4); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .message-item { display: flex; gap: 10px; animation: message-appear 0.3s ease; }
-        .message-item.right { flex-direction: row-reverse; }
-        .message-avatar { width: 36px; height: 36px; min-width: 36px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .message-content { max-width: 75%; }
-        .message-name { font-size: 11px; color: #888; margin-bottom: 4px; padding: 0 4px; font-weight: 500; }
-        .message-item.right .message-name { text-align: right; color: #FF69B4; }
-        .message-bubble { background: rgba(255, 255, 255, 0.8); padding: 10px 14px; border-radius: 18px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); font-size: 14px; color: #444; line-height: 1.5; word-break: break-word; }
-        .message-item.right .message-bubble { background: #FFB6C1; color: white; }
-        .message-image { border-radius: 12px; max-width: 100%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); cursor: zoom-in; transition: transform 0.2s; }
-        .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
-        .image-viewer img { max-width: 95%; max-height: 95%; border-radius: 5px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .chat-bottom-wrapper { background: rgba(255, 255, 255, 0.4); padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.2); position: relative; }
-        .chat-toolbar { padding: 0 10px 8px 10px; display: flex; gap: 15px; }
-        .chat-input-area { display: flex; gap: 10px; align-items: flex-end; }
-        .chat-input { flex: 1; border: 1px solid rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; resize: none; max-height: 80px; }
-        .chat-send-btn { width: 42px; height: 42px; background: #FFB6C1; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5); }
-        .emoji-picker { position: absolute; bottom: 130px; left: 15px; background: white; padding: 10px; border-radius: 15px; display: none; grid-template-columns: repeat(8, 1fr); gap: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 300px; max-height: 220px; overflow-y: auto; z-index: 200; border: 1px solid #FFE4E9; }
-        .chat-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-        .chat-login-overlay.show { display: flex; }
-        .chat-login-box { background: white; border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: login-appear 0.3s ease; }
-        @keyframes login-appear { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes window-appear { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes bounce-subtle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        @keyframes message-appear { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        .avatar-selection { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .avatar-opt { font-size: 30px; cursor: pointer; padding: 5px; border-radius: 50%; opacity: 0.5; transition: 0.3s; }
-        .avatar-opt.selected { opacity: 1; transform: scale(1.2); background: #FFF0F5; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3); }
-        .chat-login-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; text-align: center; margin-bottom: 15px; font-size: 15px; outline: none; transition: 0.2s; }
-        .chat-login-input:focus { border-color: #FF69B4; }
-        .chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-
-        /* 聊天窗口连接中占位提示 */
-        .chat-connecting-hint {
-            text-align: center; padding: 20px; color: #bbb; font-size: 13px;
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-        }
-        .chat-connecting-hint .spin {
-            width: 22px; height: 22px; border: 2px solid #FFE4E9;
-            border-top-color: #FF69B4; border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div id="img1" class="image-layer"></div>
-        <div id="img2" class="image-layer"></div>
+<div id="app">
+    <div id="img1" class="image-layer"></div>
+    <div id="img2" class="image-layer"></div>
+    <div id="star-field"></div>
 
-        <div id="star-field"></div>
+    <div id="ws-status" class="connecting">
+        <div class="dot-indicator"></div>
+        <span id="ws-status-text">连接中...</span>
+    </div>
 
-        <!-- 连接状态指示器（页面右上角） -->
-        <div id="ws-status" class="connecting">
-            <div class="dot-indicator"></div>
-            <span id="ws-status-text">连接中...</span>
+    <div class="star-trigger-btn" onclick="toggleWishModal()" title="留下你想说的话">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+    </div>
+
+    <!-- 相册弹窗 -->
+    <div class="album-modal" id="album-modal" onclick="if(event.target===this) closeAlbum()">
+        <div class="album-container">
+            <div class="album-header">
+                <h3 id="album-title">相册</h3>
+                <button class="album-close" onclick="closeAlbum()">×</button>
+            </div>
+            <div class="gallery-container">
+                <button class="nav-btn left-btn" onclick="scrollGallery(-1)">&#10094;</button>
+                <div class="album-grid" id="album-grid"></div>
+                <button class="nav-btn right-btn" onclick="scrollGallery(1)">&#10095;</button>
+            </div>
+            <input type="file" id="album-file-input" accept="image/*" style="display:none;" onchange="handleAlbumUpload(event)">
         </div>
+    </div>
 
-        <div class="star-trigger-btn" onclick="toggleWishModal()" title="留下你想说的话">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+    <!-- 星空寄语 -->
+    <div class="wish-modal" id="wish-modal" onclick="event.target===this && toggleWishModal()">
+        <div class="wish-box">
+            <h3 style="color:#FFB6C1;">✨ 星空寄语</h3>
+            <p style="font-size:12px;color:#999;margin-top:5px;">Your words will be shining in the dimension~</p>
+            <textarea id="wish-input" class="wish-input" placeholder="输入你想说的话..." rows="3" maxlength="30"></textarea>
+            <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()">放飞心愿</button>
         </div>
+    </div>
+    <div class="star-login-overlay" id="star-login-overlay">
+        <div class="star-login-box">
+            <h3 style="color:#FFD700;margin-bottom:20px;">✨ 留下你的署名</h3>
+            <input type="text" id="star-nickname-input" class="star-login-input" placeholder="输入你的名字..." maxlength="10" onkeydown="if(event.key==='Enter') enterStarName()">
+            <button class="star-login-btn" onclick="enterStarName()">下一步</button>
+        </div>
+    </div>
 
-        <!-- ============ 优化后的照片相册弹窗 ============ -->
-        <div class="album-modal" id="album-modal" onclick="if(event.target===this) closeAlbum()">
-            <div class="album-container">
-                <div class="album-header">
-                    <h3 id="album-title">相册</h3>
-                    <button class="album-close" onclick="closeAlbum()">×</button>
+    <div class="age-selector">
+        <div class="age-btn active" data-age="22" onclick="switchAge(22)">22</div>
+        <div class="age-btn" data-age="21" onclick="switchAge(21)">21</div>
+        <div class="age-btn" data-age="20" onclick="switchAge(20)">20</div>
+        <div class="age-btn" data-age="19" onclick="switchAge(19)">19</div>
+    </div>
+    <div class="dots-container" id="dynamic-dots"></div>
+
+    <!-- ============================================================
+         日记本日历卡片（main-card 正上方）
+    ============================================================ -->
+    <div class="diary-card" id="diary-card">
+        <div class="diary-cal-header">
+            <div class="diary-cal-year" id="diary-cal-year">2026年</div>
+            <div class="diary-cal-month-row">
+                <button class="diary-cal-nav" onclick="diaryNavMonth(-1)">&#8249;</button>
+                <div class="diary-cal-month-name" id="diary-cal-month">五月</div>
+                <button class="diary-cal-nav" onclick="diaryNavMonth(1)">&#8250;</button>
+            </div>
+        </div>
+        <div class="diary-cal-weekdays">
+            <div class="diary-cal-wd">日</div><div class="diary-cal-wd">一</div>
+            <div class="diary-cal-wd">二</div><div class="diary-cal-wd">三</div>
+            <div class="diary-cal-wd">四</div><div class="diary-cal-wd">五</div>
+            <div class="diary-cal-wd">六</div>
+        </div>
+        <div class="diary-cal-days" id="diary-cal-days"></div>
+    </div>
+
+    <!-- main-card -->
+    <div class="main-card">
+        <div class="album-nav">
+            <div class="album-nav-btn" onclick="openAlbum('album_food','全是好吃的')">美食</div>
+            <div class="album-nav-btn" onclick="openAlbum('album_scenery','全是好看的')">美景</div>
+            <div class="album-nav-btn" onclick="openAlbum('album_portrait','全是最美的')">美人</div>
+        </div>
+        <h1>TuoTuo</h1>
+        <div class="quote" style="color:#666;">生活原本沉闷，但跑起来就有风。</div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,182,193,0.3);">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="#FF69B4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span style="font-size:10px;color:rgba(255,105,180,0.85);font-weight:500;letter-spacing:0.04em;">在一起</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:4px;">
+                <span id="love-days" style="font-size:26px;font-weight:bold;color:#FF69B4;line-height:1;"></span>
+                <span style="font-size:12px;color:rgba(255,105,180,0.75);">天</span>
+            </div>
+            <div style="margin-top:3px;font-size:10px;color:rgba(100,80,80,0.55);">2026.04.11 —— 至今</div>
+        </div>
+    </div>
+
+    <div class="music-player-pro">
+        <div class="song-marquee-box"><div class="song-title-text" id="song-title">准备播放...</div></div>
+        <div class="music-controls">
+            <button class="btn-ctrl" onclick="prevSong()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+            <button class="btn-ctrl btn-play-pause" onclick="togglePlay()"><svg viewBox="0 0 24 24" id="play-icon-svg"><path d="M8 5v14l11-7z"/></svg></button>
+            <button class="btn-ctrl" onclick="nextSong()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+        </div>
+        <audio id="bgm" src="bgm.mp3"></audio>
+    </div>
+
+    <div class="chat-bubble-btn" id="chat-bubble-btn" onclick="toggleChat(event)">
+        <div id="msg-badge" class="msg-badge">0</div>
+        <img src="705e503b351a4e7b80ae0d24442e298b.png" alt="聊天">
+    </div>
+
+    <div class="chat-window" id="chat-window">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <h3>TuoTuo's Chat Room</h3>
+                <span><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
+            </div>
+            <button class="chat-header-close" onclick="toggleChat(event)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#666" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-bottom-wrapper">
+            <div class="chat-toolbar">
+                <button style="background:none;border:none;cursor:pointer;font-size:20px;" onclick="toggleEmojiPicker()">😊</button>
+                <input type="file" id="image-upload" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                <button style="background:none;border:none;cursor:pointer;font-size:20px;" onclick="document.getElementById('image-upload').click()">🖼️</button>
+            </div>
+            <div class="chat-input-area">
+                <textarea class="chat-input" id="chat-input" placeholder="说点什么吧..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
+                <button class="chat-send-btn" onclick="sendTextMessage()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="emoji-picker" class="emoji-picker"></div>
+    </div>
+
+    <div class="chat-login-overlay" id="chat-login-overlay">
+        <div class="chat-login-box">
+            <h3 style="color:#FFB6C1;margin-bottom:20px;">选择你的专属头像</h3>
+            <div class="avatar-selection">
+                <div class="avatar-opt selected" onclick="selAv(this,'🐰')">🐰</div>
+                <div class="avatar-opt" onclick="selAv(this,'🐱')">🐱</div>
+                <div class="avatar-opt" onclick="selAv(this,'🐶')">🐶</div>
+                <div class="avatar-opt" onclick="selAv(this,'🦊')">🦊</div>
+            </div>
+            <input type="text" id="nickname-input" class="chat-login-input" placeholder="给自己起个名字吧~" maxlength="10" onkeydown="handleLoginKey(event)">
+            <button class="chat-login-btn" onclick="enterChat()">开始聊天</button>
+        </div>
+    </div>
+
+    <div id="image-viewer" class="image-viewer" onclick="this.style.display='none'">
+        <img id="full-image" src="" alt="预览">
+    </div>
+
+    <!-- ============================================================
+         日记弹窗（点击日期后出现）
+    ============================================================ -->
+    <div class="diary-overlay" id="diary-overlay" onclick="if(event.target===this) closeDiaryModal()">
+        <div class="diary-modal">
+            <!-- 顶栏 -->
+            <div class="diary-modal-header">
+                <div>
+                    <div class="diary-modal-title" id="diary-modal-title">📖 日记</div>
+                    <div class="diary-modal-date" id="diary-modal-date"></div>
                 </div>
-                <!-- 改版为横向滑动容器 -->
-                <div class="gallery-container">
-                    <button class="nav-btn left-btn" onclick="scrollGallery(-1)">&#10094;</button>
-                    <div class="album-grid" id="album-grid">
-                        <!-- 图片和上传按钮将在 JS 中动态生成 -->
+                <button class="diary-modal-close" onclick="closeDiaryModal()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <!-- 发布框 -->
+            <div class="diary-compose">
+                <div class="diary-compose-name-row">
+                    <div class="diary-compose-avatar" id="diary-compose-avatar">✍️</div>
+                    <input type="text" id="diary-author-input" class="diary-compose-name-input"
+                           placeholder="你的名字..." maxlength="12"
+                           oninput="saveDiaryAuthor(this.value)">
+                </div>
+                <textarea id="diary-text-input" class="diary-compose-text"
+                          placeholder="今天发生了什么有趣的事呢～" maxlength="500"
+                          oninput="updateDiaryCharCount(this)"></textarea>
+                <div class="diary-img-preview" id="diary-img-preview">
+                    <img id="diary-preview-img" src="" alt="">
+                    <button class="diary-img-remove" onclick="removeDiaryImg()">✕</button>
+                </div>
+                <div class="diary-compose-toolbar">
+                    <div class="diary-tool-left" style="position:relative;">
+                        <button class="diary-tool-btn" onclick="toggleDiaryEmoji()" title="表情">😊</button>
+                        <button class="diary-tool-btn" onclick="document.getElementById('diary-img-input').click()" title="添加图片">🖼️</button>
+                        <input type="file" id="diary-img-input" accept="image/*" style="display:none;" onchange="handleDiaryImgSelect(event)">
+                        <span class="diary-char-count" id="diary-char-count">0 / 500</span>
+                        <div class="diary-emoji-picker" id="diary-emoji-picker"></div>
                     </div>
-                    <button class="nav-btn right-btn" onclick="scrollGallery(1)">&#10095;</button>
+                    <button class="diary-submit-btn" id="diary-submit-btn" onclick="submitDiaryEntry()">发布</button>
                 </div>
-                <input type="file" id="album-file-input" accept="image/*" style="display:none;" onchange="handleAlbumUpload(event)">
+            </div>
+            <!-- 日记列表 -->
+            <div class="diary-entries" id="diary-entries">
+                <div class="diary-entries-inner" id="diary-entries-inner">
+                    <div class="diary-empty" id="diary-empty">
+                        <div class="diary-empty-icon">🌙</div>
+                        <div>这一天还没有日记，来写第一篇吧~</div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="wish-modal" id="wish-modal" onclick="event.target===this && toggleWishModal()">
-            <div class="wish-box">
-                <h3 style="color:#FFB6C1;">✨ 星空寄语</h3>
-                <p style="font-size:12px; color:#999; margin-top:5px;">Your words will be shining in the dimension~</p>
-                <textarea id="wish-input" class="wish-input" placeholder="输入你想说的话..." rows="3" maxlength="30"></textarea>
-                <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()">放飞心愿</button>
-            </div>
-        </div>
-
-        <div class="star-login-overlay" id="star-login-overlay">
-            <div class="star-login-box">
-                <h3 style="color:#FFD700; margin-bottom:20px;">✨ 留下你的署名</h3>
-                <input type="text" id="star-nickname-input" class="star-login-input" placeholder="输入你的名字..." maxlength="10" onkeydown="if(event.key==='Enter') enterStarName()">
-                <button class="star-login-btn" onclick="enterStarName()">下一步</button>
-            </div>
-        </div>
-        
-        <div class="age-selector">
-            <div class="age-btn active" data-age="22" onclick="switchAge(22)">22</div>
-            <div class="age-btn" data-age="21" onclick="switchAge(21)">21</div>
-            <div class="age-btn" data-age="20" onclick="switchAge(20)">20</div>
-            <div class="age-btn" data-age="19" onclick="switchAge(19)">19</div>
-        </div>
-        <div class="dots-container" id="dynamic-dots"></div>
-        <div class="main-card">
-            <!-- ============ 新增：三大相册导航入口 ============ -->
-            <div class="album-nav">
-                <div class="album-nav-btn" onclick="openAlbum('album_food', '全是好吃的')">美食</div>
-                <div class="album-nav-btn" onclick="openAlbum('album_scenery', '全是好看的')">美景</div>
-                <div class="album-nav-btn" onclick="openAlbum('album_portrait', '全是最美的')">美人</div>
-            </div>
-            <h1>TuoTuo</h1>
-            <div class="quote" style="color:#666;">生活原本沉闷，但跑起来就有风。</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,182,193,0.3);">
-    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 3px;">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="#FF69B4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        <span style="font-size: 10px; color: rgba(255,105,180,0.85); font-weight: 500; letter-spacing: 0.04em;">在一起</span>
     </div>
-    <div style="display: flex; align-items: baseline; gap: 4px;">
-        <span id="love-days" style="font-size: 26px; font-weight: bold; color: #FF69B4; line-height: 1;"></span>
-        <span style="font-size: 12px; color: rgba(255,105,180,0.75);">天</span>
-    </div>
-    <div style="margin-top: 3px; font-size: 10px; color: rgba(100,80,80,0.55);">2026.04.11 —— 至今</div>
 </div>
-        </div>
-        
-        <div class="music-player-pro">
-            <div class="song-marquee-box">
-                <div class="song-title-text" id="song-title">准备播放...</div>
-            </div>
-            <div class="music-controls">
-                <button class="btn-ctrl" onclick="prevSong()" title="上一首">
-                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                </button>
-                <button class="btn-ctrl btn-play-pause" id="btn-play-pause" onclick="togglePlay()" title="播放/暂停">
-                    <svg viewBox="0 0 24 24" id="play-icon-svg"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <button class="btn-ctrl" onclick="nextSong()" title="下一首">
-                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                </button>
-            </div>
-            <audio id="bgm" src="bgm.mp3"></audio>
-        </div>
 
-        <div class="chat-bubble-btn" id="chat-bubble-btn" onclick="toggleChat(event)">
-            <div id="msg-badge" class="msg-badge">0</div>
-            <img src="705e503b351a4e7b80ae0d24442e298b.png" alt="聊天">
-        </div>
+<script>
+/* ============================================================
+   恋爱天数
+============================================================ */
+(function(){ const s=new Date('2026-04-11'); const d=Math.floor((new Date()-s)/86400000); document.getElementById('love-days').textContent=d; })();
 
-        <div class="chat-window" id="chat-window">
-            <div class="chat-header">
-                <div class="chat-header-info">
-                    <h3>TuoTuo's Chat Room</h3>
-                    <span class="online-count"><span style="color:#7CFC00;">●</span> <span id="online-count">0</span> 人在线</span>
-                </div>
-                <button class="chat-header-close" onclick="toggleChat(event)">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#666" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
-            </div>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-bottom-wrapper">
-                <div class="chat-toolbar">
-                    <button style="background:none; border:none; cursor:pointer; font-size:20px;" onclick="toggleEmojiPicker()">😊</button>
-                    <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <button style="background:none; border:none; cursor:pointer; font-size:20px;" onclick="document.getElementById('image-upload').click()">🖼️</button>
-                </div>
-                <div class="chat-input-area">
-                    <textarea class="chat-input" id="chat-input" placeholder="说点什么吧..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
-                    <button class="chat-send-btn" onclick="sendTextMessage()">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div id="emoji-picker" class="emoji-picker"></div>
-        </div>
+/* ============================================================
+   WebSocket
+============================================================ */
+const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
+let chatSocket = null;
+let chatNickname = sessionStorage.getItem('chat_nickname') || '';
+let chatAvatar = sessionStorage.getItem('chat_avatar') || '';
+let unreadCount = 0, isChatWindowOpen = false, reconnectTimer = null;
 
-        <div class="chat-login-overlay" id="chat-login-overlay">
-            <div class="chat-login-box">
-                <h3 style="color:#FFB6C1; margin-bottom:20px;">选择你的专属头像</h3>
-                <div class="avatar-selection">
-                    <div class="avatar-opt selected" onclick="selAv(this, '🐰')">🐰</div>
-                    <div class="avatar-opt" onclick="selAv(this, '🐱')">🐱</div>
-                    <div class="avatar-opt" onclick="selAv(this, '🐶')">🐶</div>
-                    <div class="avatar-opt" onclick="selAv(this, '🦊')">🦊</div>
-                </div>
-                <input type="text" id="nickname-input" class="chat-login-input" placeholder="给自己起个名字吧~" maxlength="10" onkeydown="handleLoginKey(event)">
-                <button class="chat-login-btn" onclick="enterChat()">开始聊天</button>
-            </div>
-        </div>
+const badge = document.getElementById('msg-badge');
+const messagesEl = document.getElementById('chat-messages');
+const wsStatusEl = document.getElementById('ws-status');
+const wsStatusTextEl = document.getElementById('ws-status-text');
 
-        <div id="image-viewer" class="image-viewer" onclick="this.style.display='none'">
-            <img id="full-image" src="" alt="预览">
-        </div>
-    </div>
+const albumData = { 'album_food': [], 'album_scenery': [], 'album_portrait': [] };
+let currentOpenAlbumType = '';
 
-    <script>
-        (function(){ const s=new Date('2026-04-11'); const d=Math.floor((new Date()-s)/86400000); document.getElementById('love-days').textContent=d; })();
-        // --- 核心配置 ---
-        const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
-        let chatSocket = null;
-        let chatNickname = sessionStorage.getItem('chat_nickname') || '';
-        let chatAvatar = sessionStorage.getItem('chat_avatar') || '';
-        let unreadCount = 0, isChatWindowOpen = false;
-        let reconnectTimer = null;
-        let isConnectedOnce = false; 
+function getConnectName() { return chatNickname || ('guest_' + Math.random().toString(36).slice(2,7)); }
+function getImgId(src) { let h=0; for(let i=0;i<src.length;i++){h=((h<<5)-h)+src.charCodeAt(i);h=h&h;} return 'img_'+Math.abs(h); }
+function setWsStatus(state,text) { wsStatusEl.className=state; wsStatusTextEl.textContent=text; }
 
-        const badge = document.getElementById('msg-badge');
-        const messagesEl = document.getElementById('chat-messages');
-        const wsStatusEl = document.getElementById('ws-status');
-        const wsStatusTextEl = document.getElementById('ws-status-text');
+function connectWebSocket(isGuest) {
+    if (chatSocket && (chatSocket.readyState===WebSocket.CONNECTING||chatSocket.readyState===WebSocket.OPEN)) return;
+    clearTimeout(reconnectTimer);
+    const name = isGuest ? getConnectName() : (chatNickname||getConnectName());
+    setWsStatus('connecting','连接中...');
+    const proto = location.protocol==='https:'?'wss':'ws';
+    chatSocket = new WebSocket(`${proto}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(name)}`);
 
-        // ============ 新增：相册本地缓存存储器 ============
-        const albumData = { 'album_food': [], 'album_scenery': [], 'album_portrait': [] };
-        let currentOpenAlbumType = '';
+    chatSocket.onopen = () => {
+        setWsStatus('connected','已连接');
+        setTimeout(()=>{ wsStatusEl.style.opacity='0'; wsStatusEl.style.pointerEvents='none'; }, 3000);
+        if (window.pendingStarWish) { chatSocket.send(window.pendingStarWish); window.pendingStarWish=null; document.getElementById('wish-input').value=''; document.getElementById('star-send-btn').innerText='放飞心愿'; toggleWishModal(); }
+        if (window.pendingChatMsg) { chatSocket.send(window.pendingChatMsg); window.pendingChatMsg=null; }
+    };
 
-        function getConnectName() {
-            return chatNickname || ('guest_' + Math.random().toString(36).slice(2, 7));
-        }
-
-        // 用于为长 base64 图片生成唯一极简 ID
-        function getImgId(src) {
-            let hash = 0;
-            if (src.length === 0) return 'img_0';
-            for (let i = 0; i < src.length; i++) {
-                hash = ((hash << 5) - hash) + src.charCodeAt(i);
-                hash = hash & hash; // Convert to 32bit integer
-            }
-            return 'img_' + Math.abs(hash);
-        }
-
-        function setWsStatus(state, text) {
-            wsStatusEl.className = state; 
-            wsStatusTextEl.textContent = text;
-        }
-
-        function connectWebSocket(isGuestConnect) {
-            if (chatSocket && (chatSocket.readyState === WebSocket.CONNECTING || chatSocket.readyState === WebSocket.OPEN)) return;
-            
-            clearTimeout(reconnectTimer);
-            const name = isGuestConnect ? getConnectName() : (chatNickname || getConnectName());
-            
-            setWsStatus('connecting', '连接中...');
-            
-            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-            chatSocket = new WebSocket(`${protocol}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(name)}`);
-            
-            chatSocket.onopen = () => {
-                isConnectedOnce = true;
-                setWsStatus('connected', '已连接');
-
-                setTimeout(() => {
-                    wsStatusEl.style.opacity = '0';
-                    wsStatusEl.style.pointerEvents = 'none';
-                }, 3000);
-
-                if (window.pendingStarWish) {
-                    chatSocket.send(window.pendingStarWish);
-                    window.pendingStarWish = null;
-                    document.getElementById('wish-input').value = '';
-                    document.getElementById('star-send-btn').innerText = '放飞心愿';
-                    toggleWishModal();
-                }
-                if (window.pendingChatMessage) {
-                    chatSocket.send(window.pendingChatMessage);
-                    window.pendingChatMessage = null;
-                }
-            };
-
-            chatSocket.onmessage = (event) => {
-                const res = JSON.parse(event.data);
-                if (res.type === 'history') {
-                    res.data.forEach(m => {
-                        if (m.msgType === 'star') addStar(m);
-                        else if (m.msgType === 'album_like') handleAlbumLike(m);
-                        else if (m.msgType && m.msgType.startsWith('album_')) addAlbumImage(m); 
-                        else addChatMessage(m);
-                    });
-                } else if (res.type === 'userlist') {
-                    document.getElementById('online-count').innerText = res.data.length;
-                } else if (res.type === 'message') {
-                    if (res.msgType === 'star') {
-                        addStar(res);
-                    } else if (res.msgType === 'album_like') {
-                        handleAlbumLike(res);
-                    } else if (res.msgType && res.msgType.startsWith('album_')) { 
-                        addAlbumImage(res);
-                    } else {
-                        addChatMessage(res);
-                        if (!isChatWindowOpen && res.name !== chatNickname) {
-                            unreadCount++;
-                            updateBadgeDisplay();
-                        }
-                    }
-                }
-            };
-
-            chatSocket.onclose = () => {
-                const btn = document.getElementById('star-send-btn');
-                if (btn && btn.innerText !== '放飞心愿') btn.innerText = '放飞心愿';
-
-                setWsStatus('disconnected', '已断线，重连中...');
-                wsStatusEl.style.opacity = '1';
-                wsStatusEl.style.pointerEvents = 'auto';
-                reconnectTimer = setTimeout(() => {
-                    connectWebSocket(false);
-                }, CHAT_CONFIG.reconnectInterval);
-            };
-
-            chatSocket.onerror = () => {
-                setWsStatus('disconnected', '连接失败');
-                wsStatusEl.style.opacity = '1';
-                wsStatusEl.style.pointerEvents = 'auto';
-            };
-        }
-
-        // ============ 滑动相册相关交互逻辑 ============
-        function openAlbum(type, title) {
-            currentOpenAlbumType = type;
-            document.getElementById('album-title').innerText = title;
-            renderAlbumGrid();
-            document.getElementById('album-modal').classList.add('show');
-        }
-
-        function closeAlbum() {
-            document.getElementById('album-modal').classList.remove('show');
-            currentOpenAlbumType = '';
-        }
-
-        // 控制左右平滑滑动
-        function scrollGallery(direction) {
-            const wrapper = document.getElementById('album-grid');
-            const scrollAmount = 256; // 图片卡片宽度(240px) + 间距(16px)
-            wrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-        }
-
-        // 发送并处理爱心点赞逻辑
-        function toggleHeart(e, imgId, albumType) {
-            e.stopPropagation(); 
-            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
-                alert("网络断开啦，请稍后再试哦~");
-                return;
-            }
-
-            const imgObj = albumData[albumType].find(img => img.id === imgId);
-            if (!imgObj) return;
-
-            const myName = chatNickname || getConnectName();
-            if (!imgObj.likedBy) imgObj.likedBy = new Set();
-
-            // 本地切换点赞状态
-            if (imgObj.likedBy.has(myName)) {
-                imgObj.likedBy.delete(myName);
-                imgObj.myLike = false;
-            } else {
-                imgObj.likedBy.add(myName);
-                imgObj.myLike = true;
-            }
-            
-            // 实时更新本地数量并渲染
-            imgObj.likes = imgObj.likedBy.size;
-            renderAlbumGrid();
-
-            // 发送给服务器广播
-            const payloadStr = JSON.stringify({
-                name: myName,
-                msgType: 'album_like',
-                albumType: albumType,
-                imgId: imgId,
-                isLike: imgObj.myLike
+    chatSocket.onmessage = (ev) => {
+        const res = JSON.parse(ev.data);
+        if (res.type === 'history') {
+            res.data.forEach(m => {
+                if (m.msgType === 'star') addStar(m);
+                else if (m.msgType === 'album_like') handleAlbumLike(m);
+                else if (m.msgType && m.msgType.startsWith('album_')) addAlbumImage(m);
+                else if (m.msgType === 'diary') receiveDiaryEntry(m);
+                else if (m.msgType === 'diary_like') receiveDiaryLike(m);
+                else addChatMessage(m);
             });
-            chatSocket.send(payloadStr);
+        } else if (res.type === 'userlist') {
+            document.getElementById('online-count').innerText = res.data.length;
+        } else if (res.type === 'message') {
+            if (res.msgType === 'star') addStar(res);
+            else if (res.msgType === 'album_like') handleAlbumLike(res);
+            else if (res.msgType && res.msgType.startsWith('album_')) addAlbumImage(res);
+            else if (res.msgType === 'diary') receiveDiaryEntry(res);
+            else if (res.msgType === 'diary_like') receiveDiaryLike(res);
+            else { addChatMessage(res); if(!isChatWindowOpen&&res.name!==chatNickname){unreadCount++;updateBadgeDisplay();} }
         }
+    };
 
-        // 接收服务器的点赞广播/历史数据重建
-        function handleAlbumLike(data) {
-            if (!albumData[data.albumType]) return;
-            const imgObj = albumData[data.albumType].find(img => img.id === data.imgId);
-            if (imgObj) {
-                if (!imgObj.likedBy) imgObj.likedBy = new Set();
-                const userKey = data.name;
+    chatSocket.onclose = () => {
+        setWsStatus('disconnected','已断线，重连中...');
+        wsStatusEl.style.opacity='1'; wsStatusEl.style.pointerEvents='auto';
+        reconnectTimer = setTimeout(()=>connectWebSocket(false), CHAT_CONFIG.reconnectInterval);
+    };
+    chatSocket.onerror = () => { setWsStatus('disconnected','连接失败'); wsStatusEl.style.opacity='1'; wsStatusEl.style.pointerEvents='auto'; };
+}
 
-                if (data.isLike) {
-                    imgObj.likedBy.add(userKey);
-                } else {
-                    imgObj.likedBy.delete(userKey);
-                }
+function wsSend(payload) {
+    const s = JSON.stringify(payload);
+    if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) { window.pendingChatMsg=s; connectWebSocket(false); }
+    else if (chatSocket.readyState === WebSocket.CONNECTING) { window.pendingChatMsg=s; }
+    else if (chatSocket.readyState === WebSocket.OPEN) { chatSocket.send(s); }
+}
 
-                // 依靠 Set 自动去重计算真实点赞总数
-                imgObj.likes = imgObj.likedBy.size;
+/* ============================================================
+   音乐
+============================================================ */
+const playlist = [
+    { title: "Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
+    { title: "Oneul-Morning-Peppermint", src: "bgm2.mp3" },
+    { title: "선샤인(Sunshine) - 圣诞快乐", src: "bgm3.mp3" }
+];
+let currentSongIdx = 0;
+const bgm = document.getElementById('bgm'), songTitleText = document.getElementById('song-title'), playIconSvg = document.getElementById('play-icon-svg');
+const svgPlay='<path d="M8 5v14l11-7z"/>', svgPause='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+function loadSong(i) { bgm.src=playlist[i].src; songTitleText.innerText=playlist[i].title; songTitleText.style.animation='none'; void songTitleText.offsetWidth; songTitleText.style.animation='marquee 8s linear infinite'; }
+function togglePlay() { if(bgm.paused){bgm.play();playIconSvg.innerHTML=svgPause;}else{bgm.pause();playIconSvg.innerHTML=svgPlay;} }
+function nextSong() { currentSongIdx=(currentSongIdx+1)%playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML=svgPause; }
+function prevSong() { currentSongIdx=(currentSongIdx-1+playlist.length)%playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML=svgPause; }
+bgm.addEventListener('ended',nextSong); loadSong(currentSongIdx);
 
-                // 判断是否是自己点过赞的
-                const myName = chatNickname || getConnectName();
-                imgObj.myLike = imgObj.likedBy.has(myName);
+/* ============================================================
+   星空寄语
+============================================================ */
+function toggleWishModal() {
+    if (!chatNickname) { document.getElementById('star-login-overlay').classList.add('show'); return; }
+    const m = document.getElementById('wish-modal');
+    m.style.display = m.style.display==='flex' ? 'none' : 'flex';
+}
+function enterStarName() {
+    const n=document.getElementById('star-nickname-input').value.trim();
+    if(n){ chatNickname=n; sessionStorage.setItem('chat_nickname',n); if(!chatAvatar){chatAvatar='✨';sessionStorage.setItem('chat_avatar',chatAvatar);} document.getElementById('star-login-overlay').classList.remove('show'); if(chatSocket)chatSocket.close(); connectWebSocket(false); toggleWishModal(); }
+}
+function sendStarWish() {
+    const input=document.getElementById('wish-input'); const content=input.value.trim(); const btn=document.getElementById('star-send-btn');
+    if(!content) return;
+    const t=new Date(); const timeStr=`${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}`;
+    const payload=JSON.stringify({name:chatNickname,avatar:chatAvatar,time:timeStr,msgType:'star',msg:content});
+    if(!chatSocket||chatSocket.readyState===WebSocket.CLOSED){window.pendingStarWish=payload;btn.innerText='唤醒星空中...';connectWebSocket(false);}
+    else if(chatSocket.readyState===WebSocket.CONNECTING){window.pendingStarWish=payload;btn.innerText='正在飞向星空...';}
+    else{chatSocket.send(payload);input.value='';btn.innerText='放飞心愿';toggleWishModal();}
+}
+function getHashPos(str) { let h=0; for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h); return{left:5+Math.abs(h%90),top:5+Math.abs((h>>8)%60)}; }
+function addStar(data) { const field=document.getElementById('star-field'); const star=document.createElement('div'); star.className='star-wish'; const pos=getHashPos((data.name||'')+(data.msg||'')+(data.time||'')); star.style.left=pos.left+'%'; star.style.top=pos.top+'%'; star.innerHTML=`<div class="star-tooltip"><b>${escapeHtml(data.name)}:</b> ${escapeHtml(data.msg)}</div>`; field.appendChild(star); const stars=field.getElementsByClassName('star-wish'); if(stars.length>50)field.removeChild(stars[0]); }
 
-                if (currentOpenAlbumType === data.albumType) {
-                    renderAlbumGrid();
-                }
+/* ============================================================
+   相册
+============================================================ */
+function openAlbum(type,title) { currentOpenAlbumType=type; document.getElementById('album-title').innerText=title; renderAlbumGrid(); document.getElementById('album-modal').classList.add('show'); }
+function closeAlbum() { document.getElementById('album-modal').classList.remove('show'); currentOpenAlbumType=''; }
+function scrollGallery(dir) { document.getElementById('album-grid').scrollBy({left:dir*256,behavior:'smooth'}); }
+function toggleHeart(e,imgId,albumType) {
+    e.stopPropagation();
+    const imgObj=albumData[albumType].find(img=>img.id===imgId); if(!imgObj) return;
+    const myName=chatNickname||getConnectName();
+    if(!imgObj.likedBy) imgObj.likedBy=new Set();
+    if(imgObj.likedBy.has(myName)){imgObj.likedBy.delete(myName);imgObj.myLike=false;}else{imgObj.likedBy.add(myName);imgObj.myLike=true;}
+    imgObj.likes=imgObj.likedBy.size; renderAlbumGrid();
+    wsSend({name:myName,msgType:'album_like',albumType,imgId,isLike:imgObj.myLike});
+}
+function handleAlbumLike(data) {
+    if(!albumData[data.albumType]) return;
+    const imgObj=albumData[data.albumType].find(img=>img.id===data.imgId); if(!imgObj) return;
+    if(!imgObj.likedBy) imgObj.likedBy=new Set();
+    if(data.isLike) imgObj.likedBy.add(data.name); else imgObj.likedBy.delete(data.name);
+    imgObj.likes=imgObj.likedBy.size; imgObj.myLike=imgObj.likedBy.has(chatNickname||getConnectName());
+    if(currentOpenAlbumType===data.albumType) renderAlbumGrid();
+}
+function renderAlbumGrid() {
+    const grid=document.getElementById('album-grid'); grid.innerHTML='';
+    const up=document.createElement('div'); up.className='album-item upload-card'; up.onclick=()=>document.getElementById('album-file-input').click();
+    up.innerHTML=`<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span style="font-size:14px;color:white;font-weight:bold;">上传照片</span>`; grid.appendChild(up);
+    (albumData[currentOpenAlbumType]||[]).forEach(img=>{
+        const div=document.createElement('div'); div.className='album-item';
+        const lc=img.likes||0; const lClass=img.myLike?'liked':''; const fa=img.myLike?'currentColor':'none';
+        div.innerHTML=`<img src="${img.src}" onclick="openFull('${img.src}')"><div class="album-date">${img.date}</div><div class="heart-icon ${lClass}" onclick="toggleHeart(event,'${img.id}','${currentOpenAlbumType}')"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="${fa}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span class="heart-count">${lc>0?lc:'赞'}</span></div>`;
+        grid.appendChild(div);
+    });
+}
+function addAlbumImage(data) {
+    const type=data.msgType; if(!albumData[type]) albumData[type]=[];
+    const imgId=data.id||getImgId(data.msg); if(albumData[type].find(i=>i.id===imgId)) return;
+    albumData[type].unshift({id:imgId,src:data.msg,date:data.time||'刚刚',likes:0,myLike:false,likedBy:new Set()});
+    if(currentOpenAlbumType===type) renderAlbumGrid();
+}
+function handleAlbumUpload(e) {
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>{ const img=new Image(); img.onload=()=>{ const canvas=document.createElement('canvas'); const MAX=1000; let w=img.width,h=img.height; if(w>MAX||h>MAX){if(w>h){h*=(MAX/w);w=MAX;}else{w*=(MAX/h);h=MAX;}} canvas.width=w;canvas.height=h; canvas.getContext('2d').drawImage(img,0,0,w,h); sendAlbumImage(canvas.toDataURL('image/jpeg',0.85)); }; img.src=ev.target.result; };
+    reader.readAsDataURL(file); e.target.value='';
+}
+function sendAlbumImage(base64) {
+    if(!chatSocket||chatSocket.readyState!==WebSocket.OPEN){alert("网络不佳，请稍后重试~");connectWebSocket(false);return;}
+    const t=new Date(); const dateStr=`${t.getFullYear()}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getDate().toString().padStart(2,'0')}`;
+    chatSocket.send(JSON.stringify({name:chatNickname||getConnectName(),avatar:chatAvatar,time:dateStr,msgType:currentOpenAlbumType,msg:base64}));
+}
+
+/* ============================================================
+   聊天
+============================================================ */
+function toggleChat(e) {
+    if(e) e.stopPropagation();
+    const win=document.getElementById('chat-window');
+    if(!win.classList.contains('show')){
+        if(!chatNickname){document.getElementById('chat-login-overlay').classList.add('show');return;}
+        win.classList.add('show'); isChatWindowOpen=true; unreadCount=0; updateBadgeDisplay();
+        setTimeout(()=>messagesEl.scrollTop=messagesEl.scrollHeight,100);
+    } else { win.classList.remove('show'); isChatWindowOpen=false; document.getElementById('emoji-picker').style.display='none'; }
+}
+function enterChat() {
+    const n=document.getElementById('nickname-input').value.trim();
+    if(n){ chatNickname=n; sessionStorage.setItem('chat_nickname',n); sessionStorage.setItem('chat_avatar',chatAvatar||'🐰'); document.getElementById('chat-login-overlay').classList.remove('show'); if(chatSocket)chatSocket.close(); connectWebSocket(false); toggleChat(); }
+}
+function selAv(el,icon) { document.querySelectorAll('.avatar-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); chatAvatar=icon; }
+function updateBadgeDisplay() { if(unreadCount>0){badge.style.display='flex';badge.innerText=unreadCount>99?'99+':unreadCount;}else{badge.style.display='none';} }
+function insertEmoji(e) { document.getElementById('chat-input').value+=e; document.getElementById('emoji-picker').style.display='none'; }
+function toggleEmojiPicker() { const p=document.getElementById('emoji-picker'); p.style.display=p.style.display==='grid'?'none':'grid'; }
+function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+function handleInputKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendTextMessage();} }
+function handleLoginKey(e) { if(e.key==='Enter') enterChat(); }
+function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function openFull(src) { document.getElementById('full-image').src=src; document.getElementById('image-viewer').style.display='flex'; }
+function sendTextMessage() { const i=document.getElementById('chat-input'); if(i.value.trim()){sendChatPayload({type:'text',content:i.value});i.value='';i.style.height='auto';} }
+function sendChatPayload(p) { const t=new Date(); const ts=`${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}`; wsSend({name:chatNickname,avatar:chatAvatar,time:ts,msgType:p.type,msg:p.content}); }
+function addChatMessage(data) { const isMe=data.name===chatNickname; const content=data.msgType==='image'?`<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">`:`<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const timeHtml=data.time?`<div style="font-size:10px;color:#bbb;margin-top:4px;padding:0 4px;text-align:${isMe?'right':'left'};">${escapeHtml(data.time)}</div>`:''; const html=`<div class="message-item ${isMe?'right':''}"><div class="message-avatar">${data.avatar||'🐰'}</div><div class="message-content"><div class="message-name">${escapeHtml(data.name)}</div>${content}${timeHtml}</div></div>`; messagesEl.insertAdjacentHTML('beforeend',html); messagesEl.scrollTop=messagesEl.scrollHeight; }
+function handleImageUpload(e) { const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(ev)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=800;let w=img.width,h=img.height;if(w>MAX){h*=(MAX/w);w=MAX;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);sendChatPayload({type:'image',content:canvas.toDataURL('image/jpeg',0.9)});};img.src=ev.target.result;};reader.readAsDataURL(file); }
+
+/* ============================================================
+   ★★★ 日记本核心逻辑 ★★★
+============================================================ */
+// 内存存储：{ 'YYYY-MM-DD': [ {id,author,text,img,time,likes,likedBy:[]} ] }
+const diaryStore = {};
+let diaryCurrentDateKey = '';   // 当前打开弹窗的日期
+let diaryViewYear = 0;
+let diaryViewMonth = 0;         // 0-based
+let diaryPendingImg = null;     // 待发布的图片 base64
+
+// 初始化日历视图为当前月
+function initDiaryCalendar() {
+    const now = new Date();
+    diaryViewYear = now.getFullYear();
+    diaryViewMonth = now.getMonth();
+    renderDiaryCalendar();
+    positionDiaryCard();
+}
+
+// 根据 main-card 位置动态设置日历卡片位置
+function positionDiaryCard() {
+    const mainCard = document.querySelector('.main-card');
+    const diaryCard = document.getElementById('diary-card');
+    if (!mainCard || !diaryCard) return;
+    const mainRect = mainCard.getBoundingClientRect();
+    const cardH = diaryCard.offsetHeight;
+    const gap = 10;
+    const top = mainRect.top - cardH - gap;
+    diaryCard.style.top = Math.max(10, top) + 'px';
+    diaryCard.style.left = mainCard.style.left || '30px';
+}
+
+// 渲染日历格子
+function renderDiaryCalendar() {
+    const MONTHS_CN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+    document.getElementById('diary-cal-year').textContent = diaryViewYear + '年';
+    document.getElementById('diary-cal-month').textContent = MONTHS_CN[diaryViewMonth];
+
+    const container = document.getElementById('diary-cal-days');
+    container.innerHTML = '';
+
+    const today = new Date();
+    const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+    // 该月第一天是星期几
+    const firstDay = new Date(diaryViewYear, diaryViewMonth, 1).getDay();
+    // 该月天数
+    const daysInMonth = new Date(diaryViewYear, diaryViewMonth + 1, 0).getDate();
+
+    // 填充前置空格
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'diary-day empty';
+        container.appendChild(empty);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const key = dateKey(diaryViewYear, diaryViewMonth, d);
+        const hasDiary = diaryStore[key] && diaryStore[key].length > 0;
+        const isToday = key === todayKey;
+        const dayOfWeek = new Date(diaryViewYear, diaryViewMonth, d).getDay();
+
+        const cell = document.createElement('div');
+        let cls = 'diary-day';
+        if (hasDiary) cls += ' has-diary';
+        if (isToday) cls += ' today';
+        if (dayOfWeek === 0) cls += ' sun';
+        if (dayOfWeek === 6) cls += ' sat';
+        cell.className = cls;
+        cell.dataset.key = key;
+        cell.dataset.d = d;
+        cell.onclick = () => openDiaryModal(key, d);
+
+        cell.innerHTML = `<div class="diary-day-num">${d}</div><div class="diary-day-dot"></div>`;
+        container.appendChild(cell);
+    }
+}
+
+function dateKey(y, m, d) {
+    return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function diaryNavMonth(dir) {
+    diaryViewMonth += dir;
+    if (diaryViewMonth > 11) { diaryViewMonth = 0; diaryViewYear++; }
+    if (diaryViewMonth < 0) { diaryViewMonth = 11; diaryViewYear--; }
+    renderDiaryCalendar();
+}
+
+// 打开某天的日记弹窗
+function openDiaryModal(key, day) {
+    diaryCurrentDateKey = key;
+    const [y, m, d_] = key.split('-');
+    const MONTHS_CN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+    document.getElementById('diary-modal-title').textContent = `📖 ${y}年${MONTHS_CN[parseInt(m)-1]} ${parseInt(d_)}日`;
+    document.getElementById('diary-modal-date').textContent = `${y}.${m}.${d_}`;
+
+    // 恢复之前保存的作者名
+    const savedAuthor = localStorage.getItem('diary_author') || '';
+    document.getElementById('diary-author-input').value = savedAuthor;
+    document.getElementById('diary-text-input').value = '';
+    updateDiaryCharCount(document.getElementById('diary-text-input'));
+    removeDiaryImg();
+
+    renderDiaryEntries(key);
+    document.getElementById('diary-overlay').classList.add('show');
+}
+
+function closeDiaryModal() {
+    document.getElementById('diary-overlay').classList.remove('show');
+    // 关闭时关掉表情选择器
+    document.getElementById('diary-emoji-picker').style.display = 'none';
+}
+
+// 渲染当天日记列表
+function renderDiaryEntries(key) {
+    const inner = document.getElementById('diary-entries-inner');
+    const empty = document.getElementById('diary-empty');
+    const entries = diaryStore[key] || [];
+
+    // 保留 empty 节点，清空其余
+    inner.innerHTML = '';
+    inner.appendChild(empty);
+
+    if (entries.length === 0) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    // 按时间正序渲染
+    entries.forEach(entry => {
+        const el = buildDiaryEntryEl(entry, key);
+        inner.appendChild(el);
+    });
+
+    // 滚到底部看最新
+    const diaryEntriesEl = document.getElementById('diary-entries');
+    setTimeout(() => { diaryEntriesEl.scrollTop = diaryEntriesEl.scrollHeight; }, 50);
+}
+
+function buildDiaryEntryEl(entry, key) {
+    const div = document.createElement('div');
+    div.className = 'diary-entry';
+    div.id = 'diary-entry-' + entry.id;
+
+    const myName = chatNickname || localStorage.getItem('diary_author') || '';
+    const likedByMe = entry.likedBy && entry.likedBy.includes(myName);
+    const likeCount = entry.likes || 0;
+
+    const imgHtml = entry.img
+        ? `<div class="diary-entry-img"><img src="${entry.img}" onclick="openFull('${entry.img}')"></div>`
+        : '';
+
+    // 作者首字母头像
+    const firstChar = (entry.author || '?').charAt(0).toUpperCase();
+
+    div.innerHTML = `
+        <div class="diary-entry-header">
+            <div class="diary-entry-avatar">${firstChar}</div>
+            <div class="diary-entry-meta">
+                <div class="diary-entry-name">${escapeHtml(entry.author)}</div>
+                <div class="diary-entry-time">${entry.time}</div>
+            </div>
+        </div>
+        <div class="diary-entry-body">${escapeHtml(entry.text)}</div>
+        ${imgHtml}
+        <div class="diary-entry-footer">
+            <button class="diary-like-btn ${likedByMe?'liked':''}"
+                    onclick="toggleDiaryLike('${key}','${entry.id}',this)">
+                <span class="like-heart">${likedByMe?'❤️':'🤍'}</span>
+                <span class="like-num">${likeCount > 0 ? likeCount : ''}</span>
+            </button>
+        </div>
+    `;
+    return div;
+}
+
+// 发布日记
+function submitDiaryEntry() {
+    const author = document.getElementById('diary-author-input').value.trim();
+    const text = document.getElementById('diary-text-input').value.trim();
+    if (!author) { alert('请先输入你的名字哦~'); document.getElementById('diary-author-input').focus(); return; }
+    if (!text && !diaryPendingImg) { alert('写点什么再发布吧~'); document.getElementById('diary-text-input').focus(); return; }
+
+    const btn = document.getElementById('diary-submit-btn');
+    btn.disabled = true; btn.textContent = '发布中...';
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const entryId = 'de_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+    const payload = {
+        msgType: 'diary',
+        dateKey: diaryCurrentDateKey,
+        id: entryId,
+        author: author,
+        text: text,
+        img: diaryPendingImg || null,
+        time: timeStr,
+        likes: 0,
+        likedBy: []
+    };
+
+    wsSend(payload);
+    localStorage.setItem('diary_author', author);
+
+    // 乐观更新：先本地显示
+    receiveDiaryEntry(payload);
+    renderDiaryCalendar();
+
+    // 重置输入区
+    document.getElementById('diary-text-input').value = '';
+    updateDiaryCharCount(document.getElementById('diary-text-input'));
+    removeDiaryImg();
+    btn.disabled = false; btn.textContent = '发布';
+}
+
+// 接收（来自 WS）一条日记
+function receiveDiaryEntry(data) {
+    const key = data.dateKey;
+    if (!key) return;
+    if (!diaryStore[key]) diaryStore[key] = [];
+    // 去重
+    if (diaryStore[key].find(e => e.id === data.id)) return;
+    diaryStore[key].push({
+        id: data.id, author: data.author, text: data.text,
+        img: data.img || null, time: data.time,
+        likes: data.likes || 0,
+        likedBy: data.likedBy || []
+    });
+    // 如果当前弹窗就在这一天，追加渲染
+    if (diaryCurrentDateKey === key && document.getElementById('diary-overlay').classList.contains('show')) {
+        renderDiaryEntries(key);
+    }
+    // 更新日历（有日记的日期加粗）
+    renderDiaryCalendar();
+}
+
+// 点赞日记
+function toggleDiaryLike(key, entryId, btn) {
+    const entries = diaryStore[key];
+    if (!entries) return;
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    const myName = chatNickname || localStorage.getItem('diary_author') || ('visitor_' + Math.random().toString(36).slice(2,6));
+    if (!entry.likedBy) entry.likedBy = [];
+
+    const alreadyLiked = entry.likedBy.includes(myName);
+    if (alreadyLiked) {
+        entry.likedBy = entry.likedBy.filter(n => n !== myName);
+        entry.likes = Math.max(0, (entry.likes||1) - 1);
+    } else {
+        entry.likedBy.push(myName);
+        entry.likes = (entry.likes||0) + 1;
+    }
+
+    // 更新按钮 UI
+    const isLiked = !alreadyLiked;
+    btn.className = 'diary-like-btn' + (isLiked ? ' liked' : '');
+    btn.querySelector('.like-heart').textContent = isLiked ? '❤️' : '🤍';
+    btn.querySelector('.like-num').textContent = entry.likes > 0 ? entry.likes : '';
+
+    wsSend({ msgType: 'diary_like', dateKey: key, entryId: entryId, name: myName, isLike: isLiked });
+}
+
+// 接收点赞广播
+function receiveDiaryLike(data) {
+    const entries = diaryStore[data.dateKey];
+    if (!entries) return;
+    const entry = entries.find(e => e.id === data.entryId);
+    if (!entry) return;
+    if (!entry.likedBy) entry.likedBy = [];
+    if (data.isLike) {
+        if (!entry.likedBy.includes(data.name)) entry.likedBy.push(data.name);
+    } else {
+        entry.likedBy = entry.likedBy.filter(n => n !== data.name);
+    }
+    entry.likes = entry.likedBy.length;
+
+    // 如果弹窗打开在这天，更新对应条目
+    if (diaryCurrentDateKey === data.dateKey && document.getElementById('diary-overlay').classList.contains('show')) {
+        const entryEl = document.getElementById('diary-entry-' + data.entryId);
+        if (entryEl) {
+            const myName = chatNickname || localStorage.getItem('diary_author') || '';
+            const isLiked = entry.likedBy.includes(myName);
+            const likeBtn = entryEl.querySelector('.diary-like-btn');
+            if (likeBtn) {
+                likeBtn.className = 'diary-like-btn' + (isLiked ? ' liked' : '');
+                likeBtn.querySelector('.like-heart').textContent = isLiked ? '❤️' : '🤍';
+                likeBtn.querySelector('.like-num').textContent = entry.likes > 0 ? entry.likes : '';
             }
         }
+    }
+}
 
-        function renderAlbumGrid() {
-            const grid = document.getElementById('album-grid');
-            grid.innerHTML = '';
-            
-            // 渲染固定在第一位的“上传照片”按钮
-            const uploadDiv = document.createElement('div');
-            uploadDiv.className = 'album-item upload-card';
-            uploadDiv.onclick = () => document.getElementById('album-file-input').click();
-            uploadDiv.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span style="font-size:14px; color:white; font-weight:bold;">上传照片</span>`;
-            grid.appendChild(uploadDiv);
+// 字数统计
+function updateDiaryCharCount(el) {
+    const count = el.value.length;
+    document.getElementById('diary-char-count').textContent = `${count} / 500`;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
 
-            // 依次渲染云端相册图片及点赞爱心
-            const images = albumData[currentOpenAlbumType] || [];
-            images.forEach(img => {
-                const div = document.createElement('div');
-                div.className = 'album-item';
-                
-                const likesCount = img.likes || 0;
-                const likedClass = img.myLike ? 'liked' : '';
-                const fillAttr = img.myLike ? 'currentColor' : 'none';
+// 作者名持久化
+function saveDiaryAuthor(val) { localStorage.setItem('diary_author', val.trim()); }
 
-                div.innerHTML = `
-                    <img src="${img.src}" onclick="openFull('${img.src}')">
-                    <div class="album-date">${img.date}</div>
-                    <div class="heart-icon ${likedClass}" onclick="toggleHeart(event, '${img.id}', '${currentOpenAlbumType}')">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="${fillAttr}">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                        <span class="heart-count">${likesCount > 0 ? likesCount : '赞'}</span>
-                    </div>
-                `;
-                grid.appendChild(div);
-            });
-        }
-
-        function addAlbumImage(data) {
-            const type = data.msgType;
-            if (!albumData[type]) albumData[type] = [];
-            
-            const imgId = data.id || getImgId(data.msg);
-            
-            // 避免重复加载同一张图片
-            if (albumData[type].find(img => img.id === imgId)) return;
-
-            albumData[type].unshift({ 
-                id: imgId,
-                src: data.msg, 
-                date: data.time || '刚刚',
-                likes: 0,
-                myLike: false,
-                likedBy: new Set()
-            }); 
-            if (currentOpenAlbumType === type) {
-                renderAlbumGrid();
-            }
-        }
-
-        // 上传与图片压缩逻辑
-        function handleAlbumUpload(e) {
-            const file = e.target.files[0]; 
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 1000; 
-                    let w = img.width, h = img.height;
-                    if (w > MAX || h > MAX) {
-                        if (w > h) { h *= (MAX/w); w = MAX; } 
-                        else { w *= (MAX/h); h = MAX; }
-                    }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    const base64Data = canvas.toDataURL('image/jpeg', 0.85); 
-                    sendAlbumImage(base64Data);
-                };
-                img.src = ev.target.result;
-            };
-            reader.readAsDataURL(file);
-            e.target.value = ''; 
-        }
-
-        function sendAlbumImage(base64) {
-            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
-                alert("网络不佳，相册通道未开启，请稍后再试哦~");
-                connectWebSocket(false);
-                return;
-            }
-            const t = new Date();
-            const dateStr = `${t.getFullYear()}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getDate().toString().padStart(2,'0')}`;
-            
-            const payloadStr = JSON.stringify({ 
-                name: chatNickname || getConnectName(), 
-                avatar: chatAvatar,
-                time: dateStr, 
-                msgType: currentOpenAlbumType, 
-                msg: base64 
-            });
-            chatSocket.send(payloadStr);
-        }
-
-        // --- 音乐控制 ---
-        const playlist = [
-            { title: "Nintendo-Sound-Team-Welcome-Horizons", src: "bgm.mp3" },
-            { title: "Oneul-Morning-Peppermint", src: "bgm2.mp3" }, 
-            { title: "선샤인(Sunshine) - 圣诞快乐", src: "bgm3.mp3" }
-        ];
-        let currentSongIdx = 0;
-        const bgm = document.getElementById('bgm'), songTitleText = document.getElementById('song-title'), playIconSvg = document.getElementById('play-icon-svg');
-        const svgPlay = '<path d="M8 5v14l11-7z"/>', svgPause = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-        function loadSong(i) { bgm.src = playlist[i].src; songTitleText.innerText = playlist[i].title; songTitleText.style.animation = 'none'; void songTitleText.offsetWidth; songTitleText.style.animation = 'marquee 8s linear infinite'; }
-        function togglePlay() { if (bgm.paused) { bgm.play(); playIconSvg.innerHTML = svgPause; } else { bgm.pause(); playIconSvg.innerHTML = svgPlay; } }
-        function nextSong() { currentSongIdx = (currentSongIdx + 1) % playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause; }
-        function prevSong() { currentSongIdx = (currentSongIdx - 1 + playlist.length) % playlist.length; loadSong(currentSongIdx); bgm.play(); playIconSvg.innerHTML = svgPause; }
-        bgm.addEventListener('ended', nextSong); loadSong(currentSongIdx);
-
-        // --- 星空愿望逻辑 ---
-        function toggleWishModal() {
-            if (!chatNickname) { 
-                document.getElementById('star-login-overlay').classList.add('show'); 
-                return; 
-            }
-            const m = document.getElementById('wish-modal');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function enterStarName() {
-            const n = document.getElementById('star-nickname-input').value.trim();
-            if (n) {
-                chatNickname = n;
-                sessionStorage.setItem('chat_nickname', n);
-                if (!chatAvatar) { chatAvatar = '✨'; sessionStorage.setItem('chat_avatar', chatAvatar); }
-                
-                document.getElementById('star-login-overlay').classList.remove('show');
-                
-                if (chatSocket) chatSocket.close();
-                connectWebSocket(false);
-                
-                toggleWishModal(); 
-            }
-        }
-
-        function sendStarWish() {
-            const input = document.getElementById('wish-input');
-            const content = input.value.trim();
-            const btn = document.getElementById('star-send-btn');
-            if (!content) return;
-            
-            const t = new Date();
-            const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`;
-            const payload = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: 'star', msg: content });
-            
-            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-                window.pendingStarWish = payload;
-                btn.innerText = '唤醒星空中...';
-                connectWebSocket(false);
-            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
-                window.pendingStarWish = payload;
-                btn.innerText = '正在飞向星空...';
-            } else if (chatSocket.readyState === WebSocket.OPEN) {
-                chatSocket.send(payload);
-                input.value = '';
-                btn.innerText = '放飞心愿';
-                toggleWishModal();
-            }
-        }
-
-        function getHashPos(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const left = 5 + Math.abs(hash % 90);
-            const top = 5 + Math.abs((hash >> 8) % 60);
-            return { left, top };
-        }
-
-        function addStar(data) {
-            const field = document.getElementById('star-field');
-            const star = document.createElement('div');
-            star.className = 'star-wish';
-            
-            const uniqueStr = (data.name || '') + (data.msg || '') + (data.time || '');
-            const pos = getHashPos(uniqueStr);
-            star.style.left = pos.left + '%';
-            star.style.top = pos.top + '%';
-            
-            star.innerHTML = `<div class="star-tooltip"><b>${escapeHtml(data.name)}:</b> ${escapeHtml(data.msg)}</div>`;
-            field.appendChild(star);
-            
-            const stars = field.getElementsByClassName('star-wish');
-            if (stars.length > 50) {
-                field.removeChild(stars[0]);
-            }
-        }
-
-        // --- 聊天室逻辑 ---
-        function toggleChat(e) { 
-            if (e) e.stopPropagation(); 
-            const win = document.getElementById('chat-window'); 
-            if (!win.classList.contains('show')) { 
-                if (!chatNickname) { 
-                    document.getElementById('chat-login-overlay').classList.add('show'); 
-                    return; 
-                } 
-                win.classList.add('show'); 
-                isChatWindowOpen = true; 
-                unreadCount = 0; 
-                updateBadgeDisplay(); 
-                setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 100); 
-            } else { 
-                win.classList.remove('show'); 
-                isChatWindowOpen = false; 
-                document.getElementById('emoji-picker').style.display = 'none'; 
-            } 
-        }
-
-        function enterChat() { 
-            const n = document.getElementById('nickname-input').value.trim(); 
-            if (n) { 
-                chatNickname = n; 
-                sessionStorage.setItem('chat_nickname', n); 
-                sessionStorage.setItem('chat_avatar', chatAvatar || '🐰');
-                document.getElementById('chat-login-overlay').classList.remove('show'); 
-                
-                if (chatSocket) chatSocket.close();
-                connectWebSocket(false);
-                
-                toggleChat(); 
-            } 
-        }
-
-        function selAv(el, icon) { document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); chatAvatar = icon; }
-
-        // --- 初始化与其他原功能 ---
-        const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
-        const emojiPicker = document.getElementById('emoji-picker');
-        emojiList.forEach(e => { const s = document.createElement('span'); s.style.cursor='pointer'; s.style.fontSize='20px'; s.innerText=e; s.onclick=()=>insertEmoji(e); emojiPicker.appendChild(s); });
-
-        const albums = { 22: ['22-1.webp', '22-2.webp', '22-3.webp', '22-4.webp', '22-5.webp'], 21: ['21-1.webp', '21-2.webp', '21-3.webp', '21-4.webp'], 20: ['20-1.webp', '20-2.webp'], 19: ['19-1.webp'] };
-        // 核心修复点 1：在这里新增 fadeTimer 变量
-        let currentAge = 22, currentImages = albums[currentAge], idx = 0, cur = document.getElementById('img1'), nxt = document.getElementById('img2'), slideTimer, fadeTimer = null;
-        
-        const SLIDE_INTERVAL = 9000; 
-
-        function renderDots() { const dc = document.getElementById('dynamic-dots'); dc.innerHTML = ''; if (currentImages.length > 1) { dc.style.display='flex'; for (let i=0; i<currentImages.length; i++) { const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goTo(i); dc.appendChild(d); } } else dc.style.display='none'; }
-        function updateDots(ai) { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === ai)); }
-        
-        function sw() { 
-            nxt.style.backgroundImage = `url('${currentImages[idx]}')`; 
-            
-            // 切换瞬间，先移除动画强制归位
-            nxt.style.animation = 'none'; 
-            void nxt.offsetWidth; 
-            
-            // 设置动画时长略大于切换间隔，并移除 infinite 避免闪烁
-            nxt.style.animation = `imageZoom ${SLIDE_INTERVAL + 500}ms ease-out forwards`;
-            
-            cur.style.opacity = 0; 
-            nxt.style.opacity = 1; 
-            updateDots(idx); 
-            
-            // ============================================
-            // 核心修复点 2：修复快速切换导致的粉色背景 Bug
-            // ============================================
-            if (fadeTimer) clearTimeout(fadeTimer); // 如果还有旧的清理任务，直接取消
-            
-            const oldLayer = cur; // 锁定【目前需要被隐藏的层】
-            
-            fadeTimer = setTimeout(() => { 
-                oldLayer.style.backgroundImage = 'none'; // 1.5秒后只清空被锁定的旧层
-            }, 1500); 
-            
-            // 身份互换必须马上、同步执行！绝不能放进 setTimeout 里面！
-            let t = cur; cur = nxt; nxt = t; 
-            // ============================================
-            
-            if(currentImages.length > 1) idx = (idx+1)%currentImages.length; 
-        }
-
-        function goTo(n) { clearInterval(slideTimer); idx = n; sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
-        function switchAge(age) { if(currentAge === age) return; currentAge = age; currentImages = albums[age]; document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.age) === age)); clearInterval(slideTimer); idx = 0; renderDots(); sw(); if(currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL); }
-        
-        window.onload = () => { 
-            renderDots(); sw(); 
-            if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
-            connectWebSocket(false);
+// 图片选择
+function handleDiaryImgSelect(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX = 1000; let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) { if(w>h){h*=(MAX/w);w=MAX;}else{w*=(MAX/h);h=MAX;} }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            diaryPendingImg = canvas.toDataURL('image/jpeg', 0.82);
+            document.getElementById('diary-preview-img').src = diaryPendingImg;
+            document.getElementById('diary-img-preview').style.display = 'block';
         };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+}
+function removeDiaryImg() {
+    diaryPendingImg = null;
+    document.getElementById('diary-img-preview').style.display = 'none';
+    document.getElementById('diary-preview-img').src = '';
+}
 
-        function updateBadgeDisplay() { if (unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount > 99 ? '99+' : unreadCount; } else { badge.style.display = 'none'; } }
-        function insertEmoji(e) { document.getElementById('chat-input').value += e; document.getElementById('emoji-picker').style.display='none'; }
-        function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
-        function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
-        function handleInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } }
-        function handleLoginKey(e) { if (e.key === 'Enter') enterChat(); }
-        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-        function openFull(src) { const v = document.getElementById('image-viewer'); document.getElementById('full-image').src = src; v.style.display = 'flex'; }
-        
-        function sendTextMessage() { const i = document.getElementById('chat-input'); if(i.value.trim()){ sendPayload({ type: 'text', content: i.value }); i.value = ''; i.style.height = 'auto'; } }
-        
-        function sendPayload(p) { 
-            const t = new Date(); const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`; 
-            const payloadStr = JSON.stringify({ name: chatNickname, avatar: chatAvatar, time: timeStr, msgType: p.type, msg: p.content });
-            
-            if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-                window.pendingChatMessage = payloadStr;
-                connectWebSocket(false);
-            } else if (chatSocket.readyState === WebSocket.CONNECTING) {
-                window.pendingChatMessage = payloadStr;
-            } else if (chatSocket.readyState === WebSocket.OPEN) {
-                chatSocket.send(payloadStr); 
-            }
-        }
-        
-        function addChatMessage(data) { const isMe = data.name === chatNickname; const safeName = escapeHtml(data.name); const content = data.msgType === 'image' ? `<img src="${data.msg}" class="message-image" onclick="openFull('${data.msg}')">` : `<div class="message-bubble">${escapeHtml(data.msg)}</div>`; const timeHtml = data.time ? `<div style="font-size:10px; color:#bbb; margin-top:4px; padding:0 4px; text-align:${isMe?'right':'left'};">${escapeHtml(data.time)}</div>` : ''; const html = `<div class="message-item ${isMe ? 'right' : ''}"><div class="message-avatar">${data.avatar || '🐰'}</div><div class="message-content"><div class="message-name">${safeName}</div>${content}${timeHtml}</div></div>`; messagesEl.insertAdjacentHTML('beforeend', html); messagesEl.scrollTop = messagesEl.scrollHeight; }
+// 日记专属表情选择器
+const diaryEmojiList = "😀,😂,🥰,😍,🤩,😘,😋,😎,🥳,😭,😱,🤔,🤗,😴,🥺,😤,🙄,💀,🔥,✨,💕,❤️,🌸,🌙,⭐,🎉,🎊,🍜,🍦,🎂,🍰,☕,🌈,🐱,🐰,🐶,🌷,🌻,💐,🎵,📷,✈️,🏖️,🌅,🌃,🎬,📚,🎮,🌿".split(',');
+const diaryEmojiPicker = document.getElementById('diary-emoji-picker');
+diaryEmojiList.forEach(em => {
+    const s = document.createElement('span');
+    s.style.cssText = 'cursor:pointer;font-size:18px;padding:3px;border-radius:6px;transition:0.15s;display:inline-block;';
+    s.textContent = em;
+    s.onmouseenter = () => s.style.background = 'rgba(255,105,180,0.1)';
+    s.onmouseleave = () => s.style.background = '';
+    s.onclick = () => { const ta = document.getElementById('diary-text-input'); ta.value += em; updateDiaryCharCount(ta); document.getElementById('diary-emoji-picker').style.display = 'none'; };
+    diaryEmojiPicker.appendChild(s);
+});
+function toggleDiaryEmoji() {
+    const p = document.getElementById('diary-emoji-picker');
+    p.style.display = p.style.display === 'grid' ? 'none' : 'grid';
+}
 
-        function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if (w > MAX) { h *= (MAX/w); w = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); sendPayload({ type: 'image', content: canvas.toDataURL('image/jpeg', 0.9) }); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }
+// 点击弹窗外关闭表情
+document.addEventListener('click', (e) => {
+    const ep = document.getElementById('diary-emoji-picker');
+    if (ep.style.display === 'grid' && !ep.contains(e.target) && !e.target.closest('.diary-tool-btn')) {
+        ep.style.display = 'none';
+    }
+});
 
-        const colors = ['#FF69B4', '#FFB6C1', '#FF1493', '#DB7093', '#FFA07A', '#FFD700', '#32CD32', '#00FFFF', '#1E90FF', '#9370DB', '#FF4500'];
-        let lastTime = 0;
-        document.addEventListener('mousemove', function(e) {
-            const now = Date.now(); if (now - lastTime < 50) return; lastTime = now;
-            const heart = document.createElement('div'); heart.className = 'heart-trail'; heart.style.left = (e.clientX - 10) + 'px'; heart.style.top = (e.clientY - 10) + 'px';
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            heart.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="${color}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-            document.body.appendChild(heart); setTimeout(() => heart.remove(), 1000);
-        });
+/* ============================================================
+   幻灯片
+============================================================ */
+const albums2 = { 22:['22-1.webp','22-2.webp','22-3.webp','22-4.webp','22-5.webp'], 21:['21-1.webp','21-2.webp','21-3.webp','21-4.webp'], 20:['20-1.webp','20-2.webp'], 19:['19-1.webp'] };
+let currentAge=22, currentImages=albums2[currentAge], idx=0, cur=document.getElementById('img1'), nxt=document.getElementById('img2'), slideTimer, fadeTimer=null;
+const SLIDE_INTERVAL=9000;
+function renderDots() { const dc=document.getElementById('dynamic-dots');dc.innerHTML='';if(currentImages.length>1){dc.style.display='flex';for(let i=0;i<currentImages.length;i++){const d=document.createElement('div');d.className='dot';d.onclick=()=>goTo(i);dc.appendChild(d);}}else dc.style.display='none'; }
+function updateDots(ai) { document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===ai)); }
+function sw() { nxt.style.backgroundImage=`url('${currentImages[idx]}')`; nxt.style.animation='none'; void nxt.offsetWidth; nxt.style.animation=`imageZoom ${SLIDE_INTERVAL+500}ms ease-out forwards`; cur.style.opacity=0; nxt.style.opacity=1; updateDots(idx); if(fadeTimer)clearTimeout(fadeTimer); const old=cur; fadeTimer=setTimeout(()=>{old.style.backgroundImage='none';},1500); let t=cur;cur=nxt;nxt=t; if(currentImages.length>1)idx=(idx+1)%currentImages.length; }
+function goTo(n) { clearInterval(slideTimer);idx=n;sw();if(currentImages.length>1)slideTimer=setInterval(sw,SLIDE_INTERVAL); }
+function switchAge(age) { if(currentAge===age)return;currentAge=age;currentImages=albums2[age];document.querySelectorAll('.age-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.age)===age));clearInterval(slideTimer);idx=0;renderDots();sw();if(currentImages.length>1)slideTimer=setInterval(sw,SLIDE_INTERVAL); }
 
-        setInterval(() => {
-            const count = Math.floor(Math.random() * 2) + 1;
-            for(let i=0; i<count; i++) createBubble();
-        }, 1000);
+/* ============================================================
+   表情包（聊天）
+============================================================ */
+const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
+const emojiPicker = document.getElementById('emoji-picker');
+emojiList.forEach(e=>{const s=document.createElement('span');s.style.cursor='pointer';s.style.fontSize='20px';s.innerText=e;s.onclick=()=>insertEmoji(e);emojiPicker.appendChild(s);});
 
-        function createBubble() {
-            const bubble = document.createElement('div'); bubble.className = 'floating-bubble';
-            const size = Math.random() * 30 + 15; bubble.style.width = size + 'px'; bubble.style.height = size + 'px'; bubble.style.left = Math.random() * window.innerWidth + 'px';
-            const duration = Math.random() * 4 + 6; bubble.style.animationDuration = duration + 's';
-            bubble.addEventListener('mouseenter', () => {
-                bubble.style.animation = 'none'; bubble.style.transition = 'all 0.15s ease-out'; bubble.style.transform = 'scale(1.5)'; bubble.style.opacity = '0';
-                setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, 150);
-            });
-            document.getElementById('app').appendChild(bubble);
-            setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, duration * 1000);
-        }
-    </script>
+/* ============================================================
+   鼠标特效 & 气泡
+============================================================ */
+const colors=['#FF69B4','#FFB6C1','#FF1493','#DB7093','#FFA07A','#FFD700','#32CD32','#00FFFF','#1E90FF','#9370DB','#FF4500'];
+let lastTime=0;
+document.addEventListener('mousemove',function(e){
+    const now=Date.now();if(now-lastTime<50)return;lastTime=now;
+    const heart=document.createElement('div');heart.className='heart-trail';heart.style.left=(e.clientX-10)+'px';heart.style.top=(e.clientY-10)+'px';
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    heart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="${color}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+    document.body.appendChild(heart);setTimeout(()=>heart.remove(),1000);
+});
+setInterval(()=>{const c=Math.floor(Math.random()*2)+1;for(let i=0;i<c;i++)createBubble();},1000);
+function createBubble(){const bubble=document.createElement('div');bubble.className='floating-bubble';const size=Math.random()*30+15;bubble.style.width=size+'px';bubble.style.height=size+'px';bubble.style.left=Math.random()*window.innerWidth+'px';const dur=Math.random()*4+6;bubble.style.animationDuration=dur+'s';bubble.addEventListener('mouseenter',()=>{bubble.style.animation='none';bubble.style.transition='all 0.15s ease-out';bubble.style.transform='scale(1.5)';bubble.style.opacity='0';setTimeout(()=>{if(bubble.parentElement)bubble.remove();},150);});document.getElementById('app').appendChild(bubble);setTimeout(()=>{if(bubble.parentElement)bubble.remove();},dur*1000);}
+
+/* ============================================================
+   Esc 关闭弹窗
+============================================================ */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('diary-overlay').classList.contains('show')) { closeDiaryModal(); return; }
+        if (document.getElementById('album-modal').classList.contains('show')) { closeAlbum(); return; }
+    }
+});
+
+/* ============================================================
+   初始化
+============================================================ */
+window.onload = () => {
+    renderDots(); sw();
+    if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
+    connectWebSocket(false);
+    initDiaryCalendar();
+    // 延迟一帧等 main-card 渲染好再定位
+    requestAnimationFrame(() => { requestAnimationFrame(positionDiaryCard); });
+};
+window.addEventListener('resize', positionDiaryCard);
+</script>
 </body>
 </html>
