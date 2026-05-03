@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TuoTuo's Dimension</title>
     <link rel="icon" href="logo.png?v=2" type="image/png">
+    
+    <!-- 引入 marked.js 用于解析 AI 输出的 Markdown 格式 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html {
@@ -81,7 +85,7 @@
         .upload-card svg { width: 36px; height: 36px; fill: white; margin-bottom: 8px; transition: 0.3s; }
         .upload-card:hover svg { fill: #FFB6C1; }
 
-        /* ===== 主布局 & 左侧卡片 ===== */
+        /* ===== 主布局 ===== */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
         .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; }
         .age-btn:hover { background: rgba(255,255,255,0.3); }
@@ -89,12 +93,9 @@
         .dots-container { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 12px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); }
         .dot.active { background: #fff; transform: scale(1.3); box-shadow: 0 0 10px rgba(255,255,255,0.8); }
-        
-        .left-panel-card { position: absolute; z-index: 20; width: 220px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,182,193,0.2); }
-        .main-card { bottom: 30px; left: 30px; padding: 15px; }
+        .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,182,193,0.2); }
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
-        
         .music-player-pro { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255,182,193,0.2); width: 280px; max-width: 90vw; }
         .song-marquee-box { flex: 1; overflow: hidden; white-space: nowrap; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
         .song-title-text { display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold; animation: marquee 8s linear infinite; }
@@ -105,7 +106,7 @@
         .btn-ctrl svg { width: 16px; height: 16px; fill: currentColor; }
         .btn-play-pause svg { width: 22px; height: 22px; }
 
-        /* ===== 聊天悬浮球 ===== */
+        /* ===== 聊天 ===== */
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255,105,180,0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
         .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
@@ -308,9 +309,21 @@
         .gpt-avatar-ai { background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; }
         .gpt-avatar-user { background: white; color: #FF69B4; border: 2px solid #FFB6C1; }
         
-        .gpt-content { max-width: 85%; line-height: 1.6; font-size: 15px; color: #333; display: flex; flex-direction: column; justify-content: center; }
-        .gpt-msg-container.user .gpt-content { background: rgba(255,255,255,0.9); padding: 12px 18px; border-radius: 20px; border-bottom-right-radius: 5px; box-shadow: 0 4px 15px rgba(255,182,193,0.2); border: 1px solid rgba(255,182,193,0.3); }
+        .gpt-content { max-width: 85%; font-size: 15px; color: #333; display: flex; flex-direction: column; justify-content: center; overflow: hidden;}
+        .gpt-msg-container.user .gpt-content { background: rgba(255,255,255,0.9); padding: 12px 18px; border-radius: 20px; border-bottom-right-radius: 5px; box-shadow: 0 4px 15px rgba(255,182,193,0.2); border: 1px solid rgba(255,182,193,0.3); line-height: 1.6;}
         .gpt-msg-container.ai .gpt-content { background: rgba(255,182,193,0.15); padding: 12px 18px; border-radius: 20px; border-top-left-radius: 5px; box-shadow: 0 4px 15px rgba(255,182,193,0.1); border: 1px solid rgba(255,182,193,0.4); }
+
+        /* ✨ 新增: Markdown 专属样式定制 ✨ */
+        .markdown-body p { margin-bottom: 8px; line-height: 1.6; }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 { font-weight: bold; color: #c94f82; margin: 16px 0 8px 0; }
+        .markdown-body ul, .markdown-body ol { margin-bottom: 8px; padding-left: 24px; line-height: 1.6; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body strong { font-weight: 600; color: #FF1493; }
+        .markdown-body code { background: rgba(255,182,193,0.3); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; color: #c94f82; }
+        .markdown-body pre { background: rgba(255,255,255,0.6); border: 1px solid rgba(255,182,193,0.4); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+        .markdown-body pre code { background: transparent; padding: 0; color: #333; font-size: 13px; }
+        .markdown-body blockquote { border-left: 4px solid #FFB6C1; margin: 0 0 10px 0; padding-left: 12px; color: #666; background: rgba(255,240,245,0.5); padding: 8px 12px; border-radius: 0 8px 8px 0; }
 
         /* 底部输入区 */
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,240,245,0) 0%, rgba(255,240,245,0.9) 30%); }
@@ -406,7 +419,7 @@
 
     <!-- 左侧卡片 3：AI 专属入口 -->
     <div class="left-panel-card ai-entry-card" id="ai-entry-card" onclick="toggleFullScreenGPT()">
-        <div style="font-size: 26px;"></div>
+        <div style="font-size: 26px;">✨</div>
         <div style="font-size: 16px; font-weight: bold; color: #c94f82; letter-spacing: 1px;">Smart TuoTuo</div>
     </div>
 
@@ -548,7 +561,7 @@
     </div>
 
     <!-- ===================================================================
-         ★★★ 全屏 Smart TuoTuo AI 界面 (粉色磨砂主题 & 真实历史记录) ★★★
+         ★★★ 全屏 Smart TuoTuo AI 界面 (粉色磨砂主题 & 真实历史记录 & Markdown 支持) ★★★
     =================================================================== -->
     <div id="gpt-fullscreen" class="gpt-fullscreen">
         <!-- 左侧边栏 -->
@@ -1255,7 +1268,7 @@ function saveSessions() {
     localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(chatSessions));
 }
 
-// 渲染当前聊天窗口内容
+// ✨ 核心修改点：渲染当前聊天窗口内容，引入 Markdown 解析 ✨
 function renderCurrentChat() {
     const chatArea = document.getElementById('gpt-chat-area');
     chatArea.innerHTML = '';
@@ -1265,22 +1278,24 @@ function renderCurrentChat() {
         chatArea.innerHTML = `
             <div class="gpt-msg-container ai">
                 <div class="gpt-avatar gpt-avatar-ai">✨</div>
-                <div class="gpt-content">
+                <div class="gpt-content markdown-body">
                     你好呀～我是基于目前世界上最强大 AI 模型打造的 TuoTuo，有什么想聊的、想问的，都可以尽管跟我说哦！
                 </div>
             </div>`;
     } else {
         session.messages.forEach(msg => {
             if (msg.role === 'user') {
+                // 用户的消息保持转义，防止跨站脚本攻击 (XSS)
                 chatArea.innerHTML += `
                     <div class="gpt-msg-container user">
                         <div class="gpt-content">${escapeHtml(msg.content)}</div>
                     </div>`;
             } else if (msg.role === 'assistant') {
+                // AI 的消息使用 marked 解析为富文本 HTML
                 chatArea.innerHTML += `
                     <div class="gpt-msg-container ai">
                         <div class="gpt-avatar gpt-avatar-ai">✨</div>
-                        <div class="gpt-content">${escapeHtml(msg.content)}</div>
+                        <div class="gpt-content markdown-body">${marked.parse(msg.content)}</div>
                     </div>`;
             }
         });
@@ -1334,7 +1349,7 @@ async function sendGPTMessage() {
     msgBox.innerHTML += `
         <div class="gpt-msg-container ai" id="${thinkingId}">
             <div class="gpt-avatar gpt-avatar-ai">✨</div>
-            <div class="gpt-content" style="color: #FF69B4; font-weight: bold; opacity: 0.7;">TuoTuo正在努力思考ing...</div>
+            <div class="gpt-content" style="color: #FF69B4; font-weight: bold; opacity: 0.7;">正在思考中...</div>
         </div>`;
     msgBox.scrollTop = msgBox.scrollHeight;
 
