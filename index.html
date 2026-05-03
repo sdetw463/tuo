@@ -1240,13 +1240,17 @@ async function sendGPTMessage() {
         const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
+            // 把前端填写的名字 (如果没填就用一个随机生成的访客ID) 作为 sessionId 传给后端
+            body: JSON.stringify({ 
+                message: text,
+                sessionId: chatNickname || ('visitor_' + Math.random().toString(36).slice(2,7))
+            })
         });
         
-        // 先解析数据
+        // 解析后端返回的 JSON 数据
         const data = await response.json();
 
-        // 如果后端返回的不是 200 OK，强制抛出真实的错误原因
+        // 如果后端报错（比如状态码 500），强制抛出后端设定的详细错误原因
         if (!response.ok) {
             throw new Error(data.error || '未知的网络请求失败，可能是跨域(CORS)拦截或后端崩溃');
         }
