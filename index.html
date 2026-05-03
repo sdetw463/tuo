@@ -81,7 +81,7 @@
         .upload-card svg { width: 36px; height: 36px; fill: white; margin-bottom: 8px; transition: 0.3s; }
         .upload-card:hover svg { fill: #FFB6C1; }
 
-        /* ===== 主布局 ===== */
+        /* ===== 主布局 & 左侧卡片 ===== */
         .age-selector { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 15px; }
         .age-btn { padding: 4px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); font-size: 14px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; }
         .age-btn:hover { background: rgba(255,255,255,0.3); }
@@ -89,9 +89,12 @@
         .dots-container { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; gap: 12px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); }
         .dot.active { background: #fff; transform: scale(1.3); box-shadow: 0 0 10px rgba(255,255,255,0.8); }
-        .main-card { position: absolute; bottom: 30px; left: 30px; z-index: 20; width: 220px; padding: 15px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,182,193,0.2); }
+        
+        .left-panel-card { position: absolute; z-index: 20; width: 220px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 15px; color: #333; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,182,193,0.2); }
+        .main-card { bottom: 30px; left: 30px; padding: 15px; }
         h1 { margin: 0; font-size: 22px; font-weight: bold; color: #FFB6C1; }
         .quote { margin-top: 6px; font-size: 11px; opacity: 0.8; line-height: 1.4; }
+        
         .music-player-pro { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; background: rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(255,182,193,0.2); width: 280px; max-width: 90vw; }
         .song-marquee-box { flex: 1; overflow: hidden; white-space: nowrap; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
         .song-title-text { display: inline-block; padding-left: 100%; color: #555; font-size: 13px; font-weight: bold; animation: marquee 8s linear infinite; }
@@ -102,7 +105,7 @@
         .btn-ctrl svg { width: 16px; height: 16px; fill: currentColor; }
         .btn-play-pause svg { width: 22px; height: 22px; }
 
-        /* ===== 聊天 ===== */
+        /* ===== 聊天悬浮球 ===== */
         .chat-bubble-btn { position: absolute; bottom: 30px; right: 30px; z-index: 110; width: 60px; height: 60px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255,105,180,0.5); transition: all 0.3s; animation: bounce-subtle 2s ease-in-out infinite; padding: 0; }
         .chat-bubble-btn:hover { transform: scale(1.15); }
         .chat-bubble-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
@@ -148,228 +151,161 @@
         /* ===================================================================
            日记本 — 日历卡片（左侧）
         =================================================================== */
-        .diary-card {
-            position: absolute; left: 30px; z-index: 20; width: 220px;
-            background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(255,182,193,0.2);
-            overflow: hidden;
-        }
-        .diary-cal-header {
-            background: rgba(255,182,193,0.35); padding: 8px 10px 6px;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .diary-cal-year {
-            font-size: 11px; color: rgba(255,80,140,0.8); font-weight: 600;
-            letter-spacing: 0.05em; text-align: center;
-        }
-        .diary-cal-month-row {
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .diary-cal-month-name {
-            font-size: 17px; font-weight: bold; color: #c94f82; letter-spacing: 0.03em;
-        }
-        .diary-cal-nav {
-            background: none; border: none; cursor: pointer; color: #c94f82;
-            font-size: 16px; padding: 0 4px; line-height: 1; transition: 0.2s;
-            display: flex; align-items: center;
-        }
+        .diary-card { overflow: hidden; }
+        .diary-cal-header { background: rgba(255,182,193,0.35); padding: 8px 10px 6px; display: flex; flex-direction: column; gap: 4px; }
+        .diary-cal-year { font-size: 11px; color: rgba(255,80,140,0.8); font-weight: 600; letter-spacing: 0.05em; text-align: center; }
+        .diary-cal-month-row { display: flex; align-items: center; justify-content: space-between; }
+        .diary-cal-month-name { font-size: 17px; font-weight: bold; color: #c94f82; letter-spacing: 0.03em; }
+        .diary-cal-nav { background: none; border: none; cursor: pointer; color: #c94f82; font-size: 16px; padding: 0 4px; line-height: 1; transition: 0.2s; display: flex; align-items: center; }
         .diary-cal-nav:hover { color: #FF1493; transform: scale(1.2); }
-        .diary-cal-weekdays {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 4px 8px 2px; gap: 0;
-        }
-        .diary-cal-wd {
-            text-align: center; font-size: 9px; color: rgba(180,80,130,0.7);
-            font-weight: 600; padding: 2px 0; letter-spacing: 0.03em;
-        }
+        .diary-cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 4px 8px 2px; gap: 0; }
+        .diary-cal-wd { text-align: center; font-size: 9px; color: rgba(180,80,130,0.7); font-weight: 600; padding: 2px 0; letter-spacing: 0.03em; }
         .diary-cal-wd:first-child { color: rgba(220,80,80,0.7); }
         .diary-cal-wd:last-child { color: rgba(80,130,220,0.7); }
-        .diary-cal-days {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 2px 8px 8px; gap: 2px;
-        }
-        .diary-day {
-            position: relative; text-align: center; padding: 3px 0;
-            border-radius: 7px; cursor: pointer; transition: background 0.2s;
-            min-height: 26px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-        }
+        .diary-cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 2px 8px 8px; gap: 2px; }
+        .diary-day { position: relative; text-align: center; padding: 3px 0; border-radius: 7px; cursor: pointer; transition: background 0.2s; min-height: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .diary-day:hover { background: rgba(255,105,180,0.12); }
         .diary-day.empty { cursor: default; }
         .diary-day.empty:hover { background: none; }
-        .diary-day-num {
-            font-size: 11px; color: rgba(160,130,140,0.65); line-height: 1;
-        }
-        .diary-day.has-diary .diary-day-num {
-            color: #2a1520; font-weight: 700;
-        }
-        .diary-day.today .diary-day-num {
-            background: #FF69B4; color: white; border-radius: 50%;
-            width: 18px; height: 18px; display: flex; align-items: center;
-            justify-content: center; font-weight: bold;
-        }
-        .diary-day-dot {
-            width: 4px; height: 4px; background: #FF69B4; border-radius: 50%;
-            margin-top: 1px; display: none;
-        }
+        .diary-day-num { font-size: 11px; color: rgba(160,130,140,0.65); line-height: 1; }
+        .diary-day.has-diary .diary-day-num { color: #2a1520; font-weight: 700; }
+        .diary-day.today .diary-day-num { background: #FF69B4; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .diary-day-dot { width: 4px; height: 4px; background: #FF69B4; border-radius: 50%; margin-top: 1px; display: none; }
         .diary-day.has-diary .diary-day-dot { display: block; }
         .diary-day.sun .diary-day-num { color: rgba(200,60,60,0.55); }
         .diary-day.sun.has-diary .diary-day-num { color: #c0392b; }
         .diary-day.sat .diary-day-num { color: rgba(60,100,200,0.55); }
         .diary-day.sat.has-diary .diary-day-num { color: #2962be; }
 
-        /* ===================================================================
-           日记弹窗（全屏覆盖 + 中央卡片）
-        =================================================================== */
-        .diary-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(10px);
-            z-index: 3000; display: none; align-items: center; justify-content: center;
-        }
+        /* 日记弹窗 */
+        .diary-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); backdrop-filter: blur(10px); z-index: 3000; display: none; align-items: center; justify-content: center; }
         .diary-overlay.show { display: flex; }
-        .diary-modal {
-            width: min(94vw, 520px); max-height: 85vh;
-            background: rgba(255,255,255,0.96); border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(255,105,180,0.25);
-            display: flex; flex-direction: column; overflow: hidden;
-            animation: login-appear 0.3s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        .diary-modal-header {
-            background: linear-gradient(135deg, rgba(255,182,193,0.6), rgba(255,105,180,0.3));
-            padding: 14px 18px; display: flex; align-items: center;
-            justify-content: space-between; flex-shrink: 0;
-            border-bottom: 1px solid rgba(255,182,193,0.3);
-        }
+        .diary-modal { width: min(94vw, 520px); max-height: 85vh; background: rgba(255,255,255,0.96); border-radius: 24px; box-shadow: 0 20px 60px rgba(255,105,180,0.25); display: flex; flex-direction: column; overflow: hidden; animation: login-appear 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        .diary-modal-header { background: linear-gradient(135deg, rgba(255,182,193,0.6), rgba(255,105,180,0.3)); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid rgba(255,182,193,0.3); }
         .diary-modal-title { font-size: 15px; font-weight: bold; color: #c94f82; }
         .diary-modal-date { font-size: 11px; color: rgba(180,80,130,0.7); margin-top: 2px; }
-        .diary-modal-close {
-            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.5);
-            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; color: #999;
-        }
+        .diary-modal-close { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #999; }
         .diary-modal-close:hover { background: rgba(255,105,180,0.2); color: #FF69B4; }
-
-        /* 发布区 */
-        .diary-compose {
-            padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,182,193,0.2);
-            flex-shrink: 0; background: rgba(255,250,252,0.8); position: relative;
-        }
-        .diary-compose-name-row {
-            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-        }
-        .diary-compose-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #FFB6C1, #FF69B4);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; flex-shrink: 0;
-        }
-        .diary-compose-name-input {
-            flex: 1; padding: 5px 10px; border: 1.5px solid #FFE4E9;
-            border-radius: 20px; font-size: 13px; outline: none; background: white;
-            color: #444; font-family: inherit;
-        }
+        .diary-compose { padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,182,193,0.2); flex-shrink: 0; background: rgba(255,250,252,0.8); position: relative; }
+        .diary-compose-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .diary-compose-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FFB6C1, #FF69B4); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .diary-compose-name-input { flex: 1; padding: 5px 10px; border: 1.5px solid #FFE4E9; border-radius: 20px; font-size: 13px; outline: none; background: white; color: #444; font-family: inherit; }
         .diary-compose-name-input:focus { border-color: #FF69B4; }
-        .diary-compose-text {
-            width: 100%; min-height: 70px; max-height: 140px;
-            border: 1.5px solid #FFE4E9; border-radius: 12px; padding: 10px 12px;
-            font-size: 14px; outline: none; resize: none; font-family: inherit;
-            line-height: 1.6; color: #333; background: white;
-        }
+        .diary-compose-text { width: 100%; min-height: 70px; max-height: 140px; border: 1.5px solid #FFE4E9; border-radius: 12px; padding: 10px 12px; font-size: 14px; outline: none; resize: none; font-family: inherit; line-height: 1.6; color: #333; background: white; }
         .diary-compose-text:focus { border-color: #FF69B4; }
-
-        /* 工具栏 */
-        .diary-compose-toolbar {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 8px;
-        }
+        .diary-compose-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
         .diary-tool-left { display: flex; gap: 6px; align-items: center; }
-        .diary-tool-btn {
-            background: none; border: none; cursor: pointer; font-size: 18px;
-            padding: 4px; border-radius: 8px; transition: 0.15s; line-height: 1;
-        }
+        .diary-tool-btn { background: none; border: none; cursor: pointer; font-size: 18px; padding: 4px; border-radius: 8px; transition: 0.15s; line-height: 1; }
         .diary-tool-btn:hover { background: rgba(255,105,180,0.1); transform: scale(1.1); }
         .diary-char-count { font-size: 10px; color: #ccc; }
-        .diary-submit-btn {
-            padding: 7px 18px; background: linear-gradient(135deg, #FFB6C1, #FF69B4);
-            border: none; border-radius: 20px; color: white; font-size: 13px;
-            font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 10px rgba(255,105,180,0.3);
-        }
+        .diary-submit-btn { padding: 7px 18px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 20px; color: white; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 10px rgba(255,105,180,0.3); }
         .diary-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,105,180,0.4); }
         .diary-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        /* ===== 修改：日记多图预览网格 ===== */
-        .diary-img-preview {
-            margin-top: 8px; display: none; gap: 8px; flex-wrap: wrap;
-        }
-        .diary-preview-item {
-            position: relative; width: 64px; height: 64px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .diary-preview-item img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block;
-        }
-        .diary-img-remove {
-            position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
-            background: rgba(0,0,0,0.6); border: none; border-radius: 50%; cursor: pointer;
-            color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
+        .diary-img-preview { margin-top: 8px; display: none; gap: 8px; flex-wrap: wrap; }
+        .diary-preview-item { position: relative; width: 64px; height: 64px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .diary-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; }
+        .diary-img-remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; cursor: pointer; color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .diary-img-remove:hover { background: #ff4d4f; }
-
-        .diary-emoji-picker {
-            position: absolute; bottom: 44px; left: 0; background: white;
-            padding: 8px; border-radius: 12px; display: none;
-            grid-template-columns: repeat(8, 1fr); gap: 4px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12); width: 280px;
-            max-height: 180px; overflow-y: auto; z-index: 10;
-            border: 1px solid #FFE4E9;
-        }
-
-        /* 日记列表 */
+        .diary-emoji-picker { position: absolute; bottom: 44px; left: 0; background: white; padding: 8px; border-radius: 12px; display: none; grid-template-columns: repeat(8, 1fr); gap: 4px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); width: 280px; max-height: 180px; overflow-y: auto; z-index: 10; border: 1px solid #FFE4E9; }
         .diary-entries { flex: 1; overflow-y: auto; padding: 0; }
         .diary-entries-inner { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
         .diary-empty { text-align: center; padding: 40px 20px; color: #ccc; font-size: 13px; }
         .diary-empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
-        
-        .diary-entry {
-            border-radius: 14px; background: rgba(255,240,245,0.6);
-            border: 1px solid rgba(255,182,193,0.25);
-            padding: 12px 14px; animation: fadeIn 0.3s ease;
-        }
+        .diary-entry { border-radius: 14px; background: rgba(255,240,245,0.6); border: 1px solid rgba(255,182,193,0.25); padding: 12px 14px; animation: fadeIn 0.3s ease; }
         .diary-entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .diary-entry-avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: linear-gradient(135deg, #FFD6E0, #FFB6C1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: bold; color: #c94f82; flex-shrink: 0;
-        }
+        .diary-entry-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #FFD6E0, #FFB6C1); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; color: #c94f82; flex-shrink: 0; }
         .diary-entry-meta { flex: 1; }
         .diary-entry-name { font-size: 12px; font-weight: 600; color: #c94f82; }
         .diary-entry-time { font-size: 10px; color: #bbb; margin-top: 1px; }
         .diary-entry-body { font-size: 13px; color: #444; line-height: 1.7; word-break: break-word; white-space: pre-wrap; }
-
-        /* ===== 修改：日记图片正方形网格展示 ===== */
-        .diary-entry-imgs { 
-            margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; 
-        }
-        .diary-entry-imgs img { 
-            width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; cursor: zoom-in; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: transform 0.2s; 
-        }
+        .diary-entry-imgs { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+        .diary-entry-imgs img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; cursor: zoom-in; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .diary-entry-imgs img:hover { transform: scale(1.03); }
-
         .diary-entry-footer { margin-top: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-        .diary-like-btn {
-            display: flex; align-items: center; gap: 4px; background: none; border: none;
-            cursor: pointer; font-size: 12px; color: #ccc; padding: 3px 8px;
-            border-radius: 12px; transition: 0.2s;
-        }
+        .diary-like-btn { display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-size: 12px; color: #ccc; padding: 3px 8px; border-radius: 12px; transition: 0.2s; }
         .diary-like-btn:hover { background: rgba(255,105,180,0.1); color: #FF69B4; }
         .diary-like-btn.liked { color: #FF69B4; }
         .diary-like-btn .like-heart { font-size: 13px; }
 
+        /* ===================================================================
+           ★★★ 全屏 ChatGPT 风格 AI 界面 ★★★
+        =================================================================== */
+        .gpt-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5000; background: #fff; display: none; flex-direction: row; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; animation: window-appear 0.3s ease; }
+        .gpt-fullscreen.show { display: flex; }
+        
+        /* 左侧边栏 */
+        .gpt-sidebar { width: 260px; background: #f9f9f9; border-right: 1px solid #e5e5e5; display: flex; flex-direction: column; padding: 15px 10px; transition: transform 0.3s ease; }
+        .gpt-sidebar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .gpt-btn-icon { background: none; border: none; cursor: pointer; color: #333; display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; transition: 0.2s; }
+        .gpt-btn-icon:hover { background: #ececec; }
+        .gpt-btn-icon svg { width: 20px; height: 20px; }
+        .gpt-new-chat-btn { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #333; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; }
+        .gpt-new-chat-btn:hover { background: #ececec; }
+        
+        /* 历史记录 */
+        .gpt-history { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .gpt-history-title { font-size: 12px; color: #888; margin: 10px 8px 5px; font-weight: 500; }
+        .gpt-history-item { padding: 10px 12px; font-size: 14px; color: #333; border-radius: 8px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.2s; }
+        .gpt-history-item:hover { background: #ececec; }
+        .gpt-history-item.active { background: #e5e5e5; font-weight: 500; }
+        
+        /* 底部返回主页 */
+        .gpt-sidebar-bottom { margin-top: auto; padding-top: 10px; border-top: 1px solid #e5e5e5; }
+        .gpt-back-home { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 14px; color: #333; transition: 0.2s; }
+        .gpt-back-home:hover { background: #ececec; color: #c94f82; }
+        .gpt-back-home svg { width: 18px; height: 18px; }
+
+        /* 右侧主体聊天区 */
+        .gpt-main { flex: 1; display: flex; flex-direction: column; background: #fff; position: relative; }
+        
+        /* 顶部栏 */
+        .gpt-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid transparent; }
+        .gpt-model-selector { font-size: 18px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: 0.2s; }
+        .gpt-model-selector:hover { background: #f4f4f4; }
+        .gpt-model-selector svg { width: 16px; height: 16px; color: #888; }
+        .gpt-header-actions { display: flex; gap: 15px; color: #666; }
+        .gpt-action-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #666; }
+        .gpt-action-btn:hover { color: #333; }
+
+        /* 聊天消息流 */
+        .gpt-chat-area { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
+        .gpt-msg-container { width: 100%; max-width: 800px; padding: 15px 20px; display: flex; gap: 20px; }
+        .gpt-msg-container.user { justify-content: flex-end; }
+        .gpt-msg-container.ai { justify-content: flex-start; }
+        
+        .gpt-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .gpt-avatar-ai { background: white; border: 1px solid #d9d9e3; }
+        .gpt-avatar-ai svg { width: 22px; height: 22px; }
+        
+        .gpt-content { max-width: 85%; line-height: 1.6; font-size: 16px; color: #0d0d0d; display: flex; align-items: center; }
+        .gpt-msg-container.user .gpt-content { background: #f4f4f4; padding: 10px 18px; border-radius: 20px; border-bottom-right-radius: 5px; }
+
+        /* 底部输入区 */
+        .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 30%); }
+        .gpt-input-box { width: 100%; max-width: 800px; background: #f4f4f4; border-radius: 25px; padding: 12px 15px; display: flex; align-items: flex-end; gap: 10px; border: 1px solid transparent; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .gpt-input-box:focus-within { border-color: #d9d9e3; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #666; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: 300; transition: 0.2s; padding-bottom: 2px; }
+        .gpt-attach-btn:hover { background: #e5e5e5; color: #333; }
+        
+        .gpt-textarea { flex: 1; max-height: 200px; background: transparent; border: none; outline: none; resize: none; font-size: 16px; font-family: inherit; line-height: 1.5; padding: 4px 0; color: #0d0d0d; }
+        .gpt-textarea::placeholder { color: #8e8ea0; }
+        
+        .gpt-send-btn { width: 32px; height: 32px; background: #000; border: none; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; }
+        .gpt-send-btn:hover { background: #333; }
+        .gpt-send-btn svg { width: 14px; height: 14px; fill: currentColor; }
+        .gpt-send-btn:disabled { background: #e5e5e5; color: #fff; cursor: not-allowed; }
+
+        .gpt-disclaimer { font-size: 12px; color: #888; margin-top: 10px; text-align: center; }
+        
+        /* AI 卡片样式覆盖与动态排布 */
+        .ai-entry-card { cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 15px; gap: 12px; }
+        .ai-entry-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,105,180,0.3); background: rgba(255,255,255,0.5); }
+
         /* ===== 响应式 ===== */
         @media (max-width: 768px) {
-            .main-card { bottom: auto; top: 30px; left: 20px; width: 60%; }
-            .diary-card { display: none; }
+            .left-panel-card { bottom: auto; top: 30px; left: 20px; width: 60%; }
+            .diary-card, .ai-entry-card { display: none; }
             .music-player-pro { bottom: 30px; left: 20px; transform: none; width: calc(100vw - 120px); }
             .dots-container { bottom: 90px; }
             .age-selector { bottom: 125px; gap: 10px; }
@@ -380,6 +316,7 @@
             #ws-status { top: 8px; right: 8px; padding: 4px 8px; }
             .album-item { flex: 0 0 160px; height: 160px; }
             .nav-btn { display: none; }
+            .gpt-sidebar { display: none; } /* 移动端隐藏侧边栏 */
         }
     </style>
 </head>
@@ -420,7 +357,7 @@
             <h3 style="color:#FFB6C1;">✨ 星空寄语</h3>
             <p style="font-size:12px;color:#999;margin-top:5px;">Your words will be shining in the dimension~</p>
             <textarea id="wish-input" class="wish-input" placeholder="输入你想说的话..." rows="3" maxlength="30"></textarea>
-            <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()"化为一颗小星星~</button>
+            <button class="chat-login-btn" id="star-send-btn" onclick="sendStarWish()">放飞心愿</button>
         </div>
     </div>
     <div class="star-login-overlay" id="star-login-overlay">
@@ -439,7 +376,14 @@
     </div>
     <div class="dots-container" id="dynamic-dots"></div>
 
-    <div class="diary-card" id="diary-card">
+    <!-- 左侧卡片 3：AI 专属入口 (新添加) -->
+    <div class="left-panel-card ai-entry-card" id="ai-entry-card" onclick="toggleFullScreenGPT()">
+        <div style="font-size: 26px;">🤖</div>
+        <div style="font-size: 16px; font-weight: bold; color: #c94f82; letter-spacing: 1px;">GPT-5.5 助手</div>
+    </div>
+
+    <!-- 左侧卡片 2：日历日记本 -->
+    <div class="left-panel-card diary-card" id="diary-card">
         <div class="diary-cal-header">
             <div class="diary-cal-year" id="diary-cal-year">2026年</div>
             <div class="diary-cal-month-row">
@@ -457,8 +401,8 @@
         <div class="diary-cal-days" id="diary-cal-days"></div>
     </div>
 
-    <!-- main-card -->
-    <div class="main-card">
+    <!-- 左侧卡片 1：主信息区 -->
+    <div class="left-panel-card main-card" id="main-card">
         <div class="album-nav">
             <div class="album-nav-btn" onclick="openAlbum('album_food','全是好吃的')">美食</div>
             <div class="album-nav-btn" onclick="openAlbum('album_scenery','全是好看的')">美景</div>
@@ -537,7 +481,6 @@
     <!-- 日记弹窗 -->
     <div class="diary-overlay" id="diary-overlay" onclick="if(event.target===this) closeDiaryModal()">
         <div class="diary-modal">
-            <!-- 顶栏 -->
             <div class="diary-modal-header">
                 <div>
                     <div class="diary-modal-title" id="diary-modal-title">📖 日记</div>
@@ -547,26 +490,17 @@
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
-            <!-- 发布框 -->
             <div class="diary-compose" id="diary-compose-area">
                 <div class="diary-compose-name-row">
                     <div class="diary-compose-avatar" id="diary-compose-avatar">✍️</div>
-                    <input type="text" id="diary-author-input" class="diary-compose-name-input"
-                           placeholder="你的名字..." maxlength="12"
-                           oninput="saveDiaryAuthor(this.value)">
+                    <input type="text" id="diary-author-input" class="diary-compose-name-input" placeholder="你的名字..." maxlength="12" oninput="saveDiaryAuthor(this.value)">
                 </div>
-                <textarea id="diary-text-input" class="diary-compose-text"
-                          placeholder="今天发生了什么有趣的事呢～" maxlength="500"
-                          oninput="updateDiaryCharCount(this)"></textarea>
-                
-                <!-- ===== 修改：新增的动态网格多图预览区 ===== -->
+                <textarea id="diary-text-input" class="diary-compose-text" placeholder="今天发生了什么有趣的事呢～" maxlength="500" oninput="updateDiaryCharCount(this)"></textarea>
                 <div class="diary-img-preview" id="diary-img-preview"></div>
-
                 <div class="diary-compose-toolbar">
                     <div class="diary-tool-left" style="position:relative;">
                         <button class="diary-tool-btn" onclick="toggleDiaryEmoji()" title="表情">😊</button>
                         <button class="diary-tool-btn" onclick="document.getElementById('diary-img-input').click()" title="添加图片">🖼️</button>
-                        <!-- ===== 修改：加入 multiple 属性支持多图 ===== -->
                         <input type="file" id="diary-img-input" accept="image/*" multiple style="display:none;" onchange="handleDiaryImgSelect(event)">
                         <span class="diary-char-count" id="diary-char-count">0 / 500</span>
                         <div class="diary-emoji-picker" id="diary-emoji-picker"></div>
@@ -574,13 +508,95 @@
                     <button class="diary-submit-btn" id="diary-submit-btn" onclick="submitDiaryEntry()">发布</button>
                 </div>
             </div>
-            <!-- 日记列表 -->
             <div class="diary-entries" id="diary-entries">
                 <div class="diary-entries-inner" id="diary-entries-inner">
                     <div class="diary-empty" id="diary-empty">
                         <div class="diary-empty-icon">🌙</div>
                         <div>这一天还没有日记，来写第一篇吧~</div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         ★★★ 新增：全屏 ChatGPT 风格 AI 界面 ★★★
+    =================================================================== -->
+    <div id="gpt-fullscreen" class="gpt-fullscreen">
+        <!-- 左侧边栏 -->
+        <div class="gpt-sidebar">
+            <div class="gpt-sidebar-top">
+                <button class="gpt-new-chat-btn" onclick="startNewGPTChat()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg> 
+                    新聊天
+                </button>
+                <button class="gpt-btn-icon" title="关闭侧边栏">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                </button>
+            </div>
+            
+            <div class="gpt-history">
+                <div class="gpt-history-title">最近</div>
+                <div class="gpt-history-item active">模型介绍</div>
+                <div class="gpt-history-item">实验方法核对与优化</div>
+                <div class="gpt-history-item">METTL3研究总结与设计</div>
+                <div class="gpt-history-item">AADAT代谢通路文献总结</div>
+                <div class="gpt-history-item">差异基因分析指导</div>
+                <div class="gpt-history-item">国自然标书伦理审查填报</div>
+            </div>
+
+            <div class="gpt-sidebar-bottom">
+                <div class="gpt-back-home" onclick="toggleFullScreenGPT()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+                    退出界面，返回主页
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧主体 -->
+        <div class="gpt-main">
+            <!-- 顶部 -->
+            <div class="gpt-header">
+                <div class="gpt-model-selector">
+                    ChatGPT <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <span style="font-size: 13px; font-weight: normal; color: #888; margin-left: 8px;">(部署: gpt-5.5)</span>
+                </div>
+                <div class="gpt-header-actions">
+                    <button class="gpt-action-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg>
+                        分享
+                    </button>
+                    <button class="gpt-action-btn" style="padding: 0 5px;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="12" r="2"></circle></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 聊天记录流 -->
+            <div class="gpt-chat-area" id="gpt-chat-area">
+                <div class="gpt-msg-container ai">
+                    <div class="gpt-avatar gpt-avatar-ai">
+                        <!-- OpenAI 风格 Logo -->
+                        <svg viewBox="0 0 41 41" fill="none" stroke="#000" stroke-width="1.5"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.476 37.595a7.48 7.48 0 0 1-5.914-2.79l-4.52-5.118a1.275 1.275 0 0 1 .28-1.802l10.457-7.53v15.932a1.275 1.275 0 0 1-.303 1.308zm-11.666-6.49a7.483 7.483 0 0 1-1.393-6.39l2.453-6.402a1.275 1.275 0 0 1 1.748-.718l11.59 5.378-13.684 6.77a1.275 1.275 0 0 1-.714 1.362zM5.443 20.472a7.48 7.48 0 0 1 4.522-4.73l6.402-2.454a1.275 1.275 0 0 1 1.558 1.01l3.238 12.44-15.02-3.896a1.275 1.275 0 0 1-.7-1.37zm13.08-14.567a7.48 7.48 0 0 1 5.914 2.79l4.52 5.118a1.275 1.275 0 0 1-.28 1.802L18.22 23.146V7.214a1.275 1.275 0 0 1 .303-1.308zm11.666 6.49a7.483 7.483 0 0 1 1.393 6.39l-2.453 6.402a1.275 1.275 0 0 1-1.748.718l-11.59-5.378 13.684-6.77a1.275 1.275 0 0 1 .714-1.362zm5.367 10.632a7.48 7.48 0 0 1-4.522 4.73l-6.402 2.454a1.275 1.275 0 0 1-1.558-1.01l-3.238-12.44 15.02 3.896a1.275 1.275 0 0 1 .7 1.37zM20.5 25.12a4.62 4.62 0 1 1 0-9.24 4.62 4.62 0 0 1 0 9.24z"/></svg>
+                    </div>
+                    <div class="gpt-content">
+                        我是已部署在 Azure AI Foundry 的 <b>gpt-5.5</b> 模型（ChatGPT），属于当前较新的大语言模型一代，经过优化用于对话、推理和多语言交流。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部输入框 -->
+            <div class="gpt-input-wrapper">
+                <div class="gpt-input-box">
+                    <button class="gpt-attach-btn" title="附加文件">＋</button>
+                    <textarea class="gpt-textarea" id="gpt-input-el" placeholder="有问题，尽管问" rows="1" oninput="autoResizeGPT(this)" onkeydown="handleGPTKey(event)"></textarea>
+                    
+                    <button class="gpt-send-btn" id="gpt-send-btn" onclick="sendGPTMessage()">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
+                    </button>
+                </div>
+                <div class="gpt-disclaimer">
+                    ChatGPT 也可能会犯错。请核查重要信息。
                 </div>
             </div>
         </div>
@@ -799,32 +815,44 @@ function addChatMessage(data) { const isMe=data.name===chatNickname; const conte
 function handleImageUpload(e) { const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(ev)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=800;let w=img.width,h=img.height;if(w>MAX){h*=(MAX/w);w=MAX;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);sendChatPayload({type:'image',content:canvas.toDataURL('image/jpeg',0.9)});};img.src=ev.target.result;};reader.readAsDataURL(file); }
 
 /* ============================================================
-   ★★★ 日记本核心逻辑 (多图更新版) ★★★
+   日记本核心逻辑
 ============================================================ */
 const diaryStore = {};
 let diaryCurrentDateKey = '';
 let diaryViewYear = 0;
 let diaryViewMonth = 0;
-let diaryPendingImgs = []; // ===== 修改：改为数组形式存储多张图片 =====
+let diaryPendingImgs = [];
 
 function initDiaryCalendar() {
     const now = new Date();
     diaryViewYear = now.getFullYear();
     diaryViewMonth = now.getMonth();
     renderDiaryCalendar();
-    positionDiaryCard();
 }
 
-function positionDiaryCard() {
-    const mainCard = document.querySelector('.main-card');
+// 动态堆叠排布左侧的三个卡片
+function positionLeftCards() {
+    const mainCard = document.getElementById('main-card');
     const diaryCard = document.getElementById('diary-card');
-    if (!mainCard || !diaryCard) return;
-    const mainRect = mainCard.getBoundingClientRect();
-    const cardH = diaryCard.offsetHeight;
-    const gap = 10;
-    const top = mainRect.top - cardH - gap;
-    diaryCard.style.top = Math.max(10, top) + 'px';
-    diaryCard.style.left = mainCard.style.left || '30px';
+    const aiCard = document.getElementById('ai-entry-card');
+    if (!mainCard) return;
+    
+    // 只在非移动端执行精确定位
+    if (window.innerWidth > 768) {
+        const gap = 10;
+        const mainRect = mainCard.getBoundingClientRect();
+        
+        if (diaryCard) {
+            diaryCard.style.top = Math.max(10, mainRect.top - diaryCard.offsetHeight - gap) + 'px';
+            diaryCard.style.left = mainCard.style.left || '30px';
+            
+            if (aiCard) {
+                const diaryRect = diaryCard.getBoundingClientRect();
+                aiCard.style.top = Math.max(10, diaryRect.top - aiCard.offsetHeight - gap) + 'px';
+                aiCard.style.left = diaryCard.style.left || '30px';
+            }
+        }
+    }
 }
 
 function renderDiaryCalendar() {
@@ -837,7 +865,6 @@ function renderDiaryCalendar() {
 
     const today = new Date();
     const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
-
     const firstDay = new Date(diaryViewYear, diaryViewMonth, 1).getDay();
     const daysInMonth = new Date(diaryViewYear, diaryViewMonth + 1, 0).getDate();
 
@@ -885,7 +912,6 @@ function openDiaryModal(key, day) {
     document.getElementById('diary-modal-title').textContent = `📖 ${y}年${MONTHS_CN[parseInt(m)-1]} ${parseInt(d_)}日`;
     document.getElementById('diary-modal-date').textContent = `${y}.${m}.${d_}`;
 
-    // ===== 修改：控制发布区仅今天可见 =====
     const today = new Date();
     const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
     const composeArea = document.getElementById('diary-compose-area');
@@ -900,7 +926,6 @@ function openDiaryModal(key, day) {
     document.getElementById('diary-text-input').value = '';
     updateDiaryCharCount(document.getElementById('diary-text-input'));
     
-    // 清除可能存在的上次未发布的图片
     diaryPendingImgs = [];
     renderDiaryImgPreview();
 
@@ -933,7 +958,6 @@ function renderDiaryEntries(key) {
     setTimeout(() => { diaryEntriesEl.scrollTop = diaryEntriesEl.scrollHeight; }, 50);
 }
 
-// ===== 修改：支持多图的新版渲染器 =====
 function buildDiaryEntryEl(entry, key) {
     const div = document.createElement('div');
     div.className = 'diary-entry';
@@ -945,16 +969,11 @@ function buildDiaryEntryEl(entry, key) {
 
     let imagesHtml = '';
     let imgList = entry.imgs || [];
-    // 兼容历史旧数据的单图形式
-    if (imgList.length === 0 && entry.img) {
-        imgList = [entry.img];
-    }
+    if (imgList.length === 0 && entry.img) { imgList = [entry.img]; }
 
     if (imgList.length > 0) {
         imagesHtml = '<div class="diary-entry-imgs">';
-        imgList.forEach(src => {
-            imagesHtml += `<img src="${src}" onclick="openFull('${src}')">`;
-        });
+        imgList.forEach(src => { imagesHtml += `<img src="${src}" onclick="openFull('${src}')">`; });
         imagesHtml += '</div>';
     }
 
@@ -971,8 +990,7 @@ function buildDiaryEntryEl(entry, key) {
         <div class="diary-entry-body">${escapeHtml(entry.text)}</div>
         ${imagesHtml}
         <div class="diary-entry-footer">
-            <button class="diary-like-btn ${likedByMe?'liked':''}"
-                    onclick="toggleDiaryLike('${key}','${entry.id}',this)">
+            <button class="diary-like-btn ${likedByMe?'liked':''}" onclick="toggleDiaryLike('${key}','${entry.id}',this)">
                 <span class="like-heart">${likedByMe?'❤️':'🤍'}</span>
                 <span class="like-num">${likeCount > 0 ? likeCount : ''}</span>
             </button>
@@ -985,8 +1003,6 @@ function submitDiaryEntry() {
     const author = document.getElementById('diary-author-input').value.trim();
     const text = document.getElementById('diary-text-input').value.trim();
     if (!author) { alert('请先输入你的名字哦~'); document.getElementById('diary-author-input').focus(); return; }
-    
-    // 改为检查图片数组长度
     if (!text && diaryPendingImgs.length === 0) { alert('写点什么再发布吧~'); document.getElementById('diary-text-input').focus(); return; }
 
     const btn = document.getElementById('diary-submit-btn');
@@ -997,15 +1013,7 @@ function submitDiaryEntry() {
     const entryId = 'de_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
 
     const payload = {
-        msgType: 'diary',
-        dateKey: diaryCurrentDateKey,
-        id: entryId,
-        author: author,
-        text: text,
-        imgs: [...diaryPendingImgs], // 使用数组承载多图
-        time: timeStr,
-        likes: 0,
-        likedBy: []
+        msgType: 'diary', dateKey: diaryCurrentDateKey, id: entryId, author: author, text: text, imgs: [...diaryPendingImgs], time: timeStr, likes: 0, likedBy: []
     };
 
     wsSend(payload);
@@ -1017,7 +1025,6 @@ function submitDiaryEntry() {
     document.getElementById('diary-text-input').value = '';
     updateDiaryCharCount(document.getElementById('diary-text-input'));
     
-    // 发布后清空图片区
     diaryPendingImgs = [];
     renderDiaryImgPreview();
 
@@ -1029,17 +1036,8 @@ function receiveDiaryEntry(data) {
     if (!key) return;
     if (!diaryStore[key]) diaryStore[key] = [];
     if (diaryStore[key].find(e => e.id === data.id)) return;
-    diaryStore[key].push({
-        id: data.id, author: data.author, text: data.text,
-        img: data.img || null,
-        imgs: data.imgs || [],
-        time: data.time,
-        likes: data.likes || 0,
-        likedBy: data.likedBy || []
-    });
-    if (diaryCurrentDateKey === key && document.getElementById('diary-overlay').classList.contains('show')) {
-        renderDiaryEntries(key);
-    }
+    diaryStore[key].push({ id: data.id, author: data.author, text: data.text, img: data.img || null, imgs: data.imgs || [], time: data.time, likes: data.likes || 0, likedBy: data.likedBy || [] });
+    if (diaryCurrentDateKey === key && document.getElementById('diary-overlay').classList.contains('show')) { renderDiaryEntries(key); }
     renderDiaryCalendar();
 }
 
@@ -1053,13 +1051,8 @@ function toggleDiaryLike(key, entryId, btn) {
     if (!entry.likedBy) entry.likedBy = [];
 
     const alreadyLiked = entry.likedBy.includes(myName);
-    if (alreadyLiked) {
-        entry.likedBy = entry.likedBy.filter(n => n !== myName);
-        entry.likes = Math.max(0, (entry.likes||1) - 1);
-    } else {
-        entry.likedBy.push(myName);
-        entry.likes = (entry.likes||0) + 1;
-    }
+    if (alreadyLiked) { entry.likedBy = entry.likedBy.filter(n => n !== myName); entry.likes = Math.max(0, (entry.likes||1) - 1); } 
+    else { entry.likedBy.push(myName); entry.likes = (entry.likes||0) + 1; }
 
     const isLiked = !alreadyLiked;
     btn.className = 'diary-like-btn' + (isLiked ? ' liked' : '');
@@ -1075,11 +1068,8 @@ function receiveDiaryLike(data) {
     const entry = entries.find(e => e.id === data.entryId);
     if (!entry) return;
     if (!entry.likedBy) entry.likedBy = [];
-    if (data.isLike) {
-        if (!entry.likedBy.includes(data.name)) entry.likedBy.push(data.name);
-    } else {
-        entry.likedBy = entry.likedBy.filter(n => n !== data.name);
-    }
+    if (data.isLike) { if (!entry.likedBy.includes(data.name)) entry.likedBy.push(data.name); } 
+    else { entry.likedBy = entry.likedBy.filter(n => n !== data.name); }
     entry.likes = entry.likedBy.length;
 
     if (diaryCurrentDateKey === data.dateKey && document.getElementById('diary-overlay').classList.contains('show')) {
@@ -1106,15 +1096,10 @@ function updateDiaryCharCount(el) {
 
 function saveDiaryAuthor(val) { localStorage.setItem('diary_author', val.trim()); }
 
-// ===== 修改：支持多图上传的处理逻辑 =====
 function handleDiaryImgSelect(e) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-
-    if (diaryPendingImgs.length + files.length > 10) {
-        alert('最多只能上传 10 张图片哦~');
-        files.splice(10 - diaryPendingImgs.length); // 截取掉超出名额的图片
-    }
+    if (diaryPendingImgs.length + files.length > 10) { alert('最多只能上传 10 张图片哦~'); files.splice(10 - diaryPendingImgs.length); }
 
     let loadedCount = 0;
     files.forEach(file => {
@@ -1127,47 +1112,32 @@ function handleDiaryImgSelect(e) {
                 if (w > MAX || h > MAX) { if(w>h){h*=(MAX/w);w=MAX;}else{w*=(MAX/h);h=MAX;} }
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                
                 diaryPendingImgs.push(canvas.toDataURL('image/jpeg', 0.82));
                 loadedCount++;
-                if (loadedCount === files.length) {
-                    renderDiaryImgPreview();
-                }
+                if (loadedCount === files.length) { renderDiaryImgPreview(); }
             };
             img.src = ev.target.result;
         };
         reader.readAsDataURL(file);
     });
-    // 清空，以便再次选中同一张图时能触发
     e.target.value = '';
 }
 
-// 渲染图片预览区
 function renderDiaryImgPreview() {
     const container = document.getElementById('diary-img-preview');
     container.innerHTML = '';
-    if (diaryPendingImgs.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
+    if (diaryPendingImgs.length === 0) { container.style.display = 'none'; return; }
     container.style.display = 'flex';
     diaryPendingImgs.forEach((src, idx) => {
         const div = document.createElement('div');
         div.className = 'diary-preview-item';
-        div.innerHTML = `
-            <img src="${src}" alt="预览" onclick="openFull('${src}')">
-            <button class="diary-img-remove" onclick="removeDiaryImg(${idx})">✕</button>
-        `;
+        div.innerHTML = `<img src="${src}" alt="预览" onclick="openFull('${src}')"><button class="diary-img-remove" onclick="removeDiaryImg(${idx})">✕</button>`;
         container.appendChild(div);
     });
 }
 
 function removeDiaryImg(index) {
-    if (index !== undefined) {
-        diaryPendingImgs.splice(index, 1);
-    } else {
-        diaryPendingImgs = []; // 兼容兜底清除
-    }
+    if (index !== undefined) { diaryPendingImgs.splice(index, 1); } else { diaryPendingImgs = []; }
     renderDiaryImgPreview();
 }
 
@@ -1182,17 +1152,122 @@ diaryEmojiList.forEach(em => {
     s.onclick = () => { const ta = document.getElementById('diary-text-input'); ta.value += em; updateDiaryCharCount(ta); document.getElementById('diary-emoji-picker').style.display = 'none'; };
     diaryEmojiPicker.appendChild(s);
 });
-function toggleDiaryEmoji() {
-    const p = document.getElementById('diary-emoji-picker');
-    p.style.display = p.style.display === 'grid' ? 'none' : 'grid';
-}
+function toggleDiaryEmoji() { const p = document.getElementById('diary-emoji-picker'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
 
 document.addEventListener('click', (e) => {
     const ep = document.getElementById('diary-emoji-picker');
-    if (ep.style.display === 'grid' && !ep.contains(e.target) && !e.target.closest('.diary-tool-btn')) {
-        ep.style.display = 'none';
-    }
+    if (ep && ep.style.display === 'grid' && !ep.contains(e.target) && !e.target.closest('.diary-tool-btn')) { ep.style.display = 'none'; }
 });
+
+
+/* ============================================================
+   ★★★ 新增：全屏 ChatGPT 交互逻辑 ★★★
+============================================================ */
+function toggleFullScreenGPT() {
+    const win = document.getElementById('gpt-fullscreen');
+    win.classList.toggle('show');
+}
+
+function startNewGPTChat() {
+    const chatArea = document.getElementById('gpt-chat-area');
+    // 保留系统默认的第一条欢迎信息，清空其余
+    chatArea.innerHTML = `
+        <div class="gpt-msg-container ai">
+            <div class="gpt-avatar gpt-avatar-ai">
+                <svg viewBox="0 0 41 41" fill="none" stroke="#000" stroke-width="1.5"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.476 37.595a7.48 7.48 0 0 1-5.914-2.79l-4.52-5.118a1.275 1.275 0 0 1 .28-1.802l10.457-7.53v15.932a1.275 1.275 0 0 1-.303 1.308zm-11.666-6.49a7.483 7.483 0 0 1-1.393-6.39l2.453-6.402a1.275 1.275 0 0 1 1.748-.718l11.59 5.378-13.684 6.77a1.275 1.275 0 0 1-.714 1.362zM5.443 20.472a7.48 7.48 0 0 1 4.522-4.73l6.402-2.454a1.275 1.275 0 0 1 1.558 1.01l3.238 12.44-15.02-3.896a1.275 1.275 0 0 1-.7-1.37zm13.08-14.567a7.48 7.48 0 0 1 5.914 2.79l4.52 5.118a1.275 1.275 0 0 1-.28 1.802L18.22 23.146V7.214a1.275 1.275 0 0 1 .303-1.308zm11.666 6.49a7.483 7.483 0 0 1 1.393 6.39l-2.453 6.402a1.275 1.275 0 0 1-1.748.718l-11.59-5.378 13.684-6.77a1.275 1.275 0 0 1 .714-1.362zm5.367 10.632a7.48 7.48 0 0 1-4.522 4.73l-6.402 2.454a1.275 1.275 0 0 1-1.558-1.01l-3.238-12.44 15.02 3.896a1.275 1.275 0 0 1 .7 1.37zM20.5 25.12a4.62 4.62 0 1 1 0-9.24 4.62 4.62 0 0 1 0 9.24z"/></svg>
+            </div>
+            <div class="gpt-content">
+                我已经准备好新的对话了。请问有什么我可以帮你的？
+            </div>
+        </div>`;
+}
+
+function autoResizeGPT(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+    const btn = document.getElementById('gpt-send-btn');
+    if(el.value.trim().length > 0) {
+        btn.style.background = '#000';
+        btn.disabled = false;
+    } else {
+        btn.style.background = '#e5e5e5';
+        btn.disabled = true;
+    }
+}
+
+function handleGPTKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendGPTMessage();
+    }
+}
+
+// 核心：模拟与你后端的请求
+async function sendGPTMessage() {
+    const inputEl = document.getElementById('gpt-input-el');
+    const msgBox = document.getElementById('gpt-chat-area');
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    // 1. 显示用户的消息
+    inputEl.value = '';
+    autoResizeGPT(inputEl);
+    
+    // 获取首字母作为头像
+    let userAvatarStr = chatNickname ? chatNickname.charAt(0).toUpperCase() : '我';
+    
+    msgBox.innerHTML += `
+        <div class="gpt-msg-container user">
+            <div class="gpt-content">${escapeHtml(text)}</div>
+        </div>`;
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    // 2. 添加 "思考中" 的占位提示
+    const thinkingId = 'gpt_think_' + Date.now();
+    msgBox.innerHTML += `
+        <div class="gpt-msg-container ai" id="${thinkingId}">
+            <div class="gpt-avatar gpt-avatar-ai">
+                <svg viewBox="0 0 41 41" fill="none" stroke="#000" stroke-width="1.5"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.476 37.595a7.48 7.48 0 0 1-5.914-2.79l-4.52-5.118a1.275 1.275 0 0 1 .28-1.802l10.457-7.53v15.932a1.275 1.275 0 0 1-.303 1.308zm-11.666-6.49a7.483 7.483 0 0 1-1.393-6.39l2.453-6.402a1.275 1.275 0 0 1 1.748-.718l11.59 5.378-13.684 6.77a1.275 1.275 0 0 1-.714 1.362zM5.443 20.472a7.48 7.48 0 0 1 4.522-4.73l6.402-2.454a1.275 1.275 0 0 1 1.558 1.01l3.238 12.44-15.02-3.896a1.275 1.275 0 0 1-.7-1.37zm13.08-14.567a7.48 7.48 0 0 1 5.914 2.79l4.52 5.118a1.275 1.275 0 0 1-.28 1.802L18.22 23.146V7.214a1.275 1.275 0 0 1 .303-1.308zm11.666 6.49a7.483 7.483 0 0 1 1.393 6.39l-2.453 6.402a1.275 1.275 0 0 1-1.748.718l-11.59-5.378 13.684-6.77a1.275 1.275 0 0 1 .714-1.362zm5.367 10.632a7.48 7.48 0 0 1-4.522 4.73l-6.402 2.454a1.275 1.275 0 0 1-1.558-1.01l-3.238-12.44 15.02 3.896a1.275 1.275 0 0 1 .7 1.37zM20.5 25.12a4.62 4.62 0 1 1 0-9.24 4.62 4.62 0 0 1 0 9.24z"/></svg>
+            </div>
+            <div class="gpt-content" style="color: #888;">
+                正在通过模型思考中...
+            </div>
+        </div>`;
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    // 3. 真实发送请求给你的 Azure Web App 后端
+    try {
+        const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        
+        if (!response.ok) throw new Error('网络请求失败');
+        const data = await response.json();
+        
+        document.getElementById(thinkingId).remove();
+        
+        msgBox.innerHTML += `
+            <div class="gpt-msg-container ai">
+                <div class="gpt-avatar gpt-avatar-ai">
+                     <svg viewBox="0 0 41 41" fill="none" stroke="#000" stroke-width="1.5"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.476 37.595a7.48 7.48 0 0 1-5.914-2.79l-4.52-5.118a1.275 1.275 0 0 1 .28-1.802l10.457-7.53v15.932a1.275 1.275 0 0 1-.303 1.308zm-11.666-6.49a7.483 7.483 0 0 1-1.393-6.39l2.453-6.402a1.275 1.275 0 0 1 1.748-.718l11.59 5.378-13.684 6.77a1.275 1.275 0 0 1-.714 1.362zM5.443 20.472a7.48 7.48 0 0 1 4.522-4.73l6.402-2.454a1.275 1.275 0 0 1 1.558 1.01l3.238 12.44-15.02-3.896a1.275 1.275 0 0 1-.7-1.37zm13.08-14.567a7.48 7.48 0 0 1 5.914 2.79l4.52 5.118a1.275 1.275 0 0 1-.28 1.802L18.22 23.146V7.214a1.275 1.275 0 0 1 .303-1.308zm11.666 6.49a7.483 7.483 0 0 1 1.393 6.39l-2.453 6.402a1.275 1.275 0 0 1-1.748.718l-11.59-5.378 13.684-6.77a1.275 1.275 0 0 1 .714-1.362zm5.367 10.632a7.48 7.48 0 0 1-4.522 4.73l-6.402 2.454a1.275 1.275 0 0 1-1.558-1.01l-3.238-12.44 15.02 3.896a1.275 1.275 0 0 1 .7 1.37zM20.5 25.12a4.62 4.62 0 1 1 0-9.24 4.62 4.62 0 0 1 0 9.24z"/></svg>
+                </div>
+                <div class="gpt-content">${escapeHtml(data.reply || data.error)}</div>
+            </div>`;
+    } catch (err) {
+        document.getElementById(thinkingId).remove();
+        msgBox.innerHTML += `
+            <div class="gpt-msg-container ai">
+                <div class="gpt-avatar" style="color: #ff4d4f; background: #ffe4e6;">⚠️</div>
+                <div class="gpt-content" style="color: #ff4d4f;">
+                    网络好像开小差了，无法连接到后端服务器。请检查后端是否部署成功。
+                </div>
+            </div>`;
+    }
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
+
 
 /* ============================================================
    幻灯片
@@ -1212,7 +1287,6 @@ function sw() {
     updateDots(idx); 
     if(fadeTimer)clearTimeout(fadeTimer); 
     const old=cur; 
-    // 平滑修复点：在旧图彻底淡出后再清除其动画状态，避免在循环交替中偶尔闪回
     fadeTimer=setTimeout(()=>{
         old.style.backgroundImage='none';
         old.style.animation='none'; 
@@ -1252,6 +1326,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (document.getElementById('diary-overlay').classList.contains('show')) { closeDiaryModal(); return; }
         if (document.getElementById('album-modal').classList.contains('show')) { closeAlbum(); return; }
+        if (document.getElementById('gpt-fullscreen').classList.contains('show')) { toggleFullScreenGPT(); return; }
     }
 });
 
@@ -1263,9 +1338,11 @@ window.onload = () => {
     if (currentImages.length > 1) slideTimer = setInterval(sw, SLIDE_INTERVAL);
     connectWebSocket(false);
     initDiaryCalendar();
-    requestAnimationFrame(() => { requestAnimationFrame(positionDiaryCard); });
+    // 确保卡片动态堆叠正确
+    requestAnimationFrame(() => { requestAnimationFrame(positionLeftCards); });
 };
-window.addEventListener('resize', positionDiaryCard);
+// 监听窗口缩放，实时修正左侧卡片排列
+window.addEventListener('resize', positionLeftCards);
 </script>
 </body>
 </html>
