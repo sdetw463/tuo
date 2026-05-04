@@ -1881,10 +1881,20 @@ async function sendGPTMessage() {
             if (!response.ok) throw new Error((await response.json()).error || '画图请求失败');
             const data = await response.json();
             
-            // 使用标准的 Markdown 格式直接渲染生成的图像
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})\n\n*💡 提示词: ${data.revised_prompt}*`;
             outputEl = prepareAssistantOutput(thinkingObj);
-            await typewriterMarkdown(outputEl, finalReply);
+            
+            // 🚀 核心修复：直接拼接 HTML 渲染图片，跳过会卡死浏览器的打字机特效！
+            const imgHtml = `<img src="${data.url}" class="message-image" onclick="openFull(this.src)" style="max-width: 100%; border-radius: 12px; margin-bottom: 10px;">`;
+            const promptHtml = marked.parse(`*💡 **优化提示词:** ${data.revised_prompt}*`);
+            
+            outputEl.innerHTML = imgHtml + promptHtml;
+            
+            // 让聊天框自动滚到底部
+            const chatArea = document.getElementById('gpt-chat-area');
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // 依然保留 Markdown 格式用于存入本地历史记录
+            finalReply = `![TuoTuo为你绘制的画作](${data.url})\n\n*💡 提示词: ${data.revised_prompt}*`;
 
         } else {
             // ✨ 通道 2：聊天分析
