@@ -666,8 +666,14 @@
                         </div>
 
                         <button class="gpt-attach-btn" title="附加功能" onclick="toggleAttachmentMenu(event)">＋</button>
+                        
+                        <!-- 👇👇👇 就是这里！之前你不小心删掉了它们 👇👇👇 -->
+                        <textarea class="gpt-textarea" id="gpt-input-el" placeholder="有什么想问 TuoTuo 的？" rows="1" oninput="autoResizeGPT(this)" onkeydown="handleGPTKey(event)"></textarea>
+                        
+                        <button class="gpt-send-btn" id="gpt-send-btn" onclick="sendGPTMessage()" disabled>
                             <!-- 动态加载图标：发送/停止 -->
                         </button>
+                        <!-- 👆👆👆 恢复到这里 👆👆👆 -->
                     </div>
                 </div>
                 <div class="gpt-disclaimer">
