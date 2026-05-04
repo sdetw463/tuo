@@ -1260,7 +1260,6 @@ let chatSessions = JSON.parse(localStorage.getItem('tuotuo_gpt_sessions') || '[]
 let currentSessionId = null;
 let currentGPTMode = 'chat'; 
 
-// ✨ 完美侧边栏折叠与展开功能
 function toggleGPTSidebar() {
     const container = document.getElementById('gpt-fullscreen');
     container.classList.toggle('sidebar-collapsed');
@@ -1280,8 +1279,6 @@ document.addEventListener('click', (e) => {
 
 function triggerFileUpload() {
     const uploadInput = document.getElementById('gpt-image-upload');
-    
-    // 如果目前是画图模式，只允许选图片格式
     if (currentGPTMode === 'image') {
         uploadInput.accept = 'image/*';
     } else {
@@ -1469,11 +1466,55 @@ function loadSession(id) {
     clearGPTFile();
 }
 
+/* ============================================================
+   ✨ 核心修复：防止 LocalStorage 被超长数据撑爆导致程序静默崩溃
+============================================================ */
 function saveSessions() {
-    localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(chatSessions));
+    try {
+        // 我们不直接存完整的 session，因为包含大量图片 base64 和长文本会瞬间撑爆 LocalStorage (上限通常为 5MB)
+        const cleanSessions = chatSessions.map(session => {
+            return {
+                ...session,
+                messages: session.messages.map(msg => {
+                    let cleanMsg = { ...msg };
+                    
+                    // 1. 清理 Base64 图片：将庞大的图片数据替换为漂亮的占位符
+                    if (cleanMsg.mediaHtml) {
+                        cleanMsg.mediaHtml = cleanMsg.mediaHtml.replace(
+                            /src="data:image\/[^;]+;base64,[^"]+"/g, 
+                            'src="data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'120\'><rect width=\'160\' height=\'120\' fill=\'%23FFF0F5\' rx=\'12\'/><text x=\'80\' y=\'60\' font-size=\'13\' fill=\'%23FFB6C1\' font-weight=\'bold\' text-anchor=\'middle\' dominant-baseline=\'middle\'>[图片已过期]</text></svg>"'
+                        );
+                    }
+                    if (cleanMsg.image && cleanMsg.image.startsWith('data:image/')) {
+                        cleanMsg.image = '';
+                    }
+                    
+                    // 2. 清理超长文本：只保留前 5000 个字符用于本地历史记录回显
+                    if (cleanMsg.content && cleanMsg.content.length > 5000) {
+                        cleanMsg.content = cleanMsg.content.substring(0, 5000) + '\n\n> ✂️ *[为节省本地存储空间，超长文档内容已在历史记录中折叠]*';
+                    }
+                    
+                    return cleanMsg;
+                })
+            };
+        });
+        
+        localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(cleanSessions));
+    } catch (err) {
+        console.error("保存本地历史记录失败:", err);
+        // 如果抓取到 QuotaExceededError，说明额度超了
+        if (err.name === 'QuotaExceededError' || err.code === 22) {
+            // 如果依旧超出限制，采取紧急清理策略：自动清理所有未置顶的、非当前的旧聊天
+            if (chatSessions.length > 1) {
+                chatSessions = chatSessions.filter(s => s.id === currentSessionId || s.pinned);
+                try {
+                    localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(chatSessions)); // 再次尝试
+                } catch(e) {}
+            }
+        }
+    }
 }
 
-// ✨ 智能核心：为图生图准备完美透明的 1024x1024 Mask
 function processImageAsync(file, mode) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1483,28 +1524,23 @@ function processImageAsync(file, mode) {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // 如果是画图模式，强制生成 1024x1024 尺寸，并且附带一张纯透明遮罩(用于完美匹配后端API)
                 if (mode === 'image') {
                     const size = 1024;
                     canvas.width = size;
                     canvas.height = size;
                     
-                    // 居中裁剪缩放
                     let sx = 0, sy = 0, sw = img.width, sh = img.height;
                     if (sw > sh) { sx = (sw - sh) / 2; sw = sh; } 
                     else { sy = (sh - sw) / 2; sh = sw; }
                     
-                    // 1. 生成正方形画作 PNG
                     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
                     const imageBase64 = canvas.toDataURL('image/png');
                     
-                    // 2. 生成完全透明的图生图 Mask PNG
                     ctx.clearRect(0, 0, size, size);
                     const maskBase64 = canvas.toDataURL('image/png');
                     
                     resolve({ image: imageBase64, mask: maskBase64 });
                 } else {
-                    // 如果是普通聊天模型，保留原比例压缩即可
                     let w = img.width, h = img.height;
                     if (w > 800 || h > 800) {
                         if (w > h) { h *= 800 / w; w = 800; } 
@@ -1537,7 +1573,6 @@ async function handleGPTFileSelect(e) {
         const name = file.name;
         const ext = name.split('.').pop().toLowerCase();
 
-        // 拦截在图生图模式下上传文档
         if (currentGPTMode === 'image' && !file.type.startsWith('image/')) {
             alert(`画图模式下只能识别图片哦～已为你跳过了不支持的文件：${name}`);
             continue;
@@ -1545,7 +1580,6 @@ async function handleGPTFileSelect(e) {
 
         try {
             if (file.type.startsWith('image/')) {
-                // 根据不同模式自动裁剪并打包数据
                 const processed = await processImageAsync(file, currentGPTMode);
                 
                 if (currentGPTMode === 'image') {
@@ -1776,7 +1810,6 @@ function createThinkingMessage(text, files) {
     const el = document.getElementById(id);
     const avatarEl = el.querySelector('.gpt-avatar-ai');
 
-    // 到了最后一个状态自动固定不再循环
     const timer = setInterval(() => {
         if (index < steps.length - 1) {
             index++;
@@ -1797,7 +1830,6 @@ function createThinkingMessage(text, files) {
 
 function prepareAssistantOutput(thinkingObj) {
     thinkingObj.stop();
-    // 渲染完成，移除发光效果
     if(thinkingObj.avatarEl) {
         thinkingObj.avatarEl.classList.remove('thinking-mode');
     }
@@ -1913,7 +1945,6 @@ async function sendGPTMessage() {
 
     let imagesToSend = []; let docsText = ""; let mediaHtml = "";
     
-    // ✨ 如果是在画图模式下，我们将包含 mask 的完整对象存入数组发给后端
     filesSnapshot.forEach(f => {
         if (f.type === 'image') { 
             if (currentGPTMode === 'image') {
