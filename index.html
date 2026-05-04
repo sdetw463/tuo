@@ -1416,6 +1416,10 @@ async function handleGPTFileSelect(e) {
                 const text = await file.text();
                 gptPendingFiles.push({ type: 'document', data: text, name });
 
+            } else if (ext === 'doc') {
+                alert(`啊呀！TuoTuo 发现【${name}】是一个老版本的 Word (.doc) 文件！目前我只能看懂较新的 .docx 格式哦。请把它另存为 .docx 后再重新发给我吧～`);
+                continue; // 关键：跳过这个不支持的文件，继续去处理用户上传的下一个文件
+            
             } else if (ext === 'docx') {
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
