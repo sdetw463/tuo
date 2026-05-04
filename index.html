@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- 引入解析 Word 的库 -->
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+    <!-- ✨ 升级：引入 localForage 来接管容量超大的本地 IndexedDB 数据库 -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1256,9 +1258,28 @@ document.addEventListener('click', (e) => {
    ★★★ 全屏 Smart TuoTuo 交互与多模态文件上传逻辑 ★★★
 ============================================================ */
 
-let chatSessions = JSON.parse(localStorage.getItem('tuotuo_gpt_sessions') || '[]');
+// ✨ 升级 1/3：初始化 IndexedDB 配置，移除同步读取 LocalStorage
+let chatSessions = [];
 let currentSessionId = null;
 let currentGPTMode = 'chat'; 
+
+localforage.config({
+    name: 'TuoTuoDimension',
+    storeName: 'gpt_sessions_db'
+});
+
+// ✨ 升级 2/3：异步预加载历史记录数据
+localforage.getItem('tuotuo_gpt_sessions').then(data => {
+    if (data && Array.isArray(data)) {
+        chatSessions = data.map(s => ({
+            pinned: false,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            ...s
+        }));
+    }
+}).catch(err => console.error("读取历史记录失败:", err));
+
 
 function toggleGPTSidebar() {
     const container = document.getElementById('gpt-fullscreen');
@@ -1310,13 +1331,6 @@ let gptPendingFiles = [];
 let gptIsSending = false;
 let gptAbortController = null;
 
-chatSessions = chatSessions.map(s => ({
-    pinned: false,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    ...s
-}));
-
 function getSortedSessions() {
     return [...chatSessions].sort((a, b) => {
         if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
@@ -1328,18 +1342,28 @@ function getCurrentSession() {
     return chatSessions.find(s => s.id === currentSessionId);
 }
 
-function toggleFullScreenGPT() {
+async function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
     win.classList.toggle('show');
 
     if (win.classList.contains('show')) {
+        // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
+        try {
+            const data = await localforage.getItem('tuotuo_gpt_sessions');
+            if (data && Array.isArray(data)) {
+                chatSessions = data;
+            }
+        } catch(e) {}
+
         renderHistoryList();
 
         if (chatSessions.length === 0) {
             startNewGPTChat();
-        } else {
+        } else if (!currentSessionId) {
             const first = getSortedSessions()[0];
             loadSession(first.id);
+        } else {
+            renderCurrentChat();
         }
     }
 }
@@ -1466,53 +1490,11 @@ function loadSession(id) {
     clearGPTFile();
 }
 
-/* ============================================================
-   ✨ 核心修复：防止 LocalStorage 被超长数据撑爆导致程序静默崩溃
-============================================================ */
+// ✨ 升级 3/3：移除容量截断代码，使用 localForage 完美保存大文件
 function saveSessions() {
-    try {
-        // 我们不直接存完整的 session，因为包含大量图片 base64 和长文本会瞬间撑爆 LocalStorage (上限通常为 5MB)
-        const cleanSessions = chatSessions.map(session => {
-            return {
-                ...session,
-                messages: session.messages.map(msg => {
-                    let cleanMsg = { ...msg };
-                    
-                    // 1. 清理 Base64 图片：将庞大的图片数据替换为漂亮的占位符
-                    if (cleanMsg.mediaHtml) {
-                        cleanMsg.mediaHtml = cleanMsg.mediaHtml.replace(
-                            /src="data:image\/[^;]+;base64,[^"]+"/g, 
-                            'src="data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'120\'><rect width=\'160\' height=\'120\' fill=\'%23FFF0F5\' rx=\'12\'/><text x=\'80\' y=\'60\' font-size=\'13\' fill=\'%23FFB6C1\' font-weight=\'bold\' text-anchor=\'middle\' dominant-baseline=\'middle\'>[图片已过期]</text></svg>"'
-                        );
-                    }
-                    if (cleanMsg.image && cleanMsg.image.startsWith('data:image/')) {
-                        cleanMsg.image = '';
-                    }
-                    
-                    // 2. 清理超长文本：只保留前 5000 个字符用于本地历史记录回显
-                    if (cleanMsg.content && cleanMsg.content.length > 5000) {
-                        cleanMsg.content = cleanMsg.content.substring(0, 5000) + '\n\n> ✂️ *[为节省本地存储空间，超长文档内容已在历史记录中折叠]*';
-                    }
-                    
-                    return cleanMsg;
-                })
-            };
-        });
-        
-        localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(cleanSessions));
-    } catch (err) {
-        console.error("保存本地历史记录失败:", err);
-        // 如果抓取到 QuotaExceededError，说明额度超了
-        if (err.name === 'QuotaExceededError' || err.code === 22) {
-            // 如果依旧超出限制，采取紧急清理策略：自动清理所有未置顶的、非当前的旧聊天
-            if (chatSessions.length > 1) {
-                chatSessions = chatSessions.filter(s => s.id === currentSessionId || s.pinned);
-                try {
-                    localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(chatSessions)); // 再次尝试
-                } catch(e) {}
-            }
-        }
-    }
+    localforage.setItem('tuotuo_gpt_sessions', chatSessions).catch(err => {
+        console.error("IndexedDB 保存失败:", err);
+    });
 }
 
 function processImageAsync(file, mode) {
