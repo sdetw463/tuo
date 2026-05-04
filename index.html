@@ -12,8 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- 引入解析 Word 的库 -->
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-    <!-- ✨ 升级：引入 localForage 来接管容量超大的本地 IndexedDB 数据库 -->
-    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -268,10 +266,8 @@
         .gpt-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5000; background: #ffffff !important; display: none; flex-direction: row; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; animation: window-appear 0.3s ease; }
         .gpt-fullscreen.show { display: flex; }
         
-        /* 左侧边栏 - 平滑折叠动画 */
-        .gpt-sidebar { width: 260px; background: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,182,193,0.4); display: flex; flex-direction: column; padding: 15px 10px; transition: all 0.3s ease; box-shadow: 2px 0 15px rgba(255,182,193,0.15); overflow: hidden; }
-        .gpt-fullscreen.sidebar-collapsed .gpt-sidebar { width: 0; padding-left: 0; padding-right: 0; border: none; opacity: 0; margin-left: -20px; }
-
+        /* 左侧边栏 */
+        .gpt-sidebar { width: 260px; background: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,182,193,0.4); display: flex; flex-direction: column; padding: 15px 10px; transition: transform 0.3s ease; box-shadow: 2px 0 15px rgba(255,182,193,0.15); }
         .gpt-sidebar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .gpt-btn-icon { background: none; border: none; cursor: pointer; color: #FF69B4; display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; transition: 0.2s; }
         .gpt-btn-icon:hover { background: rgba(255,182,193,0.3); }
@@ -305,16 +301,12 @@
         .gpt-back-home svg { width: 18px; height: 18px; }
 
         /* 右侧主体聊天区 - 白底 */
-        .gpt-main { flex: 1; display: flex; flex-direction: column; background: #ffffff !important; position: relative; transition: width 0.3s ease; }
+        .gpt-main { flex: 1; display: flex; flex-direction: column; background: #ffffff !important; position: relative; }
         
         /* 顶部栏 */
         .gpt-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid transparent; }
         .gpt-model-selector { font-size: 18px; font-weight: bold; color: #c94f82; display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px; }
-        .gpt-header-actions { display: flex !important; align-items: center; } 
-        
-        .gpt-toggle-sidebar-btn { background: none; border: none; cursor: pointer; color: #FF69B4; display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; transition: 0.2s; }
-        .gpt-toggle-sidebar-btn:hover { background: rgba(255,182,193,0.3); }
-        .gpt-fullscreen.sidebar-collapsed #gpt-reopen-btn { display: block !important; }
+        .gpt-header-actions { display: none !important; } /* 隐藏原来的清空按钮 */
 
         /* 聊天消息流 */
         .gpt-chat-area { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; background: #ffffff !important; }
@@ -322,22 +314,16 @@
         .gpt-msg-container.user { justify-content: flex-end !important; }
         .gpt-msg-container.ai { justify-content: flex-start !important; }
         
-        /* 动态炫彩光环头像 */
         .gpt-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,182,193,0.3); font-weight: bold; }
         .gpt-avatar-ai { background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; }
         .gpt-avatar-user { background: white; color: #FF69B4; border: 2px solid #FFB6C1; }
         
-        .gpt-avatar-ai.thinking-mode { position: relative; z-index: 1; overflow: visible; }
-        .gpt-avatar-ai.thinking-mode::before { content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0%, #FF69B4 25%, #00FFFF 50%, #FFD700 75%, transparent 100%); animation: spinAvatarRing 1.5s linear infinite; z-index: -2; }
-        .gpt-avatar-ai.thinking-mode::after { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; background: #ffffff; border-radius: 50%; z-index: -1; }
-        @keyframes spinAvatarRing { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
-
         /* 用户与 AI 气泡颜色区分 */
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
         .gpt-msg-container.user .gpt-content { background: #e6f4ff !important; border: 1px solid #bae0ff !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; border-radius: 20px !important; border-bottom-right-radius: 5px !important; padding: 12px 18px !important; color: #2f2f2f !important; white-space: pre-wrap; text-align: left; }
         .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; }
 
-        /* Markdown 专属样式定制 */
+        /* ✨ Markdown 专属样式定制 ✨ */
         .gpt-msg-container.ai .markdown-body { width: 100%; }
         .markdown-body p { margin-bottom: 10px !important; line-height: 1.75 !important; }
         .markdown-body p:last-child { margin-bottom: 0 !important; }
@@ -361,7 +347,7 @@
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%); }
         .gpt-input-box { width: 100%; max-width: 800px; background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
         .gpt-input-box:focus-within { border-color: #FF69B4; background: #fff; box-shadow: 0 4px 20px rgba(255,105,180,0.2); }
-        .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; position: relative; }
+        .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; }
 
         .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #FFB6C1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; transition: 0.2s; padding-bottom: 2px; }
         .gpt-attach-btn:hover { background: rgba(255,182,193,0.3); color: #FF69B4; }
@@ -388,13 +374,6 @@
         
         .gpt-disclaimer { font-size: 12px; color: #aaa; margin-top: 10px; text-align: center; }
 
-        /* 附件弹出菜单样式 */
-        .gpt-attachment-menu { position: absolute; bottom: 50px; left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 182, 193, 0.5); border-radius: 16px; padding: 8px; box-shadow: 0 10px 40px rgba(255, 105, 180, 0.15); display: none; flex-direction: column; gap: 4px; z-index: 100; min-width: 170px; }
-        .gpt-attachment-menu.show { display: flex; animation: fadeIn 0.2s ease; }
-        .gpt-menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #555; transition: 0.2s; font-weight: 500; }
-        .gpt-menu-item:hover { background: rgba(255, 182, 193, 0.2); color: #FF69B4; }
-        .gpt-menu-item svg { flex-shrink: 0; }
-
         /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .left-panel-card { bottom: auto; top: 30px; left: 20px; width: 60%; }
@@ -409,7 +388,7 @@
             #ws-status { top: 8px; right: 8px; padding: 4px 8px; }
             .album-item { flex: 0 0 160px; height: 160px; }
             .nav-btn { display: none; }
-            .gpt-sidebar { display: none; }
+            .gpt-sidebar { display: none; } /* 移动端隐藏侧边栏 */
             .gpt-content, .gpt-msg-container.user .gpt-content, .gpt-msg-container.ai .gpt-content { max-width: 88% !important; }
         }
     </style>
@@ -624,7 +603,7 @@
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg> 
                     新聊天
                 </button>
-                <button class="gpt-btn-icon" title="收起侧边栏" onclick="toggleGPTSidebar()">
+                <button class="gpt-btn-icon" title="关闭侧边栏" onclick="toggleFullScreenGPT()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
                 </button>
             </div>
@@ -637,7 +616,7 @@
             <div class="gpt-sidebar-bottom">
                 <div class="gpt-back-home" onclick="toggleFullScreenGPT()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
-                    返回主页
+                    退出界面，返回主页
                 </div>
             </div>
         </div>
@@ -646,12 +625,7 @@
         <div class="gpt-main">
             <!-- 顶部 -->
             <div class="gpt-header">
-                <div style="display:flex; align-items:center; gap: 10px;">
-                    <button class="gpt-toggle-sidebar-btn" title="展开侧边栏" onclick="toggleGPTSidebar()" style="display: none;" id="gpt-reopen-btn">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-                    </button>
-                    <div class="gpt-model-selector" id="gpt-top-title">TuoTuo</div>
-                </div>
+                <div class="gpt-model-selector">TuoTuo</div>
                 <div class="gpt-header-actions"></div>
             </div>
 
@@ -666,29 +640,15 @@
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
                     <div class="gpt-input-controls">
-                        <!-- 动态接受不同格式类型 -->
                         <input type="file" id="gpt-image-upload" accept="image/*,.txt,.doc,.docx,.xls,.xlsx,.csv" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
                         
-                        <div class="gpt-attachment-menu" id="gpt-attachment-menu">
-                            <div class="gpt-menu-item" onclick="triggerFileUpload()">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> 
-                                添加照片和文件
-                            </div>
-                            <div class="gpt-menu-item" onclick="switchToImageMode()">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> 
-                                创建图片
-                            </div>
-                            <div class="gpt-menu-item" onclick="switchToChatMode()" id="gpt-menu-chat-mode" style="display:none; border-top: 1px solid rgba(255,182,193,0.3); padding-top: 8px; margin-top: 4px;">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> 
-                                切换回聊天模式
-                            </div>
-                        </div>
-
-                        <button class="gpt-attach-btn" title="附加功能" onclick="toggleAttachmentMenu(event)">＋</button>
+                        <button class="gpt-attach-btn" title="附加附件" onclick="document.getElementById('gpt-image-upload').click()">＋</button>
                         
                         <textarea class="gpt-textarea" id="gpt-input-el" placeholder="有什么想问 TuoTuo 的？" rows="1" oninput="autoResizeGPT(this)" onkeydown="handleGPTKey(event)"></textarea>
                         
-                        <button class="gpt-send-btn" id="gpt-send-btn" onclick="sendGPTMessage()" disabled></button>
+                        <button class="gpt-send-btn" id="gpt-send-btn" onclick="sendGPTMessage()" disabled>
+                            <!-- 动态加载图标：发送/停止 -->
+                        </button>
                     </div>
                 </div>
                 <div class="gpt-disclaimer">
@@ -1258,78 +1218,21 @@ document.addEventListener('click', (e) => {
    ★★★ 全屏 Smart TuoTuo 交互与多模态文件上传逻辑 ★★★
 ============================================================ */
 
-// ✨ 升级 1/3：初始化 IndexedDB 配置，移除同步读取 LocalStorage
-let chatSessions = [];
+let chatSessions = JSON.parse(localStorage.getItem('tuotuo_gpt_sessions') || '[]');
 let currentSessionId = null;
-let currentGPTMode = 'chat'; 
 
-localforage.config({
-    name: 'TuoTuoDimension',
-    storeName: 'gpt_sessions_db'
-});
-
-// ✨ 升级 2/3：异步预加载历史记录数据
-localforage.getItem('tuotuo_gpt_sessions').then(data => {
-    if (data && Array.isArray(data)) {
-        chatSessions = data.map(s => ({
-            pinned: false,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            ...s
-        }));
-    }
-}).catch(err => console.error("读取历史记录失败:", err));
-
-
-function toggleGPTSidebar() {
-    const container = document.getElementById('gpt-fullscreen');
-    container.classList.toggle('sidebar-collapsed');
-}
-
-function toggleAttachmentMenu(e) {
-    e.stopPropagation();
-    document.getElementById('gpt-attachment-menu').classList.toggle('show');
-}
-
-document.addEventListener('click', (e) => {
-    const attachMenu = document.getElementById('gpt-attachment-menu');
-    if (attachMenu && !e.target.closest('#gpt-attachment-menu') && !e.target.closest('.gpt-attach-btn')) {
-        attachMenu.classList.remove('show');
-    }
-});
-
-function triggerFileUpload() {
-    const uploadInput = document.getElementById('gpt-image-upload');
-    if (currentGPTMode === 'image') {
-        uploadInput.accept = 'image/*';
-    } else {
-        uploadInput.accept = 'image/*,.txt,.doc,.docx,.xls,.xlsx,.csv';
-    }
-    
-    uploadInput.click();
-    document.getElementById('gpt-attachment-menu').classList.remove('show');
-}
-
-function switchToImageMode() {
-    currentGPTMode = 'image';
-    document.getElementById('gpt-input-el').placeholder = '让全能画家 TuoTuo 来帮你实现愿望吧...';
-    document.getElementById('gpt-menu-chat-mode').style.display = 'flex';
-    document.getElementById('gpt-top-title').innerHTML = 'TuoTuo <span style="font-size:12px;color:#FFB6C1;background:#FFF0F5;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:normal;">绘画模式</span>';
-    clearGPTFile(); 
-    document.getElementById('gpt-attachment-menu').classList.remove('show');
-}
-
-function switchToChatMode() {
-    currentGPTMode = 'chat';
-    document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
-    document.getElementById('gpt-menu-chat-mode').style.display = 'none';
-    document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
-    document.getElementById('gpt-attachment-menu').classList.remove('show');
-}
-
+// ✨ 升级附件管理，改为数组以支持多文件
 let gptPendingFiles = [];
 let gptIsSending = false;
-let gptAbortController = null;
+let gptAbortController = null; // 用于实现“停止生成”按钮
+
+/* ---------- 兼容旧历史记录数据 ---------- */
+chatSessions = chatSessions.map(s => ({
+    pinned: false,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    ...s
+}));
 
 function getSortedSessions() {
     return [...chatSessions].sort((a, b) => {
@@ -1342,32 +1245,24 @@ function getCurrentSession() {
     return chatSessions.find(s => s.id === currentSessionId);
 }
 
-async function toggleFullScreenGPT() {
+/* ---------- 打开/关闭全屏 AI ---------- */
+function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
     win.classList.toggle('show');
 
     if (win.classList.contains('show')) {
-        // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
-        try {
-            const data = await localforage.getItem('tuotuo_gpt_sessions');
-            if (data && Array.isArray(data)) {
-                chatSessions = data;
-            }
-        } catch(e) {}
-
         renderHistoryList();
 
         if (chatSessions.length === 0) {
             startNewGPTChat();
-        } else if (!currentSessionId) {
+        } else {
             const first = getSortedSessions()[0];
             loadSession(first.id);
-        } else {
-            renderCurrentChat();
         }
     }
 }
 
+/* ---------- 渲染历史记录 ---------- */
 function renderHistoryList() {
     const listEl = document.getElementById('gpt-history-list');
     listEl.innerHTML = '';
@@ -1391,6 +1286,7 @@ function renderHistoryList() {
     });
 }
 
+/* ---------- 历史记录三点菜单 ---------- */
 function closeAllSessionMenus() {
     document.querySelectorAll('.gpt-session-menu').forEach(menu => menu.remove());
 }
@@ -1467,6 +1363,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+/* ---------- 新聊天 ---------- */
 function startNewGPTChat() {
     currentSessionId = 'session_' + Date.now();
     chatSessions.unshift({
@@ -1490,61 +1387,16 @@ function loadSession(id) {
     clearGPTFile();
 }
 
-// ✨ 升级 3/3：移除容量截断代码，使用 localForage 完美保存大文件
 function saveSessions() {
-    localforage.setItem('tuotuo_gpt_sessions', chatSessions).catch(err => {
-        console.error("IndexedDB 保存失败:", err);
-    });
+    localStorage.setItem('tuotuo_gpt_sessions', JSON.stringify(chatSessions));
 }
 
-function processImageAsync(file, mode) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                if (mode === 'image') {
-                    const size = 1024;
-                    canvas.width = size;
-                    canvas.height = size;
-                    
-                    let sx = 0, sy = 0, sw = img.width, sh = img.height;
-                    if (sw > sh) { sx = (sw - sh) / 2; sw = sh; } 
-                    else { sy = (sh - sw) / 2; sh = sw; }
-                    
-                    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
-                    const imageBase64 = canvas.toDataURL('image/png');
-                    
-                    ctx.clearRect(0, 0, size, size);
-                    const maskBase64 = canvas.toDataURL('image/png');
-                    
-                    resolve({ image: imageBase64, mask: maskBase64 });
-                } else {
-                    let w = img.width, h = img.height;
-                    if (w > 800 || h > 800) {
-                        if (w > h) { h *= 800 / w; w = 800; } 
-                        else { w *= 800 / h; h = 800; }
-                    }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(img, 0, 0, w, h);
-                    resolve({ image: canvas.toDataURL('image/jpeg', 0.85) });
-                }
-            };
-            img.onerror = reject;
-            img.src = ev.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
+/* ---------- ✨ 升级：多文件上传处理 ---------- */
 async function handleGPTFileSelect(e) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
+    // 限制最多 5 个附件
     if (gptPendingFiles.length + files.length > 5) {
         alert('最多只能同时上传 5 个附件哦～');
         e.target.value = '';
@@ -1555,29 +1407,15 @@ async function handleGPTFileSelect(e) {
         const name = file.name;
         const ext = name.split('.').pop().toLowerCase();
 
-        if (currentGPTMode === 'image' && !file.type.startsWith('image/')) {
-            alert(`画图模式下只能识别图片哦～已为你跳过了不支持的文件：${name}`);
-            continue;
-        }
-
         try {
             if (file.type.startsWith('image/')) {
-                const processed = await processImageAsync(file, currentGPTMode);
-                
-                if (currentGPTMode === 'image') {
-                    gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask, name });
-                } else {
-                    gptPendingFiles.push({ type: 'image', data: processed.image, name });
-                }
+                const base64 = await processImageAsync(file);
+                gptPendingFiles.push({ type: 'image', data: base64, name });
 
             } else if (ext === 'txt' || ext === 'csv') {
                 const text = await file.text();
                 gptPendingFiles.push({ type: 'document', data: text, name });
 
-            } else if (ext === 'doc') {
-                alert(`啊呀！TuoTuo 发现【${name}】是一个老版本的 Word (.doc) 文件！目前我只能看懂较新的 .docx 格式哦。请把它另存为 .docx 后再重新发给我吧～`);
-                continue; 
-            
             } else if (ext === 'docx') {
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
@@ -1604,6 +1442,30 @@ async function handleGPTFileSelect(e) {
 
     renderGPTFilePreview();
     e.target.value = '';
+}
+
+function processImageAsync(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width, h = img.height;
+                if (w > 800 || h > 800) {
+                    if (w > h) { h *= 800 / w; w = 800; } 
+                    else { w *= 800 / h; h = 800; }
+                }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.85));
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
 function renderGPTFilePreview() {
@@ -1649,6 +1511,7 @@ function clearGPTFile() {
     renderGPTFilePreview();
 }
 
+/* ---------- 渲染当前聊天 ---------- */
 function renderCurrentChat() {
     const chatArea = document.getElementById('gpt-chat-area');
     chatArea.innerHTML = '';
@@ -1662,7 +1525,7 @@ function renderCurrentChat() {
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
                 <div class="gpt-content markdown-body">
-                    你好呀～我是TuoTuo，一个基于目前世界上最强大的语言模型打造的全能AI小助手～想和我聊聊天吗？
+                    你好呀～～我是基于 OpenAI 目前最强大的 GPT-5.5 架构打造的 TuoTuo，想和我聊聊天吗？
                 </div>
             </div>
         `;
@@ -1677,12 +1540,14 @@ function renderCurrentChat() {
     }, 50);
 }
 
+/* ---------- 添加消息到页面 ---------- */
 function appendGPTMessageToDOM(msg, shouldScroll = true) {
     const chatArea = document.getElementById('gpt-chat-area');
 
     if (msg.role === 'user') {
         let mediaHtml = msg.mediaHtml || '';
         
+        // 兼容旧历史记录格式
         if (!mediaHtml) {
             if (msg.image) mediaHtml += `<img src="${msg.image}" class="gpt-user-image" onclick="openFull('${msg.image}')">`;
             if (msg.fileName) mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(msg.fileName)}</div>`;
@@ -1710,6 +1575,7 @@ function appendGPTMessageToDOM(msg, shouldScroll = true) {
     }
 }
 
+/* ---------- ✨ 升级：输入框高度、发送/停止按钮状态切换 ---------- */
 function autoResizeGPT(el) {
     if (!el) return;
 
@@ -1745,11 +1611,8 @@ function handleGPTKey(e) {
     }
 }
 
+/* ---------- 思考提示 ---------- */
 function getThinkingSteps(text, files) {
-    if (currentGPTMode === 'image') {
-        return ['正在准备画笔和颜料 🎨', '正在构思唯美的画面 ✨', '正在为您渲染高质量图像 🖼️'];
-    }
-
     const steps = [];
     if (files.length > 0) steps.push(`正在处理你上传的 ${files.length} 个文件`);
     steps.push('正在理解你的问题');
@@ -1770,17 +1633,14 @@ function createThinkingMessage(text, files) {
     const steps = getThinkingSteps(text, files);
     let index = 0;
 
-    const titleText = currentGPTMode === 'image' ? 'TuoTuo正在竭力创作中' : 'TuoTuo正在努力思考ing';
-
     chatArea.insertAdjacentHTML('beforeend', `
         <div class="gpt-msg-container ai" id="${id}">
-            <!-- 带有动态发光特效的专属头像 -->
-            <div class="gpt-avatar gpt-avatar-ai thinking-mode">
+            <div class="gpt-avatar gpt-avatar-ai">
                 <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
             </div>
             <div class="gpt-content gpt-thinking-content">
                 <div class="gpt-thinking-title">
-                    ${titleText}<span class="gpt-thinking-dot"></span>
+                    TuoTuo正在努力思考ing<span class="gpt-thinking-dot"></span>
                 </div>
                 <div class="gpt-thinking-detail">${escapeHtml(steps[index])}</div>
             </div>
@@ -1788,33 +1648,27 @@ function createThinkingMessage(text, files) {
     `);
 
     chatArea.scrollTop = chatArea.scrollHeight;
-    
+
     const el = document.getElementById(id);
-    const avatarEl = el.querySelector('.gpt-avatar-ai');
+    const contentBox = el.querySelector('.gpt-content');
+    const detailEl = el.querySelector('.gpt-thinking-detail');
 
     const timer = setInterval(() => {
-        if (index < steps.length - 1) {
-            index++;
-            const detailEl = el.querySelector('.gpt-thinking-detail');
-            if (detailEl) detailEl.textContent = steps[index];
-        }
+        index = (index + 1) % steps.length;
+        if (detailEl) detailEl.textContent = steps[index];
     }, 1600);
 
     return {
         id,
         el,
-        avatarEl,
-        contentBox: el.querySelector('.gpt-content'),
-        detailEl: el.querySelector('.gpt-thinking-detail'),
+        contentBox,
+        detailEl,
         stop() { clearInterval(timer); }
     };
 }
 
 function prepareAssistantOutput(thinkingObj) {
     thinkingObj.stop();
-    if(thinkingObj.avatarEl) {
-        thinkingObj.avatarEl.classList.remove('thinking-mode');
-    }
     const contentBox = thinkingObj.contentBox;
     contentBox.className = 'gpt-content markdown-body';
     contentBox.innerHTML = '';
@@ -1840,7 +1694,8 @@ async function typewriterMarkdown(targetEl, fullText) {
     targetEl.innerHTML = marked.parse(fullText || '');
 }
 
-async function consumeGPTStream(response, thinkingObj) {
+/* ---------- ✨ 升级：自由滚动支持（不强制吸附到底部） ---------- */
+async function consumeGPTStream(response, targetEl, thinkingObj) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
 
@@ -1852,20 +1707,16 @@ async function consumeGPTStream(response, thinkingObj) {
     let lastRender = 0;
     const chatArea = document.getElementById('gpt-chat-area');
 
-    let outputEl = null; 
-
     function render(force = false) {
         const now = Date.now();
         if (!force && now - lastRender < 60) return;
         
-        if (!outputEl) {
-            outputEl = prepareAssistantOutput(thinkingObj);
-        }
-        
+        // ✨ 判断用户是否已经往上滑动了进度条 (允许 15px 误差)
         const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
 
-        outputEl.innerHTML = marked.parse(fullText);
+        targetEl.innerHTML = marked.parse(fullText);
         
+        // 只有在用户没有向上滚动的情况下，才自动拉到底部
         if (!isScrolledUp || force) {
             chatArea.scrollTop = chatArea.scrollHeight;
         }
@@ -1911,13 +1762,24 @@ async function consumeGPTStream(response, thinkingObj) {
     return fullText;
 }
 
+/* ---------- 发送消息 ---------- */
 async function sendGPTMessage() {
     const inputEl = document.getElementById('gpt-input-el');
-    if (gptIsSending) { if (gptAbortController) gptAbortController.abort(); return; }
+    
+    // ✨ 升级：如果你正在发送，点击按钮就是“停止生成”
+    if (gptIsSending) {
+        if (gptAbortController) {
+            gptAbortController.abort(); // 触发中止请求
+        }
+        return;
+    }
+
     const text = inputEl.value.trim();
     if ((!text && gptPendingFiles.length === 0) || !currentSessionId) return;
 
-    const session = getCurrentSession(); if (!session) return;
+    const session = getCurrentSession();
+    if (!session) return;
+
     const filesSnapshot = [...gptPendingFiles];
 
     if (session.messages.length === 0) {
@@ -1925,78 +1787,104 @@ async function sendGPTMessage() {
         session.title = titleText.length > 12 ? titleText.substring(0, 12) + '...' : titleText;
     }
 
-    let imagesToSend = []; let docsText = ""; let mediaHtml = "";
-    
+    // 处理要发送给后端和保存在本地的文本及媒体标签
+    let imagesToSend = [];
+    let docsText = "";
+    let mediaHtml = "";
+
     filesSnapshot.forEach(f => {
-        if (f.type === 'image') { 
-            if (currentGPTMode === 'image') {
-                imagesToSend.push({ image: f.data, mask: f.mask });
-            } else {
-                imagesToSend.push(f.data);
-            }
-            mediaHtml += `<img src="${f.data}" class="gpt-user-image" onclick="openFull('${f.data}')">`; 
-        }
-        else if (f.type === 'document') { 
-            docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`; 
-            mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`; 
+        if (f.type === 'image') {
+            imagesToSend.push(f.data);
+            mediaHtml += `<img src="${f.data}" class="gpt-user-image" onclick="openFull('${f.data}')">`;
+        } else if (f.type === 'document') {
+            docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`;
+            mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`;
         }
     });
 
     let textToSendToBackend = text + docsText;
-    session.messages.push({ role: 'user', content: textToSendToBackend, userText: text, mediaHtml });
-    session.updatedAt = Date.now(); saveSessions(); renderHistoryList();
 
-    inputEl.value = ''; clearGPTFile(); renderCurrentChat();
+    const messageObj = {
+        role: 'user',
+        content: textToSendToBackend,
+        userText: text, // 只保留用户打的纯文字，不包含后端隐藏的文档内容
+        mediaHtml: mediaHtml // 直接保存组合好的富文本预览标签
+    };
+
+    session.messages.push(messageObj);
+    session.updatedAt = Date.now();
+    saveSessions();
+    renderHistoryList();
+
+    inputEl.value = '';
+    clearGPTFile();
+    renderCurrentChat();
+
     const thinkingObj = createThinkingMessage(textToSendToBackend, filesSnapshot);
-    gptIsSending = true; gptAbortController = new AbortController(); autoResizeGPT(inputEl);
-    let finalReply = ''; let outputEl = null;
+
+    gptIsSending = true;
+    gptAbortController = new AbortController(); // 初始化终止控制器
+    autoResizeGPT(inputEl);
+
+    let finalReply = '';
+    const outputEl = prepareAssistantOutput(thinkingObj);
 
     try {
-        if (currentGPTMode === 'image') {
-            const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-image', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: gptAbortController.signal,
-                body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
-            });
-            if (!response.ok) throw new Error((await response.json()).error || '画图请求失败');
-            const data = await response.json();
-            
-            outputEl = prepareAssistantOutput(thinkingObj);
-            
-            const imgHtml = `<img src="${data.url}" class="message-image" onclick="openFull(this.src)" style="max-width: 300px; max-height: 300px; object-fit: contain; border-radius: 12px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">`;
-            const promptHtml = marked.parse(`*💡 **优化提示词:** ${data.revised_prompt}*`);
-            
-            outputEl.innerHTML = imgHtml + promptHtml;
-            
-            const chatArea = document.getElementById('gpt-chat-area');
-            chatArea.scrollTop = chatArea.scrollHeight;
-            
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})\n\n*💡 提示词: ${data.revised_prompt}*`;
+        const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: gptAbortController.signal, // ✨ 绑定 AbortSignal
+            body: JSON.stringify({
+                message: textToSendToBackend,
+                sessionId: currentSessionId,
+                images: imagesToSend, // 将图片数组发给后端
+                stream: true
+            })
+        });
 
-        } else {
-            const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-chat', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: gptAbortController.signal,
-                body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true })
-            });
-            if (!response.ok) throw new Error(await response.text() || '网络请求失败');
-            if ((response.headers.get('content-type') || '').includes('application/json')) {
-                outputEl = prepareAssistantOutput(thinkingObj); finalReply = (await response.json()).reply || ''; await typewriterMarkdown(outputEl, finalReply);
-            } else {
-                finalReply = await consumeGPTStream(response, thinkingObj);
-            }
+        if (!response.ok) {
+            let errorText = await response.text();
+            throw new Error(errorText || '网络请求失败');
         }
+
+        const contentType = response.headers.get('content-type') || '';
+        
+        if (response.body && !contentType.includes('application/json')) {
+            finalReply = await consumeGPTStream(response, outputEl, thinkingObj);
+        } else {
+            const data = await response.json();
+            finalReply = data.reply || data.content || '';
+            await typewriterMarkdown(outputEl, finalReply);
+        }
+
     } catch (err) {
         thinkingObj.stop();
         if (err.name === 'AbortError') {
-            outputEl = outputEl || prepareAssistantOutput(thinkingObj);
-            finalReply = outputEl.innerText + "\n\n*[已停止生成]*"; outputEl.innerHTML = marked.parse(finalReply);
+            // ✨ 捕获到中止请求时，在结尾打上标记
+            finalReply = outputEl.innerText + "\n\n*[已停止生成]*";
+            outputEl.innerHTML = marked.parse(finalReply);
         } else {
-            if (thinkingObj.el) thinkingObj.el.remove();
-            document.getElementById('gpt-chat-area').insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${escapeHtml(err.message)}</div></div>`);
-            document.getElementById('gpt-chat-area').scrollTop = document.getElementById('gpt-chat-area').scrollHeight;
+            if (thinkingObj.el && thinkingObj.el.parentElement) thinkingObj.el.remove();
+            const chatArea = document.getElementById('gpt-chat-area');
+            chatArea.insertAdjacentHTML('beforeend', `
+                <div class="gpt-msg-container ai">
+                    <div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div>
+                    <div class="gpt-content" style="color:#ff4d4f;"><b>分析失败：</b><br>${escapeHtml(err.message)}</div>
+                </div>
+            `);
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
     } finally {
-        gptIsSending = false; autoResizeGPT(inputEl);
-        if (finalReply) { session.messages.push({ role: 'assistant', content: finalReply }); session.updatedAt = Date.now(); saveSessions(); renderHistoryList(); }
+        gptIsSending = false;
+        autoResizeGPT(inputEl);
+        
+        // 只要产生了回答（即使是被中断的），也保存进历史记录
+        if (finalReply) {
+            session.messages.push({ role: 'assistant', content: finalReply });
+            session.updatedAt = Date.now();
+            saveSessions();
+            renderHistoryList();
+        }
     }
 }
 
