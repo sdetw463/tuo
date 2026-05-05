@@ -17,7 +17,10 @@
         body, html {
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            cursor: url('cat.ico') 5 5, auto;
+            cursor: url('cat.png') 5 5, auto;
+            /* 新版写法：强制让 128x128 的图片以 4倍缩小（即32x32）显示，保持绝对清晰 */
+            cursor: -webkit-image-set(url('cat.png') 4x) 5 5, auto;
+            cursor: image-set(url('cat.png') 4x) 5 5, auto;
         }
         .heart-trail { position: fixed; pointer-events: none; z-index: 9999; width: 20px; height: 20px; animation: fadeOutHeart 1s forwards ease-out; }
         @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(-40px) scale(1.5) rotate(20deg); opacity: 0; } }
