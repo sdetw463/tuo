@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TuoTuo's Dimension</title>
-    <link rel="icon" href="assets/icons/logo.png?v=2" type="image/png">
-
-    <!-- CDN 依赖库 -->
+    <!-- favicon 等 logo.png 就位后再启用 -->
+    <!-- <link rel="icon" href="assets/icons/logo.png?v=2"> -->
+    
+    <!-- CDN 依赖库（defer：并行下载，不阻塞渲染） -->
     <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-
+    
     <!-- CSS 按加载顺序引用（后者覆盖前者） -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/animation.css">
@@ -349,17 +350,17 @@
     </div>
 </div>
 
-<!-- JS 按依赖顺序加载 -->
+<!-- JS：defer 不阻塞渲染，按出现顺序执行 -->
 <script defer src="js/config.js"></script>
 <script defer src="js/utils.js"></script>
 <script defer src="js/websocket.js"></script>
 <script defer src="js/chat.js"></script>
 <script defer src="js/album.js"></script>
 <script defer src="js/diary.js"></script>
-<script defer src="js/ai.js"></script>
 <script defer src="js/music.js"></script>
-<script defer src="js/upload.js"></script>
 <script defer src="js/effects.js"></script>
+<script defer src="js/upload.js"></script>
+<script defer src="js/ai.js"></script>
 <script defer src="js/main.js"></script>
 </body>
 </html>
