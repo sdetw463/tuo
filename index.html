@@ -2243,6 +2243,11 @@ async function toggleFullScreenGPT() {
     win.classList.toggle('show');
 
     if (win.classList.contains('show')) {
+        // 手机端默认收起侧栏，让聊天主体先完整显示
+        if (window.innerWidth <= 768) {
+            win.classList.add('sidebar-collapsed');
+        }
+
         // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
         try {
             const data = await localforage.getItem('tuotuo_gpt_sessions');
