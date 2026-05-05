@@ -514,39 +514,32 @@
         font-size: 22px !important;
     }
 
-    /* AI 入口：手机端恢复显示，放到主卡下方左侧 */
+    /* AI 入口：调整位置到主卡下方，并加宽与主卡对齐 */
     #ai-entry-card.ai-entry-card {
         display: flex !important;
-        top: calc(164px + env(safe-area-inset-top));
+        top: calc(235px + env(safe-area-inset-top)); /* 往下移，完美避开主卡 */
         left: 12px;
-        width: calc(43vw - 16px);
-        min-width: 128px;
+        right: 12px; /* 设置与主卡同宽 */
+        width: auto;
         height: 58px;
         padding: 8px 10px;
-        gap: 8px;
+        gap: 10px;
         border-radius: 18px;
         background: rgba(255,255,255,0.42);
     }
 
     #ai-entry-card.ai-entry-card > div:first-child {
-        font-size: 22px !important;
+        font-size: 24px !important;
     }
 
     #ai-entry-card.ai-entry-card > div:last-child {
-        font-size: 13px !important;
+        font-size: 15px !important;
         line-height: 1.2;
     }
 
-    /* 日记日历：手机端恢复显示，放到主卡下方右侧 */
+    /* 日记日历：手机端隐藏 */
     #diary-card.diary-card {
-        display: block !important;
-        top: calc(164px + env(safe-area-inset-top));
-        right: 12px;
-        left: auto;
-        width: calc(57vw - 16px);
-        max-width: 230px;
-        border-radius: 18px;
-        background: rgba(255,255,255,0.42);
+        display: none !important;
     }
 
     .diary-cal-header {
