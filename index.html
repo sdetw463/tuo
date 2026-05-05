@@ -17,7 +17,7 @@
         body, html {
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            cursor: url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"%3E%3Cpath fill="%23FF69B4" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/%3E%3C/svg%3E') 16 16, auto;
+            cursor: url('cat_cursor.png') 10 4, auto;
         }
         .heart-trail { position: fixed; pointer-events: none; z-index: 9999; width: 20px; height: 20px; animation: fadeOutHeart 1s forwards ease-out; }
         @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(-40px) scale(1.5) rotate(20deg); opacity: 0; } }
@@ -2264,15 +2264,6 @@ emojiList.forEach(e=>{const s=document.createElement('span');s.style.cursor='poi
 /* ============================================================
    鼠标特效 & 气泡
 ============================================================ */
-const colors=['#FF69B4','#FFB6C1','#FF1493','#DB7093','#FFA07A','#FFD700','#32CD32','#00FFFF','#1E90FF','#9370DB','#FF4500'];
-let lastTime=0;
-document.addEventListener('mousemove',function(e){
-    const now=Date.now();if(now-lastTime<50)return;lastTime=now;
-    const heart=document.createElement('div');heart.className='heart-trail';heart.style.left=(e.clientX-10)+'px';heart.style.top=(e.clientY-10)+'px';
-    const color=colors[Math.floor(Math.random()*colors.length)];
-    heart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="${color}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-    document.body.appendChild(heart);setTimeout(()=>heart.remove(),1000);
-});
 setInterval(()=>{const c=Math.floor(Math.random()*2)+1;for(let i=0;i<c;i++)createBubble();},1000);
 function createBubble(){const bubble=document.createElement('div');bubble.className='floating-bubble';const size=Math.random()*30+15;bubble.style.width=size+'px';bubble.style.height=size+'px';bubble.style.left=Math.random()*window.innerWidth+'px';const dur=Math.random()*4+6;bubble.style.animationDuration=dur+'s';bubble.addEventListener('mouseenter',()=>{bubble.style.animation='none';bubble.style.transition='all 0.15s ease-out';bubble.style.transform='scale(1.5)';bubble.style.opacity='0';setTimeout(()=>{if(bubble.parentElement)bubble.remove();},150);});document.getElementById('app').appendChild(bubble);setTimeout(()=>{if(bubble.parentElement)bubble.remove();},dur*1000);}
 
