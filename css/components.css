@@ -1,0 +1,33 @@
+/* =============================================
+   components.css — 通用组件样式
+   ============================================= */
+
+/* ===== 图片查看器 ===== */
+.image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
+.image-viewer img { max-width: 95%; max-height: 95%; border-radius: 5px; }
+
+/* ===== 登录相关通用弹窗 ===== */
+.chat-login-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; text-align: center; margin-bottom: 15px; font-size: 15px; outline: none; transition: 0.2s; font-family: inherit; }
+.chat-login-input:focus { border-color: #FF69B4; }
+.chat-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+/* ===== 星空寄语 ===== */
+.star-wish { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; box-shadow: 0 0 10px white, 0 0 20px rgba(255,255,255,0.5); cursor: pointer; pointer-events: auto; animation: star-twinkle 2s infinite alternate; transition: transform 0.3s ease; }
+.star-wish:hover { transform: scale(2.5); z-index: 100; }
+.star-tooltip { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 12px; font-size: 12px; color: #444; white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none; }
+.star-wish:hover .star-tooltip { opacity: 1; visibility: visible; bottom: 20px; }
+.star-trigger-btn { position: absolute; bottom: 30px; left: 270px; z-index: 100; width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+.star-trigger-btn:hover { transform: scale(1.1); background: white; }
+.wish-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+.wish-box { background: white; border-radius: 25px; padding: 25px; width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: login-appear 0.3s ease; }
+.wish-input { width: 100%; padding: 12px; border: 2px solid #FFE4E9; border-radius: 15px; margin: 15px 0; outline: none; resize: none; font-family: inherit; }
+.star-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 600; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.star-login-overlay.show { display: flex; }
+.star-login-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 30px; width: 320px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3); animation: login-appear 0.3s ease; backdrop-filter: blur(15px); }
+.star-login-input { width: 100%; padding: 12px; border: 1px solid rgba(255,215,0,0.5); border-radius: 15px; text-align: center; margin-bottom: 20px; font-size: 15px; outline: none; transition: 0.2s; background: rgba(255,255,255,0.8); color: #333; }
+.star-login-input:focus { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.4); background: #fff; }
+.star-login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,215,0,0.3); }
+.star-login-btn:hover { transform: translateY(-2px); }
+
+/* ===== 气泡特效 ===== */
+.floating-bubble { position: absolute; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1) 60%, rgba(255,255,255,0.4)); box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 5px rgba(255,182,193,0.3); border: 1px solid rgba(255,255,255,0.4); pointer-events: auto; z-index: 10; animation: floatUp linear forwards; }

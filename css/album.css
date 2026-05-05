@@ -1,0 +1,46 @@
+/* =============================================
+   album.css — 相册 / 图片预览相关样式
+   ============================================= */
+
+/* ===== 相册导航 ===== */
+.album-nav { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,182,193,0.4); padding-bottom: 12px; }
+.album-nav-btn { flex: 1; padding: 6px 0; text-align: center; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 10px; font-size: 11px; color: #555; cursor: pointer; transition: 0.3s; font-weight: bold; }
+.album-nav-btn:hover { background: rgba(255,182,193,0.7); color: white; border-color: transparent; transform: translateY(-2px); }
+
+/* ===== 相册弹窗 ===== */
+.album-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.album-modal.show { display: flex; opacity: 1; }
+.album-container { width: 95%; max-width: 900px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+.album-header { padding: 15px 20px; background: rgba(255,255,255,0.25); border-bottom: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; align-items: center; }
+.album-header h3 { color: #fff; font-size: 18px; margin: 0; letter-spacing: 1px; }
+.album-close { background: none; border: none; font-size: 26px; color: white; cursor: pointer; transition: 0.2s; }
+.album-close:hover { transform: scale(1.2); color: #FFB6C1; }
+
+/* ===== 相册图片网格 ===== */
+.gallery-container { position: relative; width: 100%; display: flex; align-items: center; padding: 0 20px; }
+.album-grid { display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; padding: 30px 0; width: 100%; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
+.album-grid::-webkit-scrollbar { display: none; }
+.album-item { position: relative; flex: 0 0 240px; height: 240px; border-radius: 16px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: 0.3s; background: rgba(255,255,255,0.2); }
+.album-item:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 2; }
+.album-item img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; transition: transform 0.4s ease; }
+.album-item:hover img { transform: scale(1.05); }
+.album-date { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: rgba(255,255,255,0.9); font-size: 11px; padding: 25px 8px 8px; pointer-events: none; }
+
+/* ===== 爱心点赞 ===== */
+.heart-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.85); color: #aaa; border-radius: 20px; padding: 0 10px; min-width: 44px; height: 32px; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 5; backdrop-filter: blur(4px); }
+.heart-icon:hover { transform: scale(1.1); }
+.heart-icon.liked { background: #ff4d4f; color: white; }
+.heart-icon svg { width: 18px; height: 18px; }
+.heart-count { font-size: 12px; font-weight: bold; }
+
+/* ===== 导航按钮 ===== */
+.nav-btn { position: absolute; z-index: 10; background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: 0.3s; }
+.nav-btn:hover { background: rgba(255,182,193,0.9); transform: scale(1.1); }
+.left-btn { left: 15px; }
+.right-btn { right: 15px; }
+
+/* ===== 上传卡片 ===== */
+.upload-card { border: 2px dashed rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
+.upload-card:hover { background: rgba(255,255,255,0.3); border-color: #FFB6C1; transform: translateY(-5px); }
+.upload-card svg { width: 36px; height: 36px; fill: white; margin-bottom: 8px; transition: 0.3s; }
+.upload-card:hover svg { fill: #FFB6C1; }
