@@ -335,9 +335,7 @@
         .gpt-avatar-user { background: white; color: #FF69B4; border: 2px solid #FFB6C1; }
         
         .gpt-avatar-ai.thinking-mode { position: relative; z-index: 1; overflow: visible; }
-        .gpt-avatar-ai.thinking-mode::before { content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0%, #FF69B4 25%, #00FFFF 50%, #FFD700 75%, transparent 100%); animation: spinAvatarRing 1.5s linear infinite; z-index: -2; }
-        .gpt-avatar-ai.thinking-mode::after { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; background: #ffffff; border-radius: 50%; z-index: -1; }
-        @keyframes spinAvatarRing { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
+        .thinking-ring-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: -1; }
 
         /* 用户与 AI 气泡颜色区分 */
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
@@ -2665,6 +2663,191 @@ function getThinkingSteps(text, files) {
     return steps;
 }
 
+/* ============================================================
+   彩虹重力光环动画（Canvas版）
+============================================================ */
+function startThinkingRing(avatarEl) {
+    // 修复1：使用 devicePixelRatio 高清渲染，消除模糊
+    const DPR = window.devicePixelRatio || 1;
+    const CSS_SIZE = 56; // CSS显示尺寸（px）
+    const SIZE = CSS_SIZE * DPR; // 实际canvas像素
+
+    // 修复1：R紧贴头像（头像36px，半径18px，加2px间隙）
+    const R = (18 + 2.5) * DPR;
+    const LINE_W = 2.8 * DPR; // 线宽跟随DPR缩放
+
+    const canvas = document.createElement('canvas');
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    canvas.className = 'thinking-ring-canvas';
+    canvas.style.width = CSS_SIZE + 'px';
+    canvas.style.height = CSS_SIZE + 'px';
+    avatarEl.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    const cx = SIZE / 2, cy = SIZE / 2;
+
+    // 状态变量
+    let phase = 0;
+    let angle = -Math.PI / 2;
+    let loopCount = 0;
+    let arcLen = 0.18;
+    const arcLen0Start = 0.18;
+    const arcLen0End = Math.PI * 1.2;
+    const arcLen1 = Math.PI * 1.5;
+    let rafId = null;
+    let running = true;
+
+    // 修复3：过渡插值状态
+    // transiting: 是否正在过渡, transitProgress: 0~1
+    let transitPhase = -1; // 即将进入的phase
+    let transitProgress = 0;
+    const TRANSIT_SPEED = 0.04; // 每帧过渡进度，约25帧完成
+
+    // 当前渲染用的弧长和颜色混合比（会在过渡期间插值）
+    let renderArcLen = arcLen;
+    // colorBlend: 0=phase0配色, 1=phase1配色
+    let colorBlend = 0;
+
+    let phase0Progress = 0;
+    let totalAngleTraveled = 0;
+
+    function gravitySpeed(a) {
+        const base = 0.028;
+        const amp = 0.038;
+        return base + amp * (1 + Math.sin(a)) * 0.5;
+    }
+
+    // 混合两个rgba颜色
+    function lerpColor(c0, c1, t) {
+        return [
+            Math.round(c0[0] * (1-t) + c1[0] * t),
+            Math.round(c0[1] * (1-t) + c1[1] * t),
+            Math.round(c0[2] * (1-t) + c1[2] * t),
+        ];
+    }
+
+    // 根据phase0Progress和colorBlend计算弧头尾颜色
+    function getColors(p0prog, blend) {
+        // phase0 颜色：头部蓝，尾部随p0prog从蓝变绿
+        const blue = [30, 120, 255];
+        const green = [0, 200, 80];
+        const red = [255, 50, 30];
+        const yellow = [255, 210, 0];
+
+        const t = Math.max(0, (p0prog - 0.5) * 2);
+        const p0Head = blue;
+        const p0Tail = lerpColor(blue, green, t);
+
+        // phase1 颜色：头红尾黄
+        const p1Head = red;
+        const p1Tail = yellow;
+
+        const head = lerpColor(p0Head, p1Head, blend);
+        const tail = lerpColor(p0Tail, p1Tail, blend);
+        return { head, tail };
+    }
+
+    function draw() {
+        if (!running) return;
+        ctx.clearRect(0, 0, SIZE, SIZE);
+
+        const speed = gravitySpeed(angle);
+
+        // 过渡期间暂停状态机推进，只做插值
+        if (transitPhase >= 0) {
+            transitProgress += TRANSIT_SPEED;
+            renderArcLen = arcLen + (transitPhase === 1 ? arcLen1 : arcLen0Start) * transitProgress
+                           - arcLen * transitProgress;
+            // 简化：直接线性插值弧长
+            const targetLen = transitPhase === 1 ? arcLen1 : arcLen0Start;
+            renderArcLen = arcLen * (1 - transitProgress) + targetLen * transitProgress;
+            colorBlend = transitPhase === 1
+                ? transitProgress
+                : 1 - transitProgress;
+
+            if (transitProgress >= 1) {
+                // 过渡结束，正式切换
+                phase = transitPhase;
+                transitPhase = -1;
+                transitProgress = 0;
+                arcLen = phase === 1 ? arcLen1 : arcLen0Start;
+                renderArcLen = arcLen;
+                colorBlend = phase === 1 ? 1 : 0;
+                totalAngleTraveled = 0;
+                loopCount = 0;
+                phase0Progress = phase === 0 ? 0 : phase0Progress;
+            }
+        } else if (phase === 0) {
+            angle += speed;
+            totalAngleTraveled += speed;
+
+            if (totalAngleTraveled >= Math.PI * 2 * (loopCount + 1)) {
+                loopCount++;
+            }
+            phase0Progress = Math.min(totalAngleTraveled / (Math.PI * 4), 1);
+            arcLen = arcLen0Start + (arcLen0End - arcLen0Start) * phase0Progress;
+            renderArcLen = arcLen;
+            colorBlend = 0;
+
+            if (loopCount >= 2) {
+                // 开始向phase1过渡
+                transitPhase = 1;
+                transitProgress = 0;
+            }
+        } else {
+            // phase1
+            angle += speed;
+            totalAngleTraveled += speed;
+            renderArcLen = arcLen1;
+            colorBlend = 1;
+
+            if (totalAngleTraveled >= Math.PI * 2) {
+                // 开始向phase0过渡
+                transitPhase = 0;
+                transitProgress = 0;
+            }
+        }
+
+        // 过渡期间也继续转动
+        if (transitPhase >= 0) {
+            angle += speed;
+        }
+
+        const headA = angle;
+        const tailA = angle - renderArcLen;
+
+        // 获取颜色
+        const { head, tail } = getColors(phase0Progress, colorBlend);
+
+        // 绘制圆弧（修复2：butt端点，无小圆点；修复1：紧贴头像）
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, tailA, headA, false);
+        ctx.lineWidth = LINE_W;
+        ctx.lineCap = 'butt'; // 修复2：平头，不加圆点
+
+        // 渐变
+        const grad = ctx.createLinearGradient(
+            cx + R * Math.cos(tailA), cy + R * Math.sin(tailA),
+            cx + R * Math.cos(headA), cy + R * Math.sin(headA)
+        );
+        grad.addColorStop(0, `rgb(${tail[0]},${tail[1]},${tail[2]})`);
+        grad.addColorStop(1, `rgb(${head[0]},${head[1]},${head[2]})`);
+        ctx.strokeStyle = grad;
+        ctx.stroke();
+
+        rafId = requestAnimationFrame(draw);
+    }
+
+    rafId = requestAnimationFrame(draw);
+
+    return function stop() {
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
+    };
+}
+
 function createThinkingMessage(text, files) {
     const chatArea = document.getElementById('gpt-chat-area');
     const id = 'gpt_thinking_' + Date.now();
@@ -2692,6 +2875,9 @@ function createThinkingMessage(text, files) {
     const el = document.getElementById(id);
     const avatarEl = el.querySelector('.gpt-avatar-ai');
 
+    // 启动Canvas光环动画
+    const stopRing = startThinkingRing(avatarEl);
+
     const timer = setInterval(() => {
         if (index < steps.length - 1) {
             index++;
@@ -2706,7 +2892,7 @@ function createThinkingMessage(text, files) {
         avatarEl,
         contentBox: el.querySelector('.gpt-content'),
         detailEl: el.querySelector('.gpt-thinking-detail'),
-        stop() { clearInterval(timer); }
+        stop() { clearInterval(timer); stopRing(); }
     };
 }
 
