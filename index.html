@@ -378,6 +378,9 @@
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%); }
         .gpt-input-box { width: 100%; max-width: 800px; background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
         .gpt-input-box:focus-within { border-color: #FF69B4; background: #fff; box-shadow: 0 4px 20px rgba(255,105,180,0.2); }
+        .gpt-mode-chip { display: none; align-self: flex-start; align-items: center; gap: 6px; width: fit-content; max-width: 100%; border: 1px solid rgba(255,182,193,0.55); background: rgba(255,240,245,0.9); color: #c94f82; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
+        .gpt-mode-chip.show { display: inline-flex; }
+        .gpt-mode-chip button { border: none; background: transparent; color: #c94f82; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 1px 2px; }
         .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; position: relative; }
 
         .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #FFB6C1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; transition: 0.2s; padding-bottom: 2px; }
@@ -406,11 +409,13 @@
         .gpt-disclaimer { font-size: 12px; color: #aaa; margin-top: 10px; text-align: center; }
 
         /* 附件弹出菜单样式 */
-        .gpt-attachment-menu { position: absolute; bottom: 50px; left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 182, 193, 0.5); border-radius: 16px; padding: 8px; box-shadow: 0 10px 40px rgba(255, 105, 180, 0.15); display: none; flex-direction: column; gap: 4px; z-index: 100; min-width: 170px; }
+        .gpt-attachment-menu { position: absolute; bottom: 46px; left: 0; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.09); border-radius: 20px; padding: 10px; box-shadow: 0 14px 36px rgba(0,0,0,0.14); display: none; flex-direction: column; gap: 3px; z-index: 100; min-width: 218px; }
         .gpt-attachment-menu.show { display: flex; animation: fadeIn 0.2s ease; }
-        .gpt-menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #555; transition: 0.2s; font-weight: 500; }
-        .gpt-menu-item:hover { background: rgba(255, 182, 193, 0.2); color: #FF69B4; }
-        .gpt-menu-item svg { flex-shrink: 0; }
+        .gpt-menu-item { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 12px; cursor: pointer; font-size: 16px; color: #222; transition: 0.18s; font-weight: 500; line-height: 1.25; }
+        .gpt-menu-item:hover { background: rgba(0,0,0,0.055); color: #111; }
+        .gpt-menu-item.active { background: rgba(255, 182, 193, 0.22); color: #c94f82; }
+        .gpt-menu-item svg { flex-shrink: 0; width: 21px; height: 21px; color: currentColor; }
+        .gpt-menu-divider { height: 1px; background: rgba(0,0,0,0.1); margin: 5px 4px; }
 
         /* ===== 响应式 ===== */
         /* ============================================================
@@ -1340,20 +1345,34 @@
                     
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
+                    <div class="gpt-mode-chip" id="gpt-mode-chip">
+                        <span id="gpt-mode-chip-text">普通</span>
+                        <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
+                    </div>
+
                     <div class="gpt-input-controls">
                         <input type="file" id="gpt-image-upload" accept="image/*,.txt,.doc,.docx,.xls,.xlsx,.csv" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
                         
                         <div class="gpt-attachment-menu" id="gpt-attachment-menu">
                             <div class="gpt-menu-item" onclick="triggerFileUpload()">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> 
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                                 添加照片和文件
                             </div>
+                            <div class="gpt-menu-divider"></div>
                             <div class="gpt-menu-item" onclick="switchToImageMode()">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> 
-                                创建图片
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+                                绘制图片
                             </div>
-                            <div class="gpt-menu-item" onclick="switchToChatMode()" id="gpt-menu-chat-mode" style="display:none; border-top: 1px solid rgba(255,182,193,0.3); padding-top: 8px; margin-top: 4px;">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> 
+                            <div class="gpt-menu-item" id="gpt-menu-think" onclick="setGPTReasoningMode('think')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8.2 14.8A6.5 6.5 0 1 1 15.8 14.8c-.9.7-1.3 1.5-1.5 2.2H9.7c-.2-.7-.6-1.5-1.5-2.2Z"></path></svg>
+                                思考一下
+                            </div>
+                            <div class="gpt-menu-item" id="gpt-menu-research" onclick="setGPTReasoningMode('research')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path><path d="M8.5 11h5"></path><path d="M11 8.5v5"></path></svg>
+                                深度研究
+                            </div>
+                            <div class="gpt-menu-item" onclick="switchToChatMode()" id="gpt-menu-chat-mode" style="display:none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"></path></svg>
                                 切换回聊天模式
                             </div>
                         </div>
@@ -2153,7 +2172,8 @@ document.addEventListener('click', (e) => {
 // ✨ 升级 1/3：初始化 IndexedDB 配置，移除同步读取 LocalStorage
 let chatSessions = [];
 let currentSessionId = null;
-let currentGPTMode = 'chat'; 
+let currentGPTMode = 'chat';
+let currentReasoningMode = 'normal';
 
 // ✨ 从后端的数据库获取【属于自己】的聊天记录
 const myUserName = getStableUserName(); // 获取当前用户身份
@@ -2192,6 +2212,32 @@ document.addEventListener('click', (e) => {
     }
 });
 
+function setGPTReasoningMode(mode) {
+    if (!['normal', 'think', 'research'].includes(mode)) mode = 'normal';
+    currentReasoningMode = mode;
+    if (currentGPTMode === 'image') switchToChatMode();
+
+    const thinkItem = document.getElementById('gpt-menu-think');
+    const researchItem = document.getElementById('gpt-menu-research');
+    if (thinkItem) thinkItem.classList.toggle('active', mode === 'think');
+    if (researchItem) researchItem.classList.toggle('active', mode === 'research');
+
+    const chip = document.getElementById('gpt-mode-chip');
+    const chipText = document.getElementById('gpt-mode-chip-text');
+    if (chip && chipText) {
+        if (mode === 'normal') {
+            chip.classList.remove('show');
+            chipText.textContent = '普通';
+        } else {
+            chip.classList.add('show');
+            chipText.textContent = mode === 'think' ? '思考一下' : '深度研究';
+        }
+    }
+
+    const menu = document.getElementById('gpt-attachment-menu');
+    if (menu) menu.classList.remove('show');
+}
+
 function triggerFileUpload() {
     const uploadInput = document.getElementById('gpt-image-upload');
     if (currentGPTMode === 'image') {
@@ -2206,10 +2252,19 @@ function triggerFileUpload() {
 
 function switchToImageMode() {
     currentGPTMode = 'image';
+    currentReasoningMode = 'normal';
     document.getElementById('gpt-input-el').placeholder = '让全能画家 TuoTuo 来帮你实现愿望吧...';
     document.getElementById('gpt-menu-chat-mode').style.display = 'flex';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo <span style="font-size:12px;color:#FFB6C1;background:#FFF0F5;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:normal;">绘画模式</span>';
-    clearGPTFile(); 
+    const chip = document.getElementById('gpt-mode-chip');
+    if (chip) chip.classList.add('show');
+    const chipText = document.getElementById('gpt-mode-chip-text');
+    if (chipText) chipText.textContent = '绘制图片';
+    const thinkItem = document.getElementById('gpt-menu-think');
+    const researchItem = document.getElementById('gpt-menu-research');
+    if (thinkItem) thinkItem.classList.remove('active');
+    if (researchItem) researchItem.classList.remove('active');
+    clearGPTFile();
     document.getElementById('gpt-attachment-menu').classList.remove('show');
 }
 
@@ -2218,6 +2273,17 @@ function switchToChatMode() {
     document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
     document.getElementById('gpt-menu-chat-mode').style.display = 'none';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
+    const chip = document.getElementById('gpt-mode-chip');
+    const chipText = document.getElementById('gpt-mode-chip-text');
+    if (chip && chipText) {
+        if (currentReasoningMode === 'normal') {
+            chip.classList.remove('show');
+            chipText.textContent = '普通';
+        } else {
+            chip.classList.add('show');
+            chipText.textContent = currentReasoningMode === 'think' ? '思考一下' : '深度研究';
+        }
+    }
     document.getElementById('gpt-attachment-menu').classList.remove('show');
 }
 
@@ -2676,11 +2742,28 @@ function handleGPTKey(e) {
 
 function getThinkingSteps(text, files) {
     if (currentGPTMode === 'image') {
-        return ['正在准备画笔和颜料', '正在构思唯美的画面', '正在画出完美的杰作'];
+        return ['正在准备画笔和颜料 🎨', '正在构思唯美的画面 ✨', '正在为您渲染高质量图像 🖼️'];
     }
 
     const steps = [];
     if (files.length > 0) steps.push(`正在处理你上传的 ${files.length} 个文件`);
+
+    if (currentReasoningMode === 'research') {
+        steps.push('正在制定研究计划');
+        steps.push('正在联网搜索可靠资料');
+        steps.push('正在交叉整理来源');
+        steps.push('正在生成带来源的研究结论');
+        return steps;
+    }
+
+    if (currentReasoningMode === 'think') {
+        steps.push('正在认真拆解问题');
+        steps.push('正在进行更谨慎的推理');
+        steps.push('正在自检答案是否完整');
+        steps.push('正在组织清晰的回答');
+        return steps;
+    }
+
     steps.push('正在理解你的问题');
     steps.push('正在结合上下文进行分析');
 
@@ -3129,7 +3212,7 @@ async function sendGPTMessage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 signal: gptAbortController.signal,
-                body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true })
+                body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true, reasoningMode: currentReasoningMode })
             });
             if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '网络请求失败'));
 
@@ -3150,9 +3233,14 @@ async function sendGPTMessage() {
         } else {
             if (thinkingObj.el) thinkingObj.el.remove();
             const chatArea = document.getElementById('gpt-chat-area');
-            const safeMsg = escapeHtml(err.message || '请求失败，请稍后再试');
+            const rawErrorMsg = err.message || '请求失败，请稍后再试';
+            const safeMsg = escapeHtml(rawErrorMsg);
+            const isFilter = /content management policy|content_filter|filtered|内容过滤|400/i.test(rawErrorMsg);
+            const suggestion = isFilter
+                ? '这通常是 Azure 内容过滤误伤。请点击左侧【新聊天】后重试，或换成“请客观描述图片中的场景、人物姿态、物品和文字”。'
+                : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
             if (chatArea) {
-                chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。</div></div></div>`);
+                chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">${escapeHtml(suggestion)}</div></div></div>`);
                 chatArea.scrollTop = chatArea.scrollHeight;
             }
         }
