@@ -2151,8 +2151,9 @@ let chatSessions = [];
 let currentSessionId = null;
 let currentGPTMode = 'chat'; 
 
-// 从后端的数据库获取聊天记录
-fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions')
+// ✨ 从后端的数据库获取【属于自己】的聊天记录
+const myUserName = getStableUserName(); // 获取当前用户身份
+fetch(`https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions?userName=${encodeURIComponent(myUserName)}`)
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data)) {
@@ -2162,6 +2163,10 @@ fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/session
                 updatedAt: Date.now(),
                 ...s
             }));
+            // 如果面板已经打开，重新渲染一下历史列表
+            if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
+                renderHistoryList();
+            }
         }
     }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
 
@@ -2384,11 +2389,14 @@ let saveSessionsTimer = null;
 function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
-        // 静默把聊天记录发给后端存入 Cosmos DB
+        // ✨ 静默把聊天记录发给后端存入 Cosmos DB，并带上自己的名字
         fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessions: chatSessions })
+            body: JSON.stringify({ 
+                sessions: chatSessions,
+                userName: getStableUserName() // ✨ 告诉服务器这是谁的记录
+            })
         }).catch(err => console.error("同步到云端数据库失败:", err));
     }, 1000); // 稍微防抖，避免高频发请求
 }
