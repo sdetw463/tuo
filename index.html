@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
     <style>
         * { 
@@ -17,16 +19,16 @@
             padding: 0; 
             box-sizing: border-box; 
             /* 加上 !important 强制覆盖所有按钮和链接的默认鼠标 */
-            cursor: -webkit-image-set(url('cat.ico') 3x) 5 5, auto !important;
-            cursor: image-set(url('cat.ico') 3x) 5 5, auto !important;
+            cursor: -webkit-image-set(url('cat.ico') 4x) 5 5, auto !important;
+            cursor: image-set(url('cat.ico') 4x) 5 5, auto !important;
         }
         body, html {
             width: 100%; height: 100%; overflow: hidden; background-color: #FFF0F5;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             cursor: url('cat.ico') 5 5, auto;
             /* 新版写法：强制让 128x128 的图片以 4倍缩小（即32x32）显示，保持绝对清晰 */
-            cursor: -webkit-image-set(url('cat.ico') 3x) 5 5, auto;
-            cursor: image-set(url('cat.ico') 3x) 5 5, auto;
+            cursor: -webkit-image-set(url('cat.ico') 4x) 5 5, auto;
+            cursor: image-set(url('cat.ico') 4x) 5 5, auto;
         }
         .heart-trail { position: fixed; pointer-events: none; z-index: 9999; width: 20px; height: 20px; animation: fadeOutHeart 1s forwards ease-out; }
         @keyframes fadeOutHeart { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(-40px) scale(1.5) rotate(20deg); opacity: 0; } }
@@ -1351,7 +1353,7 @@
                     </div>
 
                     <div class="gpt-input-controls">
-                        <input type="file" id="gpt-image-upload" accept="image/*,.txt,.doc,.docx,.xls,.xlsx,.csv" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
+                        <input type="file" id="gpt-image-upload" accept="image/*,.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.xml,.yaml,.yml,.py,.java,.c,.cpp,.h,.hpp,.cs,.go,.rs,.php,.rb,.swift,.kt,.sql,.sh,.bat,.ps1,.ini,.toml,.log,.doc,.docx,.xls,.xlsx,.pptx,.pdf" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
                         
                         <div class="gpt-attachment-menu" id="gpt-attachment-menu">
                             <div class="gpt-menu-item" onclick="triggerFileUpload()">
@@ -2243,7 +2245,7 @@ function triggerFileUpload() {
     if (currentGPTMode === 'image') {
         uploadInput.accept = 'image/*';
     } else {
-        uploadInput.accept = 'image/*,.txt,.doc,.docx,.xls,.xlsx,.csv';
+        uploadInput.accept = 'image/*,.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.xml,.yaml,.yml,.py,.java,.c,.cpp,.h,.hpp,.cs,.go,.rs,.php,.rb,.swift,.kt,.sql,.sh,.bat,.ps1,.ini,.toml,.log,.doc,.docx,.xls,.xlsx,.pptx,.pdf';
     }
     
     uploadInput.click();
@@ -2543,6 +2545,81 @@ function showGPTTransientStatus(message) {
     }, 2200);
 }
 
+const GPT_TEXT_FILE_EXTS = new Set([
+    'txt','md','markdown','csv','tsv','json','jsonl','html','htm','css','js','mjs','cjs','ts','tsx','jsx','xml','yaml','yml',
+    'py','java','c','cpp','h','hpp','cs','go','rs','php','rb','swift','kt','sql','sh','bash','zsh','bat','ps1','ini','toml','log','env','gitignore'
+]);
+
+function normalizeExtractedDocumentText(text, name, maxChars = 180000) {
+    const body = String(text || '').replace(/\r\n/g, '\n').trim();
+    if (!body) throw new Error('没有读取到可分析的文本内容');
+    return `【文件名：${name}】\n${body}`.slice(0, maxChars);
+}
+
+async function extractPdfText(file) {
+    if (!window.pdfjsLib) throw new Error('PDF 解析库尚未加载，请稍后重试');
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pages = [];
+    const maxPages = Math.min(pdf.numPages, 30);
+    for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        pages.push(`--- PDF 第 ${i} 页 ---\n` + content.items.map(item => item.str || '').join(' '));
+    }
+    if (pdf.numPages > maxPages) pages.push(`\n[提示：PDF 共 ${pdf.numPages} 页，已读取前 ${maxPages} 页。]`);
+    return pages.join('\n\n');
+}
+
+async function extractPptxText(file) {
+    if (!window.JSZip) throw new Error('PPTX 解析库尚未加载，请稍后重试');
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const slideFiles = Object.keys(zip.files)
+        .filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+        .sort((a, b) => Number(a.match(/slide(\d+)\.xml/)?.[1] || 0) - Number(b.match(/slide(\d+)\.xml/)?.[1] || 0));
+    const slides = [];
+    for (const slideName of slideFiles.slice(0, 80)) {
+        const xml = await zip.files[slideName].async('text');
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const texts = Array.from(doc.getElementsByTagName('a:t')).map(n => n.textContent || '').filter(Boolean);
+        if (texts.length) slides.push(`--- ${slideName.replace('ppt/slides/', '')} ---\n${texts.join('\n')}`);
+    }
+    return slides.join('\n\n');
+}
+
+async function extractDocumentTextFromFile(file, ext, name) {
+    if (GPT_TEXT_FILE_EXTS.has(ext) || file.type.startsWith('text/')) {
+        return normalizeExtractedDocumentText(await file.text(), name);
+    }
+
+    if (ext === 'docx') {
+        const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+        return normalizeExtractedDocumentText(result.value || '', name);
+    }
+
+    if (ext === 'xlsx' || ext === 'xls') {
+        const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+        let extractedText = '';
+        workbook.SheetNames.forEach(sheetName => {
+            extractedText += `\n--- 表格标签页: ${sheetName} ---\n`;
+            extractedText += XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+        });
+        return normalizeExtractedDocumentText(extractedText, name);
+    }
+
+    if (ext === 'pdf') return normalizeExtractedDocumentText(await extractPdfText(file), name);
+    if (ext === 'pptx') return normalizeExtractedDocumentText(await extractPptxText(file), name);
+
+    if (ext === 'doc') {
+        throw new Error('老版 Word .doc 是二进制格式，浏览器里无法稳定解析。请另存为 .docx 或 PDF 后上传。');
+    }
+
+    throw new Error('暂时无法解析这个文件格式。建议转成 TXT、PDF、DOCX、XLSX、PPTX、HTML 或代码文本文件。');
+}
+
 async function handleGPTFileSelect(e) {
     const files = Array.from(e.target.files || e.dataTransfer?.files || []);
     if (!files.length) return;
@@ -2576,27 +2653,10 @@ async function handleGPTFileSelect(e) {
                 showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
                 gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, name });
-            } else if (ext === 'txt' || ext === 'csv' || file.type.startsWith('text/')) {
-                const text = await file.text();
-                gptPendingFiles.push({ type: 'document', data: text.slice(0, 180000), name });
-            } else if (ext === 'doc') {
-                alert(`【${name}】是老版 Word (.doc) 文件，目前请先另存为 .docx 后再上传哦～`);
-                continue;
-            } else if (ext === 'docx') {
-                const arrayBuffer = await file.arrayBuffer();
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                gptPendingFiles.push({ type: 'document', data: (result.value || '').slice(0, 180000), name });
-            } else if (ext === 'xlsx' || ext === 'xls') {
-                const arrayBuffer = await file.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                let extractedText = '';
-                workbook.SheetNames.forEach(sheetName => {
-                    extractedText += `\n--- 表格标签页: ${sheetName} ---\n`;
-                    extractedText += XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-                });
-                gptPendingFiles.push({ type: 'document', data: extractedText.slice(0, 180000), name });
             } else {
-                alert(`文件 ${name} 格式不支持，建议上传图片、TXT、Word 或 Excel。`);
+                showGPTTransientStatus(`正在读取文件：${name}`);
+                const extractedText = await extractDocumentTextFromFile(file, ext, name);
+                gptPendingFiles.push({ type: 'document', data: extractedText, name });
             }
         } catch (err) {
             console.error('文件解析失败', err);
