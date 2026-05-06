@@ -2496,7 +2496,9 @@ async function processImageAsync(file, mode) {
     const ctx = canvas.getContext('2d', { alpha: true });
 
     if (mode === 'image') {
-        const maxSide = 1536;
+        // gpt-image-2 图片编辑按官方示例使用 image + mask 的 multipart 输入。
+        // 这里统一转成 1024 内的 PNG，并提供全透明 mask，让模型可以重绘整张参考图。
+        const maxSide = 1024;
         let w = img.width;
         let h = img.height;
         if (w > maxSide || h > maxSide) {
@@ -2505,8 +2507,13 @@ async function processImageAsync(file, mode) {
         }
         canvas.width = w;
         canvas.height = h;
+        ctx.clearRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
-        return { image: canvas.toDataURL('image/png') };
+        const imageBase64 = canvas.toDataURL('image/png');
+
+        ctx.clearRect(0, 0, w, h);
+        const maskBase64 = canvas.toDataURL('image/png');
+        return { image: imageBase64, mask: maskBase64 };
     }
 
     const maxSide = 1568;
@@ -2568,7 +2575,7 @@ async function handleGPTFileSelect(e) {
             if (file.type.startsWith('image/')) {
                 showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
-                gptPendingFiles.push({ type: 'image', data: processed.image, name });
+                gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, name });
             } else if (ext === 'txt' || ext === 'csv' || file.type.startsWith('text/')) {
                 const text = await file.text();
                 gptPendingFiles.push({ type: 'document', data: text.slice(0, 180000), name });
@@ -2742,7 +2749,7 @@ function handleGPTKey(e) {
 
 function getThinkingSteps(text, files) {
     if (currentGPTMode === 'image') {
-        return ['正在准备画笔和颜料', '正在构思唯美的画面', '正在绘制完美的杰作'];
+        return ['正在准备画笔和颜料 🎨', '正在构思唯美的画面 ✨', '正在为您渲染高质量图像 🖼️'];
     }
 
     const steps = [];
@@ -3159,7 +3166,7 @@ async function sendGPTMessage() {
 
     filesSnapshot.forEach(f => {
         if (f.type === 'image') {
-            if (modeAtSend === 'image') imagesToSend.push({ image: f.data, name: f.name });
+            if (modeAtSend === 'image') imagesToSend.push({ image: f.data, mask: f.mask || null, name: f.name });
             else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
         } else if (f.type === 'document') {
@@ -3189,12 +3196,23 @@ async function sendGPTMessage() {
 
     try {
         if (modeAtSend === 'image') {
-            const response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                signal: gptAbortController.signal,
-                body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
-            });
+            const imageTimeout = setTimeout(() => {
+                if (gptAbortController) gptAbortController.abort();
+            }, 180000);
+            let response;
+            try {
+                response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: gptAbortController.signal,
+                    body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
+                });
+            } catch (fetchErr) {
+                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了，请稍后再试，或先不要上传参考图直接画。');
+                throw new Error('画图请求连接失败。可能是参考图过大、后端正在重启，或图片生成接口超时。请刷新后重试，或先不要上传参考图直接画。');
+            } finally {
+                clearTimeout(imageTimeout);
+            }
             if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '画图请求失败'));
             const data = await response.json();
             if (!data.url) throw new Error('模型没有返回有效图片，请换一个提示词再试。');
