@@ -2152,22 +2152,19 @@ let chatSessions = [];
 let currentSessionId = null;
 let currentGPTMode = 'chat'; 
 
-localforage.config({
-    name: 'TuoTuoDimension',
-    storeName: 'gpt_sessions_db'
-});
-
-// ✨ 升级 2/3：异步预加载历史记录数据
-localforage.getItem('tuotuo_gpt_sessions').then(data => {
-    if (data && Array.isArray(data)) {
-        chatSessions = data.map(s => ({
-            pinned: false,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            ...s
-        }));
-    }
-}).catch(err => console.error("读取历史记录失败:", err));
+// 从后端的数据库获取聊天记录
+fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions')
+    .then(res => res.json())
+    .then(data => {
+        if (data && Array.isArray(data)) {
+            chatSessions = data.map(s => ({
+                pinned: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                ...s
+            }));
+        }
+    }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
 
 
 function toggleGPTSidebar() {
@@ -2384,16 +2381,17 @@ function loadSession(id) {
     clearGPTFile();
 }
 
-// ✨ 升级 3/3：移除容量截断代码，使用 localForage 完美保存大文件
 let saveSessionsTimer = null;
 function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
-        localforage.setItem('tuotuo_gpt_sessions', chatSessions).catch(err => {
-            console.error("IndexedDB 保存失败:", err);
-            alert('聊天记录保存失败啦，可能是浏览器存储空间不足～');
-        });
-    }, 250);
+        // 静默把聊天记录发给后端存入 Cosmos DB
+        fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessions: chatSessions })
+        }).catch(err => console.error("同步到云端数据库失败:", err));
+    }, 1000); // 稍微防抖，避免高频发请求
 }
 
 function processImageAsync(file, mode) {
