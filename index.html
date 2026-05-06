@@ -324,6 +324,9 @@
 
         /* 聊天消息流 */
         .gpt-chat-area { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; background: #ffffff !important; }
+        .gpt-main.drag-over::after { content: '松开即可添加到对话'; position: absolute; inset: 72px 28px 110px 28px; border: 2px dashed rgba(255,105,180,0.55); background: rgba(255,240,245,0.78); color: #c94f82; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; pointer-events: none; z-index: 10; backdrop-filter: blur(8px); }
+        .gpt-status-pill { font-size: 12px; color: #c94f82; background: rgba(255,240,245,0.9); border: 1px solid rgba(255,182,193,0.45); padding: 6px 10px; border-radius: 999px; width: fit-content; margin-top: 8px; }
+        .gpt-error-actions { margin-top: 8px; font-size: 12px; color: #8c4355; line-height: 1.6; }
         .gpt-msg-container { width: 100%; max-width: 850px; padding: 16px 24px !important; gap: 16px !important; display: flex; animation: fadeIn 0.3s ease; }
         .gpt-msg-container.user { justify-content: flex-end !important; }
         .gpt-msg-container.ai { justify-content: flex-start !important; }
@@ -1437,6 +1440,7 @@ function openFull(src) {
    WebSocket
 ============================================================ */
 const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
+const TUOTUO_API_BASE = 'https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net';
 let chatSocket = null;
 let chatNickname = sessionStorage.getItem('chat_nickname') || '';
 let chatAvatar = sessionStorage.getItem('chat_avatar') || '';
@@ -2153,7 +2157,7 @@ let currentGPTMode = 'chat';
 
 // ✨ 从后端的数据库获取【属于自己】的聊天记录
 const myUserName = getStableUserName(); // 获取当前用户身份
-fetch(`https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions?userName=${encodeURIComponent(myUserName)}`)
+fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data)) {
@@ -2390,7 +2394,7 @@ function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
         // ✨ 静默把聊天记录发给后端存入 Cosmos DB，并带上自己的名字
-        fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/sessions', {
+        fetch(`${TUOTUO_API_BASE}/api/sessions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -2401,92 +2405,114 @@ function saveSessions() {
     }, 1000); // 稍微防抖，避免高频发请求
 }
 
-function processImageAsync(file, mode) {
+function fileToDataURL(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                if (mode === 'image') {
-                    const size = 1024;
-                    canvas.width = size;
-                    canvas.height = size;
-                    
-                    let sx = 0, sy = 0, sw = img.width, sh = img.height;
-                    if (sw > sh) { sx = (sw - sh) / 2; sw = sh; } 
-                    else { sy = (sh - sw) / 2; sh = sw; }
-                    
-                    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
-                    const imageBase64 = canvas.toDataURL('image/png');
-                    
-                    ctx.clearRect(0, 0, size, size);
-                    const maskBase64 = canvas.toDataURL('image/png');
-                    
-                    resolve({ image: imageBase64, mask: maskBase64 });
-                } else {
-                    let w = img.width, h = img.height;
-                    if (w > 800 || h > 800) {
-                        if (w > h) { h *= 800 / w; w = 800; } 
-                        else { w *= 800 / h; h = 800; }
-                    }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(img, 0, 0, w, h);
-                    resolve({ image: canvas.toDataURL('image/jpeg', 0.85) });
-                }
-            };
-            img.onerror = reject;
-            img.src = ev.target.result;
-        };
+        reader.onload = ev => resolve(ev.target.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
 }
 
+function loadImageFromDataURL(dataUrl) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
+
+async function processImageAsync(file, mode) {
+    const dataUrl = await fileToDataURL(file);
+    const img = await loadImageFromDataURL(dataUrl);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    if (mode === 'image') {
+        const maxSide = 1536;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxSide || h > maxSide) {
+            if (w > h) { h = Math.round(h * maxSide / w); w = maxSide; }
+            else { w = Math.round(w * maxSide / h); h = maxSide; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+        return { image: canvas.toDataURL('image/png') };
+    }
+
+    const maxSide = 1568;
+    let w = img.width;
+    let h = img.height;
+    if (w > maxSide || h > maxSide) {
+        if (w > h) { h = Math.round(h * maxSide / w); w = maxSide; }
+        else { w = Math.round(w * maxSide / h); h = maxSide; }
+    }
+    canvas.width = w;
+    canvas.height = h;
+    ctx.drawImage(img, 0, 0, w, h);
+    return { image: canvas.toDataURL('image/jpeg', 0.82) };
+}
+
+function showGPTTransientStatus(message) {
+    const previewWrap = document.getElementById('gpt-image-preview');
+    if (!previewWrap) return;
+    const pill = document.createElement('div');
+    pill.className = 'gpt-status-pill';
+    pill.textContent = message;
+    previewWrap.style.display = 'flex';
+    previewWrap.appendChild(pill);
+    setTimeout(() => {
+        if (pill.parentElement) pill.remove();
+        if (gptPendingFiles.length === 0) renderGPTFilePreview();
+    }, 2200);
+}
+
 async function handleGPTFileSelect(e) {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || e.dataTransfer?.files || []);
     if (!files.length) return;
 
-    if (gptPendingFiles.length + files.length > 5) {
+    const remainingSlots = 5 - gptPendingFiles.length;
+    if (remainingSlots <= 0) {
         alert('最多只能同时上传 5 个附件哦～');
-        e.target.value = '';
+        if (e.target) e.target.value = '';
         return;
     }
 
-    for (const file of files) {
-        const name = file.name;
-        const ext = name.split('.').pop().toLowerCase();
+    const selectedFiles = files.slice(0, remainingSlots);
+    if (files.length > remainingSlots) showGPTTransientStatus(`已自动保留前 ${remainingSlots} 个附件`);
+
+    for (const file of selectedFiles) {
+        const name = file.name || '未命名文件';
+        const ext = (name.split('.').pop() || '').toLowerCase();
 
         if (currentGPTMode === 'image' && !file.type.startsWith('image/')) {
-            alert(`画图模式下只能识别图片哦～已为你跳过了不支持的文件：${name}`);
+            alert(`画图模式下只能添加图片作为参考哦～已跳过：${name}`);
+            continue;
+        }
+
+        if (file.size > 25 * 1024 * 1024) {
+            alert(`文件 ${name} 太大啦，请尽量控制在 25MB 以内。`);
             continue;
         }
 
         try {
             if (file.type.startsWith('image/')) {
+                showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
-                
-                if (currentGPTMode === 'image') {
-                    gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask, name });
-                } else {
-                    gptPendingFiles.push({ type: 'image', data: processed.image, name });
-                }
-
-            } else if (ext === 'txt' || ext === 'csv') {
+                gptPendingFiles.push({ type: 'image', data: processed.image, name });
+            } else if (ext === 'txt' || ext === 'csv' || file.type.startsWith('text/')) {
                 const text = await file.text();
-                gptPendingFiles.push({ type: 'document', data: text, name });
-
+                gptPendingFiles.push({ type: 'document', data: text.slice(0, 180000), name });
             } else if (ext === 'doc') {
-                alert(`啊呀！TuoTuo 发现【${name}】是一个老版本的 Word (.doc) 文件！目前我只能看懂较新的 .docx 格式哦。请把它另存为 .docx 后再重新发给我吧～`);
-                continue; 
-            
+                alert(`【${name}】是老版 Word (.doc) 文件，目前请先另存为 .docx 后再上传哦～`);
+                continue;
             } else if (ext === 'docx') {
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
-                gptPendingFiles.push({ type: 'document', data: result.value, name });
-
+                gptPendingFiles.push({ type: 'document', data: (result.value || '').slice(0, 180000), name });
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const arrayBuffer = await file.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -2495,19 +2521,18 @@ async function handleGPTFileSelect(e) {
                     extractedText += `\n--- 表格标签页: ${sheetName} ---\n`;
                     extractedText += XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
                 });
-                gptPendingFiles.push({ type: 'document', data: extractedText, name });
-
+                gptPendingFiles.push({ type: 'document', data: extractedText.slice(0, 180000), name });
             } else {
                 alert(`文件 ${name} 格式不支持，建议上传图片、TXT、Word 或 Excel。`);
             }
         } catch (err) {
-            console.error("文件解析失败", err);
-            alert(`文件 ${name} 读取失败！`);
+            console.error('文件解析失败', err);
+            alert(`文件 ${name} 读取失败：${err.message || '未知错误'}`);
         }
     }
 
     renderGPTFilePreview();
-    e.target.value = '';
+    if (e.target) e.target.value = '';
 }
 
 function renderGPTFilePreview() {
@@ -3012,81 +3037,106 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
     return streamState.fullText;
 }
 
+function getErrorMessageFromResponse(response, fallback) {
+    return response.text().then(text => {
+        if (!text) return fallback;
+        try {
+            const obj = JSON.parse(text);
+            return obj.error || obj.message || text;
+        } catch {
+            return text;
+        }
+    });
+}
+
 async function sendGPTMessage() {
     const inputEl = document.getElementById('gpt-input-el');
-    if (gptIsSending) { if (gptAbortController) gptAbortController.abort(); return; }
+    if (gptIsSending) {
+        if (gptAbortController) gptAbortController.abort();
+        return;
+    }
+
     const text = inputEl.value.trim();
     if ((!text && gptPendingFiles.length === 0) || !currentSessionId) return;
 
-    const session = getCurrentSession(); if (!session) return;
+    const session = getCurrentSession();
+    if (!session) return;
+
+    const modeAtSend = currentGPTMode;
     const filesSnapshot = [...gptPendingFiles];
 
     if (session.messages.length === 0) {
-        let titleText = text || (filesSnapshot.length ? `上传了 ${filesSnapshot.length} 个附件` : '新聊天');
-        session.title = titleText.length > 12 ? titleText.substring(0, 12) + '...' : titleText;
+        const titleText = text || (filesSnapshot.length ? `上传了 ${filesSnapshot.length} 个附件` : '新聊天');
+        session.title = titleText.length > 18 ? titleText.substring(0, 18) + '...' : titleText;
     }
 
-    let imagesToSend = []; let docsText = ""; let mediaHtml = "";
-    
+    let imagesToSend = [];
+    let docsText = '';
+    let mediaHtml = '';
+
     filesSnapshot.forEach(f => {
-        if (f.type === 'image') { 
-            if (currentGPTMode === 'image') {
-                imagesToSend.push({ image: f.data, mask: f.mask });
-            } else {
-                imagesToSend.push(f.data);
-            }
-            mediaHtml += `<img src="${f.data}" class="gpt-user-image" onclick="openFull('${f.data}')">`; 
-        }
-        else if (f.type === 'document') { 
-            docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`; 
-            mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`; 
+        if (f.type === 'image') {
+            if (modeAtSend === 'image') imagesToSend.push({ image: f.data, name: f.name });
+            else imagesToSend.push(f.data);
+            mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
+        } else if (f.type === 'document') {
+            docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`;
+            mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`;
         }
     });
 
-    let textToSendToBackend = text + docsText;
+    const textToSendToBackend = text + docsText;
     session.messages.push({ role: 'user', content: textToSendToBackend, userText: text, mediaHtml });
-    session.updatedAt = Date.now(); saveSessions(); renderHistoryList();
+    session.updatedAt = Date.now();
+    saveSessions();
+    renderHistoryList();
 
-    inputEl.value = ''; clearGPTFile(); renderCurrentChat();
+    inputEl.value = '';
+    clearGPTFile();
+    renderCurrentChat();
+
     const thinkingObj = createThinkingMessage(textToSendToBackend, filesSnapshot);
-    gptIsSending = true; gptAbortController = new AbortController(); autoResizeGPT(inputEl);
-    
+    gptIsSending = true;
+    gptAbortController = new AbortController();
+    autoResizeGPT(inputEl);
+
     let finalReply = '';
     let outputEl = null;
-    const streamState = {
-        outputEl: null,
-        fullText: ''
-    };
+    const streamState = { outputEl: null, fullText: '' };
 
     try {
-        if (currentGPTMode === 'image') {
-            const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-image', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: gptAbortController.signal,
+        if (modeAtSend === 'image') {
+            const response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: gptAbortController.signal,
                 body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
             });
-            if (!response.ok) throw new Error((await response.json()).error || '画图请求失败');
+            if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '画图请求失败'));
             const data = await response.json();
-            
-            outputEl = prepareAssistantOutput(thinkingObj);
-            
-            const imgHtml = `<img src="${data.url}" class="message-image" onclick="openFull(this.src)" style="max-width: 300px; max-height: 300px; object-fit: contain; border-radius: 12px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">`;
-            const promptHtml = renderMarkdownSafe(`*💡 **优化提示词:** ${data.revised_prompt || ''}*`);
-            
-            outputEl.innerHTML = imgHtml + promptHtml;
-            
-            const chatArea = document.getElementById('gpt-chat-area');
-            chatArea.scrollTop = chatArea.scrollHeight;
-            
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})\n\n*💡 提示词: ${data.revised_prompt}*`;
+            if (!data.url) throw new Error('模型没有返回有效图片，请换一个提示词再试。');
 
+            outputEl = prepareAssistantOutput(thinkingObj);
+            const imgHtml = `<img src="${escapeAttr(data.url)}" class="message-image" onclick="openFull(this.src)" style="max-width: min(420px, 82vw); max-height: 420px; object-fit: contain; border-radius: 14px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 8px 28px rgba(0,0,0,0.12);">`;
+            const promptHtml = data.revised_prompt ? renderMarkdownSafe(`*💡 **优化提示词:** ${data.revised_prompt}*`) : '';
+            if (outputEl) outputEl.innerHTML = imgHtml + promptHtml;
+
+            const chatArea = document.getElementById('gpt-chat-area');
+            if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}`;
         } else {
-            const response = await fetch('https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net/api/ai-chat', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: gptAbortController.signal,
+            const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: gptAbortController.signal,
                 body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true })
             });
-            if (!response.ok) throw new Error(await response.text() || '网络请求失败');
+            if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '网络请求失败'));
+
             if ((response.headers.get('content-type') || '').includes('application/json')) {
-                outputEl = prepareAssistantOutput(thinkingObj); finalReply = (await response.json()).reply || ''; await typewriterMarkdown(outputEl, finalReply);
+                outputEl = prepareAssistantOutput(thinkingObj);
+                finalReply = (await response.json()).reply || '';
+                await typewriterMarkdown(outputEl, finalReply);
             } else {
                 finalReply = await consumeGPTStream(response, thinkingObj, streamState);
             }
@@ -3099,14 +3149,56 @@ async function sendGPTMessage() {
             outputEl.innerHTML = renderMarkdownSafe(finalReply);
         } else {
             if (thinkingObj.el) thinkingObj.el.remove();
-            document.getElementById('gpt-chat-area').insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${escapeHtml(err.message)}</div></div>`);
-            document.getElementById('gpt-chat-area').scrollTop = document.getElementById('gpt-chat-area').scrollHeight;
+            const chatArea = document.getElementById('gpt-chat-area');
+            const safeMsg = escapeHtml(err.message || '请求失败，请稍后再试');
+            if (chatArea) {
+                chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。</div></div></div>`);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
         }
     } finally {
-        gptIsSending = false; autoResizeGPT(inputEl);
-        if (finalReply) { session.messages.push({ role: 'assistant', content: finalReply }); session.updatedAt = Date.now(); saveSessions(); renderHistoryList(); }
+        gptIsSending = false;
+        autoResizeGPT(inputEl);
+        if (finalReply) {
+            session.messages.push({ role: 'assistant', content: finalReply });
+            session.updatedAt = Date.now();
+            saveSessions();
+            renderHistoryList();
+        }
     }
 }
+
+(function initGPTDragAndPasteUpload() {
+    const main = document.querySelector('.gpt-main');
+    const input = document.getElementById('gpt-input-el');
+    if (!main || !input) return;
+
+    ['dragenter', 'dragover'].forEach(type => {
+        main.addEventListener(type, e => {
+            if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+            e.preventDefault();
+            main.classList.add('drag-over');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(type => {
+        main.addEventListener(type, e => {
+            if (type === 'drop' && e.dataTransfer && e.dataTransfer.files.length > 0) {
+                e.preventDefault();
+                handleGPTFileSelect(e);
+            }
+            main.classList.remove('drag-over');
+        });
+    });
+
+    input.addEventListener('paste', e => {
+        const files = Array.from(e.clipboardData?.files || []);
+        if (files.length > 0) {
+            e.preventDefault();
+            handleGPTFileSelect({ dataTransfer: { files } });
+        }
+    });
+})();
 
 /* ============================================================
    幻灯片
