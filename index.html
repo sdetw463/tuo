@@ -12,6 +12,10 @@
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
 
     <style>
         * { 
@@ -353,11 +357,23 @@
         .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 { font-weight: bold; color: #c94f82; margin: 16px 0 8px 0; }
         .markdown-body ul, .markdown-body ol { margin-bottom: 8px; padding-left: 24px; line-height: 1.6; }
         .markdown-body li { margin-bottom: 4px; }
+        .markdown-body table { border-collapse: collapse; width: 100%; margin: 12px 0; display: block; overflow-x: auto; }
+        .markdown-body th, .markdown-body td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; }
+        .markdown-body th { background: #fff5f8; color: #c94f82; font-weight: 700; }
         .markdown-body strong { font-weight: 600; color: #FF1493; }
-        .markdown-body code { background: #f4f4f4 !important; color: #c94f82 !important; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; }
-        .markdown-body pre { background: #f7f7f8 !important; border: 1px solid #ececec !important; border-radius: 10px !important; padding: 12px; overflow-x: auto; margin: 10px 0; }
-        .markdown-body pre code { background: transparent !important; padding: 0; color: #333 !important; font-size: 13px; }
+        .markdown-body code:not(pre code) { background: #f4f4f4 !important; color: #c94f82 !important; padding: 2px 6px; border-radius: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.92em; }
+        .markdown-body pre { margin: 12px 0; }
+        .code-block-wrap { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; margin: 12px 0; box-shadow: 0 8px 22px rgba(0,0,0,0.12); max-width: 100%; }
+        .code-block-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #161b22; color: #c9d1d9; padding: 7px 10px; font-size: 12px; border-bottom: 1px solid #30363d; }
+        .code-block-lang { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #8b949e; text-transform: lowercase; }
+        .code-copy-btn { border: 1px solid #30363d; background: #21262d; color: #c9d1d9; border-radius: 7px; padding: 3px 8px; font-size: 12px; cursor: pointer; transition: 0.18s; }
+        .code-copy-btn:hover { background: #30363d; color: #fff; }
+        .code-block-wrap pre { background: #0d1117 !important; border: none !important; border-radius: 0 !important; padding: 14px; overflow-x: auto; margin: 0; }
+        .code-block-wrap pre code { background: transparent !important; padding: 0; color: #e6edf3 !important; font-size: 13px; line-height: 1.65; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: pre; }
         .markdown-body blockquote { border-left: 4px solid #FFB6C1; margin: 0 0 10px 0; padding-left: 12px; color: #666; background: rgba(255,240,245,0.5); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+        .math-inline { display: inline-block; max-width: 100%; overflow-x: auto; vertical-align: middle; }
+        .math-block { display: block; overflow-x: auto; overflow-y: hidden; margin: 12px 0; padding: 8px 10px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,182,193,0.25); border-radius: 10px; text-align: center; }
+        .katex-display { margin: 0 !important; }
         
         .markdown-body img {
             max-width: 300px;
@@ -1431,15 +1447,102 @@ function escapeAttr(str) {
         .replace(/>/g, '&gt;');
 }
 
-// 安全 Markdown 渲染：marked + DOMPurify
-function renderMarkdownSafe(text) {
-    const raw = marked.parse(text || '');
-    if (window.DOMPurify) {
-        return DOMPurify.sanitize(raw, {
-            ADD_ATTR: ['target', 'rel'],
-        });
+function protectMathSegments(text) {
+    const math = [];
+    let protectedText = String(text || '');
+    const stash = (display, content) => {
+        const token = `@@MATH_${math.length}@@`;
+        math.push({ display, content });
+        return token;
+    };
+
+    protectedText = protectedText.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => stash(true, expr));
+    protectedText = protectedText.replace(/\\\[([\s\S]+?)\\\]/g, (_, expr) => stash(true, expr));
+    protectedText = protectedText.replace(/\\\(([\s\S]+?)\\\)/g, (_, expr) => stash(false, expr));
+    protectedText = protectedText.replace(/(^|[^\\$])\$([^\n$]+?)\$/g, (m, prefix, expr) => `${prefix}${stash(false, expr)}`);
+    return { protectedText, math };
+}
+
+function renderMathHtml(expr, display) {
+    const source = String(expr || '').trim();
+    if (!source) return '';
+    if (!window.katex) return display ? `$$${escapeHtml(source)}$$` : `$${escapeHtml(source)}$`;
+    try {
+        return `<span class="${display ? 'math-block' : 'math-inline'}">${katex.renderToString(source, { displayMode: display, throwOnError: false, strict: false })}</span>`;
+    } catch {
+        return display ? `$$${escapeHtml(source)}$$` : `$${escapeHtml(source)}$`;
     }
-    return raw;
+}
+
+async function copyCodeBlock(btn) {
+    const wrap = btn && btn.closest('.code-block-wrap');
+    const code = wrap && wrap.querySelector('pre code');
+    if (!code) return;
+    try {
+        await navigator.clipboard.writeText(code.innerText || code.textContent || '');
+        btn.textContent = '已复制';
+        setTimeout(() => { btn.textContent = '复制'; }, 1400);
+    } catch {
+        btn.textContent = '复制失败';
+        setTimeout(() => { btn.textContent = '复制'; }, 1400);
+    }
+}
+
+function enhanceCodeBlocks(root) {
+    if (!root) return;
+    root.querySelectorAll('pre > code').forEach(code => {
+        if (code.closest('.code-block-wrap')) return;
+        const pre = code.parentElement;
+        const langClass = Array.from(code.classList).find(cls => cls.startsWith('language-')) || '';
+        const lang = (langClass.replace('language-', '') || 'text').toLowerCase();
+        if (window.hljs) {
+            try { hljs.highlightElement(code); } catch {}
+        }
+
+        const wrap = document.createElement('div');
+        wrap.className = 'code-block-wrap';
+        const header = document.createElement('div');
+        header.className = 'code-block-header';
+        const label = document.createElement('span');
+        label.className = 'code-block-lang';
+        label.textContent = lang;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'code-copy-btn';
+        btn.textContent = '复制';
+        btn.setAttribute('onclick', 'copyCodeBlock(this)');
+        header.appendChild(label);
+        header.appendChild(btn);
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(header);
+        wrap.appendChild(pre);
+    });
+}
+
+// 安全 Markdown 渲染：marked + DOMPurify + KaTeX + highlight.js
+function renderMarkdownSafe(text) {
+    const { protectedText, math } = protectMathSegments(text || '');
+    if (window.marked) {
+        marked.setOptions({ breaks: true, gfm: true, mangle: false, headerIds: false });
+    }
+    let raw = marked.parse(protectedText || '');
+    raw = raw.replace(/@@MATH_(\d+)@@/g, (_, index) => {
+        const item = math[Number(index)];
+        return item ? renderMathHtml(item.content, item.display) : '';
+    });
+
+    const safe = window.DOMPurify
+        ? DOMPurify.sanitize(raw, { ADD_ATTR: ['target', 'rel', 'class', 'data-language'], ADD_TAGS: ['span'] })
+        : raw;
+
+    const holder = document.createElement('div');
+    holder.innerHTML = safe;
+    holder.querySelectorAll('a[href]').forEach(a => {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+    });
+    enhanceCodeBlocks(holder);
+    return holder.innerHTML;
 }
 
 // 打开大图，统一做安全处理
@@ -2724,7 +2827,7 @@ function renderCurrentChat() {
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
                 <div class="gpt-content markdown-body">
-                    你好呀～我是TuoTuo，一个基于OpenAI的GPT-5.5模型打造的全能AI小助手～想和我聊聊天吗？
+                    你好呀～我是TuoTuo，一个基于目前世界上最强大的语言模型打造的全能AI小助手～想和我聊聊天吗？
                 </div>
             </div>
         `;
