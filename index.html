@@ -399,6 +399,28 @@
         .gpt-mode-chip { display: none; align-self: flex-start; align-items: center; gap: 6px; width: fit-content; max-width: 100%; border: 1px solid rgba(255,182,193,0.55); background: rgba(255,240,245,0.9); color: #c94f82; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
         .gpt-mode-chip.show { display: inline-flex; }
         .gpt-mode-chip button { border: none; background: transparent; color: #c94f82; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 1px 2px; }
+        .gpt-image-settings { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .gpt-image-settings.show { display: flex; }
+        .gpt-image-select-wrap { position: relative; }
+        .gpt-image-select-btn { border: none; background: rgba(0,0,0,0.06); color: #333; border-radius: 999px; padding: 7px 12px; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; transition: 0.18s; }
+        .gpt-image-select-btn:hover { background: rgba(0,0,0,0.1); }
+        .gpt-ratio-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 4px; display: inline-block; box-sizing: border-box; }
+        .gpt-ratio-icon.ratio-auto { width: 18px; height: 12px; border-radius: 3px; box-shadow: -4px 4px 0 -2px currentColor; }
+        .gpt-ratio-icon.ratio-1-1 { width: 16px; height: 16px; }
+        .gpt-ratio-icon.ratio-3-4 { width: 14px; height: 18px; }
+        .gpt-ratio-icon.ratio-9-16 { width: 11px; height: 20px; }
+        .gpt-ratio-icon.ratio-4-3 { width: 19px; height: 14px; }
+        .gpt-ratio-icon.ratio-16-9 { width: 22px; height: 12px; }
+        .gpt-image-options-menu { position: absolute; bottom: 42px; left: 0; width: 260px; background: rgba(255,255,255,0.98); border: 1px solid rgba(0,0,0,0.09); border-radius: 22px; padding: 14px; box-shadow: 0 18px 48px rgba(0,0,0,0.16); display: none; flex-direction: column; gap: 5px; z-index: 150; backdrop-filter: blur(20px); }
+        .gpt-image-options-menu.show { display: flex; animation: fadeIn 0.2s ease; }
+        .gpt-image-options-title { font-size: 14px; color: #999; padding: 2px 8px 8px; }
+        .gpt-image-option { border: none; background: transparent; display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 8px; border-radius: 13px; color: #222; cursor: pointer; font-size: 16px; text-align: left; }
+        .gpt-image-option:hover { background: rgba(0,0,0,0.055); }
+        .gpt-image-option.active::after { content: '✓'; margin-left: auto; font-size: 22px; line-height: 1; }
+        .gpt-image-option-muted { color: #888; }
+        .gpt-quality-chip { border: none; background: rgba(0,0,0,0.06); color: #333; border-radius: 999px; padding: 7px 12px; font-size: 14px; cursor: pointer; transition: 0.18s; }
+        .gpt-quality-chip.active { background: #172033; color: #fff; }
+        .gpt-image-help { font-size: 12px; color: #8a7180; padding-left: 4px; }
         .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; position: relative; }
 
         .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #FFB6C1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; transition: 0.2s; padding-bottom: 2px; }
@@ -1960,6 +1982,28 @@
                         <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
                     </div>
 
+                    <div class="gpt-image-settings" id="gpt-image-settings">
+                        <div class="gpt-image-select-wrap">
+                            <button type="button" class="gpt-image-select-btn" onclick="toggleImageRatioMenu(event)">
+                                <span class="gpt-ratio-icon ratio-auto" id="gpt-ratio-chip-icon"></span>
+                                <span id="gpt-ratio-chip-text">自动</span>
+                                <span>⌄</span>
+                            </button>
+                            <div class="gpt-image-options-menu" id="gpt-ratio-menu">
+                                <div class="gpt-image-options-title">选择图片宽高比</div>
+                                <button type="button" class="gpt-image-option" data-ratio="auto" onclick="setImageRatio('auto')"><span class="gpt-ratio-icon ratio-auto"></span><span>自动</span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="1:1" onclick="setImageRatio('1:1')"><span class="gpt-ratio-icon ratio-1-1"></span><span>方形 <span class="gpt-image-option-muted">1:1</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="3:4" onclick="setImageRatio('3:4')"><span class="gpt-ratio-icon ratio-3-4"></span><span>竖版 <span class="gpt-image-option-muted">3:4</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="9:16" onclick="setImageRatio('9:16')"><span class="gpt-ratio-icon ratio-9-16"></span><span>故事版 <span class="gpt-image-option-muted">9:16</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="4:3" onclick="setImageRatio('4:3')"><span class="gpt-ratio-icon ratio-4-3"></span><span>横版 <span class="gpt-image-option-muted">4:3</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="16:9" onclick="setImageRatio('16:9')"><span class="gpt-ratio-icon ratio-16-9"></span><span>宽屏 <span class="gpt-image-option-muted">16:9</span></span></button>
+                            </div>
+                        </div>
+                        <button type="button" class="gpt-quality-chip active" id="gpt-quality-chip" onclick="toggleImageQuality()">高清</button>
+                        <button type="button" class="gpt-quality-chip" id="gpt-4k-chip" onclick="toggleImage4K()">4K细节</button>
+                        <span class="gpt-image-help">4K 会强化细节提示；实际像素由 gpt-image-2 支持的尺寸决定。</span>
+                    </div>
+
                     <div class="gpt-input-controls">
                         <input type="file" id="gpt-image-upload" accept="image/*,.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.xml,.yaml,.yml,.py,.java,.c,.cpp,.h,.hpp,.cs,.go,.rs,.php,.rb,.swift,.kt,.sql,.sh,.bat,.ps1,.ini,.toml,.log,.doc,.docx,.xls,.xlsx,.pptx,.pdf" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
                         
@@ -2871,6 +2915,9 @@ let chatSessions = [];
 let currentSessionId = null;
 let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
+let currentImageRatio = 'auto';
+let currentImageQuality = 'high';
+let currentImageResolution = 'standard';
 
 // ✨ 从后端的数据库获取【属于自己】的聊天记录
 const myUserName = getStableUserName(); // 获取当前用户身份
@@ -2907,7 +2954,60 @@ document.addEventListener('click', (e) => {
     if (attachMenu && !e.target.closest('#gpt-attachment-menu') && !e.target.closest('.gpt-attach-btn')) {
         attachMenu.classList.remove('show');
     }
+    const ratioMenu = document.getElementById('gpt-ratio-menu');
+    if (ratioMenu && !e.target.closest('#gpt-ratio-menu') && !e.target.closest('.gpt-image-select-btn')) {
+        ratioMenu.classList.remove('show');
+    }
 });
+
+function ratioToIconClass(ratio) {
+    return 'ratio-' + String(ratio || 'auto').replace(':', '-');
+}
+
+function ratioLabel(ratio) {
+    const labels = { auto: '自动', '1:1': '方形 1:1', '3:4': '竖版 3:4', '9:16': '故事版 9:16', '4:3': '横版 4:3', '16:9': '宽屏 16:9' };
+    return labels[ratio] || labels.auto;
+}
+
+function toggleImageRatioMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('gpt-ratio-menu');
+    if (menu) menu.classList.toggle('show');
+}
+
+function setImageRatio(ratio) {
+    currentImageRatio = ['auto', '1:1', '3:4', '9:16', '4:3', '16:9'].includes(ratio) ? ratio : 'auto';
+    const chipText = document.getElementById('gpt-ratio-chip-text');
+    const chipIcon = document.getElementById('gpt-ratio-chip-icon');
+    if (chipText) chipText.textContent = ratioLabel(currentImageRatio);
+    if (chipIcon) chipIcon.className = `gpt-ratio-icon ${ratioToIconClass(currentImageRatio)}`;
+    document.querySelectorAll('.gpt-image-option[data-ratio]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.ratio === currentImageRatio);
+    });
+    const menu = document.getElementById('gpt-ratio-menu');
+    if (menu) menu.classList.remove('show');
+}
+
+function toggleImageQuality() {
+    currentImageQuality = currentImageQuality === 'high' ? 'low' : 'high';
+    const chip = document.getElementById('gpt-quality-chip');
+    if (chip) {
+        chip.classList.toggle('active', currentImageQuality === 'high');
+        chip.textContent = currentImageQuality === 'high' ? '高清' : '快速';
+    }
+}
+
+function toggleImage4K() {
+    currentImageResolution = currentImageResolution === '4k' ? 'standard' : '4k';
+    const chip = document.getElementById('gpt-4k-chip');
+    if (chip) chip.classList.toggle('active', currentImageResolution === '4k');
+}
+
+function updateImageSettingsVisibility() {
+    const settings = document.getElementById('gpt-image-settings');
+    if (settings) settings.classList.toggle('show', currentGPTMode === 'image');
+    setImageRatio(currentImageRatio);
+}
 
 function setGPTReasoningMode(mode) {
     if (!['normal', 'think', 'research'].includes(mode)) mode = 'normal';
@@ -2957,6 +3057,7 @@ function switchToImageMode() {
     if (chip) chip.classList.add('show');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chipText) chipText.textContent = '绘制图片';
+    updateImageSettingsVisibility();
     const thinkItem = document.getElementById('gpt-menu-think');
     const researchItem = document.getElementById('gpt-menu-research');
     if (thinkItem) thinkItem.classList.remove('active');
@@ -2970,6 +3071,7 @@ function switchToChatMode() {
     document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
     document.getElementById('gpt-menu-chat-mode').style.display = 'none';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
+    updateImageSettingsVisibility();
     const chip = document.getElementById('gpt-mode-chip');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chip && chipText) {
@@ -3953,17 +4055,23 @@ async function sendGPTMessage() {
         if (modeAtSend === 'image') {
             const imageTimeout = setTimeout(() => {
                 if (gptAbortController) gptAbortController.abort();
-            }, 180000);
+            }, 600000);
             let response;
             try {
                 response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     signal: gptAbortController.signal,
-                    body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
+                    body: JSON.stringify({
+                        prompt: textToSendToBackend,
+                        images: imagesToSend,
+                        ratio: currentImageRatio,
+                        quality: currentImageQuality,
+                        resolution: currentImageResolution
+                    })
                 });
             } catch (fetchErr) {
-                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了，请稍后再试，或先不要上传参考图直接画。');
+                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了（已等待约 10 分钟），请稍后再试，或先不要上传参考图直接画。');
                 throw new Error('画图请求连接失败。可能是参考图过大、后端正在重启，或图片生成接口超时。请刷新后重试，或先不要上传参考图直接画。');
             } finally {
                 clearTimeout(imageTimeout);
@@ -3974,12 +4082,13 @@ async function sendGPTMessage() {
 
             outputEl = prepareAssistantOutput(thinkingObj);
             const imgHtml = `<img src="${escapeAttr(data.url)}" class="message-image" onclick="openFull(this.src)" style="max-width: min(420px, 82vw); max-height: 420px; object-fit: contain; border-radius: 14px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 8px 28px rgba(0,0,0,0.12);">`;
-            const promptHtml = data.revised_prompt ? renderMarkdownSafe(`*💡 **优化提示词:** ${data.revised_prompt}*`) : '';
+            const metaText = `比例：${data.ratio || currentImageRatio}，尺寸：${data.size || '模型默认'}，质量：${data.quality || currentImageQuality}${data.resolution === '4k-intent' ? '，4K细节增强' : ''}`;
+            const promptHtml = renderMarkdownSafe(`${data.revised_prompt ? `*💡 **优化提示词:** ${data.revised_prompt}*\n\n` : ''}*🖼️ ${metaText}*`);
             if (outputEl) outputEl.innerHTML = imgHtml + promptHtml;
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}`;
+            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
                 method: 'POST',
