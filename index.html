@@ -1768,49 +1768,6 @@
     }
 }
 
-
-        /* ===== Smart TuoTuo 账号登录 & 后台管理 ===== */
-        .ai-auth-overlay, .admin-page-overlay {
-            position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center;
-            background: radial-gradient(circle at 30% 20%, rgba(255, 214, 230, 0.72), rgba(255, 240, 245, 0.52) 38%, rgba(255, 255, 255, 0.25)), rgba(80, 34, 56, 0.22);
-            backdrop-filter: blur(18px); padding: 20px;
-        }
-        .ai-auth-overlay.show, .admin-page-overlay.show { display: flex; }
-        .ai-auth-card, .admin-card {
-            width: min(92vw, 390px); border-radius: 30px; padding: 26px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.86), rgba(255,240,247,0.74));
-            border: 1px solid rgba(255,255,255,0.82);
-            box-shadow: 0 24px 70px rgba(201, 79, 130, 0.24), inset 0 1px 0 rgba(255,255,255,0.9);
-            color: #b83268; animation: login-appear 0.32s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        .admin-card { width: min(94vw, 860px); max-height: 86vh; overflow: hidden; display: flex; flex-direction: column; }
-        .ai-auth-title, .admin-title { font-size: 24px; font-weight: 800; color: #b83268; margin-bottom: 6px; letter-spacing: 0.02em; }
-        .ai-auth-subtitle, .admin-subtitle { font-size: 13px; color: #c982a0; margin-bottom: 18px; line-height: 1.55; }
-        .ai-auth-tabs { display: flex; gap: 8px; padding: 5px; background: rgba(255, 230, 240, 0.72); border-radius: 18px; margin-bottom: 16px; }
-        .ai-auth-tab { flex: 1; border: none; border-radius: 14px; padding: 10px 0; background: transparent; color: #c982a0; font-weight: 700; font-family: inherit; }
-        .ai-auth-tab.active { background: rgba(255,255,255,0.9); color: #b83268; box-shadow: 0 8px 20px rgba(184, 50, 104, 0.12); }
-        .ai-auth-input, .admin-input {
-            width: 100%; border: 1.5px solid #f4c8d9; background: rgba(255,255,255,0.86); color: #6f2f4a;
-            border-radius: 18px; padding: 12px 14px; outline: none; font-size: 14px; margin-bottom: 11px; font-family: inherit;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
-        }
-        .ai-auth-input:focus, .admin-input:focus { border-color: #e78ab0; box-shadow: 0 0 0 4px rgba(255, 182, 193, 0.22); }
-        .ai-auth-btn, .admin-btn {
-            width: 100%; border: none; border-radius: 18px; padding: 12px 16px; color: white; font-weight: 800; font-size: 15px;
-            background: linear-gradient(135deg, #ff9fbd, #d95b8d); box-shadow: 0 12px 28px rgba(217, 91, 141, 0.28); font-family: inherit;
-        }
-        .ai-auth-btn:hover, .admin-btn:hover { transform: translateY(-1px); box-shadow: 0 15px 34px rgba(217, 91, 141, 0.34); }
-        .ai-auth-msg, .admin-msg { min-height: 20px; margin-top: 11px; color: #d64f7c; font-size: 13px; line-height: 1.45; }
-        .ai-auth-close, .admin-close { float: right; border: none; background: rgba(255,255,255,0.65); color: #b83268; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; }
-        .gpt-account-pill { display: none; align-items: center; gap: 8px; font-size: 13px; color: #b83268; background: #fff0f5; border: 1px solid #f4c8d9; border-radius: 999px; padding: 7px 10px; }
-        #gpt-fullscreen.show .gpt-account-pill { display: flex; }
-        .gpt-account-pill button { border: none; background: transparent; color: #c982a0; font-family: inherit; }
-        .admin-toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
-        .admin-table-wrap { overflow: auto; border-radius: 20px; border: 1px solid #f4c8d9; background: rgba(255,255,255,0.58); }
-        .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #6f2f4a; }
-        .admin-table th, .admin-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid rgba(244, 200, 217, 0.72); white-space: nowrap; }
-        .admin-table th { color: #b83268; background: rgba(255,240,245,0.86); font-weight: 800; position: sticky; top: 0; }
-        .admin-login-panel { max-width: 360px; margin: 0 auto; width: 100%; }
     </style>
 </head>
 <body>
@@ -1965,48 +1922,6 @@
         <img id="full-image" src="" alt="预览">
     </div>
 
-    <div class="ai-auth-overlay" id="ai-auth-overlay" onclick="if(event.target===this) closeAIAuthModal()">
-        <div class="ai-auth-card">
-            <button class="ai-auth-close" onclick="closeAIAuthModal()">×</button>
-            <div class="ai-auth-title">Smart TuoTuo</div>
-            <div class="ai-auth-subtitle">注册或登录专属账号后，就可以进入 AI 聊天页面。账号名称不能重复哦～</div>
-            <div class="ai-auth-tabs">
-                <button class="ai-auth-tab active" id="ai-auth-login-tab" onclick="setAIAuthMode('login')">登录</button>
-                <button class="ai-auth-tab" id="ai-auth-register-tab" onclick="setAIAuthMode('register')">注册</button>
-            </div>
-            <input class="ai-auth-input" id="ai-auth-username" placeholder="账号名称" maxlength="32" autocomplete="username">
-            <input class="ai-auth-input" id="ai-auth-password" placeholder="密码" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitAIAuth()">
-            <button class="ai-auth-btn" id="ai-auth-submit" onclick="submitAIAuth()">登录并进入</button>
-            <div class="ai-auth-msg" id="ai-auth-msg"></div>
-        </div>
-    </div>
-
-    <div class="admin-page-overlay" id="admin-page-overlay">
-        <div class="admin-card">
-            <button class="admin-close" onclick="location.href='/'">×</button>
-            <div class="admin-title">TuoTuo 后台</div>
-            <div class="admin-subtitle">只显示 Smart TuoTuo AI 聊天账号，以及每个账号开启过多少个聊天对话窗口。</div>
-            <div class="admin-login-panel" id="admin-login-panel">
-                <input class="admin-input" id="admin-username" placeholder="后台账号" value="admin" autocomplete="username">
-                <input class="admin-input" id="admin-password" placeholder="后台密码" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitAdminLogin()">
-                <button class="admin-btn" onclick="submitAdminLogin()">进入后台</button>
-                <div class="admin-msg" id="admin-msg"></div>
-            </div>
-            <div id="admin-users-panel" style="display:none;">
-                <div class="admin-toolbar">
-                    <div id="admin-summary" style="color:#b83268;font-weight:700;"></div>
-                    <button class="admin-btn" style="width:auto;padding:9px 14px;font-size:13px;" onclick="loadAdminUsers()">刷新</button>
-                </div>
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead><tr><th>账号名称</th><th>聊天对话窗口数</th><th>注册时间</th><th>最近登录</th></tr></thead>
-                        <tbody id="admin-users-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="diary-overlay" id="diary-overlay" onclick="if(event.target===this) closeDiaryModal()">
         <div class="diary-modal">
             <div class="diary-modal-header">
@@ -2080,9 +1995,7 @@
                     </button>
                     <div class="gpt-model-selector" id="gpt-top-title">TuoTuo</div>
                 </div>
-                <div class="gpt-header-actions">
-                    <div class="gpt-account-pill" id="gpt-account-pill"><span id="gpt-account-name">未登录</span><button onclick="logoutAIAccount()">退出</button></div>
-                </div>
+                <div class="gpt-header-actions"></div>
             </div>
 
             <div class="gpt-chat-area" id="gpt-chat-area"></div>
@@ -3027,154 +2940,29 @@ document.addEventListener('click', (e) => {
 // ✨ 升级 1/3：初始化 IndexedDB 配置，移除同步读取 LocalStorage
 let chatSessions = [];
 let currentSessionId = null;
-let aiAccount = JSON.parse(sessionStorage.getItem('tuotuo_ai_account') || 'null');
-let aiAuthMode = 'login';
-let adminToken = sessionStorage.getItem('tuotuo_admin_token') || '';
 let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
 let currentImageRatio = 'auto';
 
-function getAIAuthHeaders() {
-    return aiAccount && aiAccount.token ? { 'Authorization': `Bearer ${aiAccount.token}` } : {};
-}
-
-function updateAIAccountUI() {
-    const nameEl = document.getElementById('gpt-account-name');
-    if (nameEl) nameEl.textContent = aiAccount ? aiAccount.username : '未登录';
-}
-
-async function loadAISessionsFromCloud() {
-    if (!aiAccount || !aiAccount.token) return;
-    try {
-        const res = await fetch(`${TUOTUO_API_BASE}/api/sessions`, { headers: getAIAuthHeaders() });
-        if (res.status === 401) {
-            aiAccount = null;
-            sessionStorage.removeItem('tuotuo_ai_account');
-            updateAIAccountUI();
-            openAIAuthModal('login');
-            return;
-        }
-        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '读取聊天记录失败'));
-        const data = await res.json();
+// ✨ 从后端的数据库获取【属于自己】的聊天记录
+const myUserName = getStableUserName(); // 获取当前用户身份
+fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
+    .then(res => res.json())
+    .then(data => {
         if (data && Array.isArray(data)) {
-            chatSessions = data.map(s => ({ pinned: false, createdAt: Date.now(), updatedAt: Date.now(), ...s }));
-            if (document.getElementById('gpt-fullscreen').classList.contains('show')) renderHistoryList();
+            chatSessions = data.map(s => ({
+                pinned: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                ...s
+            }));
+            // 如果面板已经打开，重新渲染一下历史列表
+            if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
+                renderHistoryList();
+            }
         }
-    } catch (err) {
-        console.error("从数据库读取 AI 历史失败:", err);
-    }
-}
+    }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
 
-function setAIAuthMode(mode) {
-    aiAuthMode = mode === 'register' ? 'register' : 'login';
-    document.getElementById('ai-auth-login-tab').classList.toggle('active', aiAuthMode === 'login');
-    document.getElementById('ai-auth-register-tab').classList.toggle('active', aiAuthMode === 'register');
-    document.getElementById('ai-auth-submit').textContent = aiAuthMode === 'login' ? '登录并进入' : '注册并进入';
-    document.getElementById('ai-auth-msg').textContent = '';
-}
-
-function openAIAuthModal(mode = 'login') {
-    setAIAuthMode(mode);
-    document.getElementById('ai-auth-overlay').classList.add('show');
-    setTimeout(() => document.getElementById('ai-auth-username')?.focus(), 50);
-}
-
-function closeAIAuthModal() {
-    document.getElementById('ai-auth-overlay').classList.remove('show');
-}
-
-async function submitAIAuth() {
-    const msg = document.getElementById('ai-auth-msg');
-    const username = document.getElementById('ai-auth-username').value.trim();
-    const password = document.getElementById('ai-auth-password').value;
-    if (!username || !password) { msg.textContent = '账号名称和密码都要填写哦。'; return; }
-    msg.textContent = aiAuthMode === 'login' ? '正在登录...' : '正在注册...';
-    try {
-        const res = await fetch(`${TUOTUO_API_BASE}/api/ai-auth/${aiAuthMode}`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password })
-        });
-        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, aiAuthMode === 'login' ? '登录失败' : '注册失败'));
-        const data = await res.json();
-        aiAccount = { username: data.username, token: data.token };
-        sessionStorage.setItem('tuotuo_ai_account', JSON.stringify(aiAccount));
-        chatSessions = [];
-        currentSessionId = null;
-        updateAIAccountUI();
-        closeAIAuthModal();
-        await loadAISessionsFromCloud();
-        openGPTWorkspace();
-    } catch (err) { msg.textContent = err.message || '操作失败，请稍后再试。'; }
-}
-
-function logoutAIAccount() {
-    if (aiAccount?.token) fetch(`${TUOTUO_API_BASE}/api/ai-auth/logout`, { method: 'POST', headers: getAIAuthHeaders() }).catch(() => {});
-    aiAccount = null;
-    sessionStorage.removeItem('tuotuo_ai_account');
-    chatSessions = [];
-    currentSessionId = null;
-    updateAIAccountUI();
-    toggleFullScreenGPT();
-}
-
-async function submitAdminLogin() {
-    const msg = document.getElementById('admin-msg');
-    const username = document.getElementById('admin-username').value.trim();
-    const password = document.getElementById('admin-password').value;
-    msg.textContent = '正在登录后台...';
-    try {
-        const res = await fetch(`${TUOTUO_API_BASE}/api/admin/login`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password })
-        });
-        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '后台登录失败'));
-        const data = await res.json();
-        adminToken = data.token;
-        sessionStorage.setItem('tuotuo_admin_token', adminToken);
-        msg.textContent = '';
-        await loadAdminUsers();
-    } catch (err) { msg.textContent = err.message || '后台登录失败，请稍后再试。'; }
-}
-
-function formatAdminTime(value) {
-    if (!value) return '—';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleString('zh-CN', { hour12: false });
-}
-
-async function loadAdminUsers() {
-    const msg = document.getElementById('admin-msg');
-    try {
-        const res = await fetch(`${TUOTUO_API_BASE}/api/admin/ai-users`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
-        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '读取用户列表失败'));
-        const users = await res.json();
-        document.getElementById('admin-login-panel').style.display = 'none';
-        document.getElementById('admin-users-panel').style.display = 'block';
-        document.getElementById('admin-summary').textContent = `共 ${users.length} 个 AI 聊天账号`;
-        document.getElementById('admin-users-body').innerHTML = users.map(u => `
-            <tr>
-                <td>${escapeHtml(u.username)}</td>
-                <td>${Number(u.chatCount || 0)}</td>
-                <td>${formatAdminTime(u.createdAt)}</td>
-                <td>${formatAdminTime(u.lastLoginAt)}</td>
-            </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center;color:#c982a0;">还没有用户注册</td></tr>';
-    } catch (err) {
-        document.getElementById('admin-login-panel').style.display = 'block';
-        document.getElementById('admin-users-panel').style.display = 'none';
-        if (msg) msg.textContent = err.message || '读取用户列表失败。';
-    }
-}
-
-function initAdminPageIfNeeded() {
-    if (location.pathname.replace(/\/$/, '') !== '/admin') return;
-    const overlay = document.getElementById('admin-page-overlay');
-    overlay.classList.add('show');
-    if (adminToken) loadAdminUsers();
-}
-
-loadAISessionsFromCloud();
-updateAIAccountUI();
-initAdminPageIfNeeded();
 
 function toggleGPTSidebar() {
     const container = document.getElementById('gpt-fullscreen');
@@ -3325,36 +3113,32 @@ function getCurrentSession() {
 
 async function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
-    if (!win.classList.contains('show') && (!aiAccount || !aiAccount.token)) {
-        openAIAuthModal('login');
-        return;
-    }
     win.classList.toggle('show');
 
-    if (win.classList.contains('show')) await openGPTWorkspace(false);
-}
+    if (win.classList.contains('show')) {
+        // 手机端默认收起侧栏，让聊天主体先完整显示
+        if (window.innerWidth <= 768) {
+            win.classList.add('sidebar-collapsed');
+        }
 
-async function openGPTWorkspace(ensureVisible = true) {
-    const win = document.getElementById('gpt-fullscreen');
-    if (ensureVisible) win.classList.add('show');
-    if (!win.classList.contains('show')) return;
-    updateAIAccountUI();
+        // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
+        try {
+            const data = await localforage.getItem('tuotuo_gpt_sessions');
+            if (data && Array.isArray(data)) {
+                chatSessions = data;
+            }
+        } catch(e) {}
 
-    // 手机端默认收起侧栏，让聊天主体先完整显示
-    if (window.innerWidth <= 768) {
-        win.classList.add('sidebar-collapsed');
-    }
+        renderHistoryList();
 
-    await loadAISessionsFromCloud();
-    renderHistoryList();
-
-    if (chatSessions.length === 0) {
-        startNewGPTChat();
-    } else if (!currentSessionId) {
-        const first = getSortedSessions()[0];
-        loadSession(first.id);
-    } else {
-        renderCurrentChat();
+        if (chatSessions.length === 0) {
+            startNewGPTChat();
+        } else if (!currentSessionId) {
+            const first = getSortedSessions()[0];
+            loadSession(first.id);
+        } else {
+            renderCurrentChat();
+        }
     }
 }
 
@@ -3485,12 +3269,12 @@ function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
         // ✨ 静默把聊天记录发给后端存入 Cosmos DB，并带上自己的名字
-        if (!aiAccount || !aiAccount.token) return;
         fetch(`${TUOTUO_API_BASE}/api/sessions`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                sessions: chatSessions
+                sessions: chatSessions,
+                userName: getStableUserName() // ✨ 告诉服务器这是谁的记录
             })
         }).catch(err => console.error("同步到云端数据库失败:", err));
     }, 1000); // 稍微防抖，避免高频发请求
@@ -4286,7 +4070,7 @@ async function sendGPTMessage() {
             try {
                 response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
+                    headers: { 'Content-Type': 'application/json' },
                     signal: gptAbortController.signal,
                     body: JSON.stringify({
                         prompt: textToSendToBackend,
@@ -4317,7 +4101,7 @@ async function sendGPTMessage() {
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
+                headers: { 'Content-Type': 'application/json' },
                 signal: gptAbortController.signal,
                 body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true, reasoningMode: currentReasoningMode })
             });
