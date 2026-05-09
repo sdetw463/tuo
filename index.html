@@ -396,9 +396,30 @@
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%); }
         .gpt-input-box { width: 100%; max-width: 800px; background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
         .gpt-input-box:focus-within { border-color: #FF69B4; background: #fff; box-shadow: 0 4px 20px rgba(255,105,180,0.2); }
-        .gpt-mode-chip { display: none; align-self: flex-start; align-items: center; gap: 6px; width: fit-content; max-width: 100%; border: 1px solid rgba(255,182,193,0.55); background: rgba(255,240,245,0.9); color: #c94f82; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
+        .gpt-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; align-self: flex-start; }
+        .gpt-mode-chip { display: none; align-items: center; gap: 8px; width: fit-content; max-width: 100%; min-height: 38px; border: 1px solid rgba(190,134,217,0.45); background: linear-gradient(135deg, rgba(255,240,250,0.72), rgba(248,244,255,0.62)); color: #7e3fa0; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 800; box-shadow: 0 10px 26px rgba(126,63,160,0.12), inset 0 1px 0 rgba(255,255,255,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .gpt-mode-chip.show { display: inline-flex; }
-        .gpt-mode-chip button { border: none; background: transparent; color: #c94f82; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 1px 2px; }
+        .gpt-mode-chip button { border: none; background: transparent; color: #7e3fa0; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 0 1px 2px; font-weight: 800; }
+        .gpt-image-settings { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .gpt-image-settings.show { display: flex; }
+        .gpt-image-select-wrap { position: relative; }
+        .gpt-image-select-btn { min-height: 38px; border: 1px solid rgba(190,134,217,0.45); background: linear-gradient(135deg, rgba(255,240,250,0.72), rgba(248,244,255,0.62)); color: #7e3fa0; border-radius: 999px; padding: 7px 16px; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.18s; box-shadow: 0 10px 26px rgba(126,63,160,0.12), inset 0 1px 0 rgba(255,255,255,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .gpt-image-select-btn:hover { background: linear-gradient(135deg, rgba(255,230,246,0.82), rgba(244,236,255,0.75)); transform: translateY(-1px); box-shadow: 0 12px 30px rgba(126,63,160,0.18); }
+        .gpt-ratio-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 4px; display: inline-block; box-sizing: border-box; background: rgba(255,255,255,0.42); color: #7e3fa0; }
+        .gpt-ratio-icon.ratio-auto { width: 18px; height: 12px; border-radius: 3px; box-shadow: -4px 4px 0 -2px currentColor; }
+        .gpt-ratio-icon.ratio-1-1 { width: 16px; height: 16px; }
+        .gpt-ratio-icon.ratio-3-4 { width: 14px; height: 18px; }
+        .gpt-ratio-icon.ratio-9-16 { width: 11px; height: 20px; }
+        .gpt-ratio-icon.ratio-4-3 { width: 19px; height: 14px; }
+        .gpt-ratio-icon.ratio-16-9 { width: 22px; height: 12px; }
+        .gpt-image-options-menu { position: absolute; bottom: 46px; left: 0; width: 216px; background: linear-gradient(135deg, rgba(255,248,252,0.78), rgba(248,244,255,0.72)); border: 1px solid rgba(190,134,217,0.36); border-radius: 19px; padding: 11px; box-shadow: 0 18px 46px rgba(126,63,160,0.16), inset 0 1px 0 rgba(255,255,255,0.72); display: none; flex-direction: column; gap: 4px; z-index: 150; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+        .gpt-image-options-menu.show { display: flex; animation: fadeIn 0.2s ease; }
+        .gpt-image-options-title { font-size: 12px; color: #7e3fa0; padding: 1px 7px 6px; font-weight: 800; }
+        .gpt-image-option { border: none; background: transparent; display: flex; align-items: center; gap: 11px; width: 100%; padding: 8px 8px; border-radius: 12px; color: #7e3fa0; cursor: pointer; font-size: 13px; text-align: left; font-weight: 800; }
+        .gpt-image-option:hover { background: rgba(255,255,255,0.5); color: #7e3fa0; }
+        .gpt-image-option.active { background: rgba(230,204,245,0.48); color: #7e3fa0; font-weight: 900; }
+        .gpt-image-option.active::after { content: '✓'; margin-left: auto; font-size: 18px; line-height: 1; color: #7e3fa0; }
+        .gpt-image-option-muted { color: #a875bd; }
         .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; position: relative; }
 
         .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #FFB6C1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; transition: 0.2s; padding-bottom: 2px; }
@@ -427,13 +448,13 @@
         .gpt-disclaimer { font-size: 12px; color: #aaa; margin-top: 10px; text-align: center; }
 
         /* 附件弹出菜单样式 */
-        .gpt-attachment-menu { position: absolute; bottom: 46px; left: 0; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.09); border-radius: 20px; padding: 10px; box-shadow: 0 14px 36px rgba(0,0,0,0.14); display: none; flex-direction: column; gap: 3px; z-index: 100; min-width: 218px; }
+        .gpt-attachment-menu { position: absolute; bottom: 46px; left: 0; background: linear-gradient(135deg, rgba(255,248,252,0.8), rgba(255,241,248,0.72)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,151,190,0.4); border-radius: 19px; padding: 10px; box-shadow: 0 18px 46px rgba(255,105,180,0.18), inset 0 1px 0 rgba(255,255,255,0.72); display: none; flex-direction: column; gap: 4px; z-index: 100; min-width: 191px; }
         .gpt-attachment-menu.show { display: flex; animation: fadeIn 0.2s ease; }
-        .gpt-menu-item { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 12px; cursor: pointer; font-size: 16px; color: #222; transition: 0.18s; font-weight: 500; line-height: 1.25; }
-        .gpt-menu-item:hover { background: rgba(0,0,0,0.055); color: #111; }
-        .gpt-menu-item.active { background: rgba(255, 182, 193, 0.22); color: #c94f82; }
-        .gpt-menu-item svg { flex-shrink: 0; width: 21px; height: 21px; color: currentColor; }
-        .gpt-menu-divider { height: 1px; background: rgba(0,0,0,0.1); margin: 5px 4px; }
+        .gpt-menu-item { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 12px; cursor: pointer; font-size: 13px; color: #ff69a6; transition: 0.18s; font-weight: 900; line-height: 1.25; }
+        .gpt-menu-item:hover { background: rgba(255,255,255,0.5); color: #ff4f99; }
+        .gpt-menu-item.active { background: rgba(255,213,231,0.58); color: #ff4f99; }
+        .gpt-menu-item svg { flex-shrink: 0; width: 17px; height: 17px; color: currentColor; }
+        .gpt-menu-divider { height: 1px; background: rgba(255,105,180,0.16); margin: 6px 4px; }
 
         /* ===== 响应式 ===== */
         /* ============================================================
@@ -1126,6 +1147,670 @@
         border-radius: 0;
     }
 }
+
+/* ===================================================================
+   Smart TuoTuo AI 蓝灰系精修层：更接近 ChatGPT 的聊天工作台
+=================================================================== */
+.gpt-fullscreen {
+    background: #ffffff !important;
+    color: #172033;
+}
+
+#ai-entry-card.ai-entry-card {
+    border-color: rgba(96, 165, 250, 0.36) !important;
+    background: rgba(248, 251, 255, 0.52) !important;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12) !important;
+}
+
+#ai-entry-card.ai-entry-card:hover {
+    background: rgba(239, 246, 255, 0.68) !important;
+    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.18) !important;
+}
+
+#ai-entry-card.ai-entry-card > div:first-child {
+    background: linear-gradient(135deg, #2563eb, #38bdf8) !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.28) !important;
+}
+
+#ai-entry-card.ai-entry-card > div:last-child,
+#gpt-top-title {
+    color: #172033 !important;
+}
+
+#gpt-top-title span {
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+.gpt-sidebar {
+    background: #f7f8fb !important;
+    border-right: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+}
+
+.gpt-new-chat-btn {
+    background: #ffffff !important;
+    border: 1px solid #d8e2f0 !important;
+    color: #172033 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.gpt-new-chat-btn:hover,
+.gpt-btn-icon:hover,
+.gpt-toggle-sidebar-btn:hover,
+.gpt-history-item:hover,
+.gpt-back-home:hover {
+    background: #eaf2ff !important;
+    color: #1d4ed8 !important;
+}
+
+.gpt-btn-icon,
+.gpt-toggle-sidebar-btn,
+.gpt-history-title,
+.gpt-pin-mark {
+    color: #2563eb !important;
+}
+
+.gpt-history-item {
+    color: #374151 !important;
+}
+
+.gpt-history-item.active {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+    font-weight: 700 !important;
+}
+
+.gpt-history-more:hover,
+.gpt-session-menu button:hover {
+    background: #eaf2ff !important;
+    color: #1d4ed8 !important;
+}
+
+.gpt-session-menu {
+    border-color: #d8e2f0 !important;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14) !important;
+}
+
+.gpt-sidebar-bottom {
+    border-top: 1px solid #e5e7eb !important;
+}
+
+.gpt-back-home {
+    color: #334155 !important;
+}
+
+.gpt-header {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-bottom: 1px solid #eef2f7 !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.gpt-model-selector {
+    color: #172033 !important;
+}
+
+.gpt-chat-area {
+    background: #ffffff !important;
+}
+
+.gpt-main.drag-over::after {
+    border-color: rgba(37, 99, 235, 0.45) !important;
+    background: rgba(239, 246, 255, 0.84) !important;
+    color: #1d4ed8 !important;
+}
+
+.gpt-status-pill,
+.gpt-mode-chip {
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+}
+
+.gpt-mode-chip button {
+    color: #1d4ed8 !important;
+}
+
+.gpt-avatar {
+    box-shadow: 0 5px 16px rgba(37, 99, 235, 0.16) !important;
+}
+
+.gpt-avatar-ai {
+    background: linear-gradient(135deg, #1d4ed8, #0ea5e9) !important;
+    color: #ffffff !important;
+}
+
+.gpt-avatar-user {
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+}
+
+.gpt-msg-container.user .gpt-content {
+    background: #eff6ff !important;
+    border: 1px solid #dbeafe !important;
+    color: #172033 !important;
+    box-shadow: none !important;
+}
+
+.gpt-msg-container.ai .gpt-content,
+.markdown-body {
+    color: #172033 !important;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+    color: #1e3a8a !important;
+}
+
+.markdown-body strong {
+    color: #1d4ed8 !important;
+}
+
+.markdown-body a {
+    color: #2563eb !important;
+    text-decoration-color: rgba(37, 99, 235, 0.35);
+}
+
+.markdown-body th {
+    background: #eff6ff !important;
+    color: #1e3a8a !important;
+}
+
+.markdown-body code:not(pre code) {
+    background: #edf2f7 !important;
+    color: #1e3a8a !important;
+}
+
+.markdown-body blockquote {
+    border-left-color: #60a5fa !important;
+    background: #f3f7ff !important;
+    color: #475569 !important;
+}
+
+.math-block {
+    border-color: #dbeafe !important;
+    background: #f8fbff !important;
+}
+
+.gpt-thinking-content {
+    color: #2563eb !important;
+}
+
+.gpt-thinking-title {
+    color: #1d4ed8 !important;
+}
+
+.gpt-thinking-detail {
+    color: #64748b !important;
+}
+
+.gpt-input-wrapper {
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%) !important;
+}
+
+.gpt-input-box {
+    background: #ffffff !important;
+    border: 1px solid #d8e2f0 !important;
+    box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10) !important;
+}
+
+.gpt-input-box:focus-within {
+    border-color: #60a5fa !important;
+    box-shadow: 0 14px 38px rgba(37, 99, 235, 0.14) !important;
+}
+
+.gpt-attach-btn {
+    color: #64748b !important;
+}
+
+.gpt-attach-btn:hover {
+    background: #eaf2ff !important;
+    color: #1d4ed8 !important;
+}
+
+.gpt-textarea {
+    color: #172033 !important;
+}
+
+.gpt-textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.gpt-send-btn {
+    background: #172033 !important;
+    color: #ffffff !important;
+}
+
+.gpt-send-btn:hover {
+    background: #1d4ed8 !important;
+    box-shadow: 0 7px 18px rgba(37, 99, 235, 0.25) !important;
+}
+
+.gpt-send-btn:disabled {
+    background: #d8e2f0 !important;
+    color: #ffffff !important;
+}
+
+.gpt-file-preview {
+    border-bottom-color: #dbeafe !important;
+}
+
+.gpt-preview-card .file-icon-box,
+.gpt-user-file-card {
+    background: #eff6ff !important;
+    color: #1e40af !important;
+}
+
+.gpt-attachment-menu {
+    border: 1px solid #d8e2f0 !important;
+    box-shadow: 0 18px 46px rgba(15, 23, 42, 0.16) !important;
+}
+
+.gpt-menu-item {
+    color: #172033 !important;
+}
+
+.gpt-menu-item:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+.gpt-menu-item.active {
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+}
+
+.gpt-error-actions {
+    color: #475569 !important;
+}
+
+@media (max-width: 768px) {
+    .gpt-sidebar,
+    .gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        background: #f7f8fb !important;
+        border-right: 1px solid #e5e7eb !important;
+        box-shadow: 12px 0 34px rgba(15, 23, 42, 0.16) !important;
+    }
+
+    .gpt-header {
+        border-bottom-color: #eef2f7 !important;
+    }
+
+    .gpt-back-home {
+        background: #eaf2ff !important;
+    }
+}
+
+/* ===================================================================
+   Smart TuoTuo AI 柔粉精修层：恢复主页入口，仅重绘全屏聊天界面
+=================================================================== */
+#ai-entry-card.ai-entry-card {
+    background: rgba(255,255,255,0.3) !important;
+    border: 1px solid rgba(255,255,255,0.5) !important;
+    box-shadow: 0 4px 15px rgba(255,182,193,0.2) !important;
+}
+
+#ai-entry-card.ai-entry-card:hover {
+    background: rgba(255,255,255,0.5) !important;
+    box-shadow: 0 8px 20px rgba(255,105,180,0.3) !important;
+}
+
+#ai-entry-card.ai-entry-card > div:first-child {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+#ai-entry-card.ai-entry-card > div:last-child {
+    color: #c94f82 !important;
+}
+
+#gpt-fullscreen.gpt-fullscreen {
+    background: #fffdfd !important;
+    color: #2a2028;
+}
+
+#gpt-fullscreen .gpt-sidebar {
+    background: #fbf7f9 !important;
+    border-right: 1px solid #eadde4 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-new-chat-btn {
+    background: #ffffff !important;
+    border: 1px solid #eadde4 !important;
+    color: #33242d !important;
+    box-shadow: 0 1px 2px rgba(67, 42, 56, 0.04) !important;
+}
+
+#gpt-fullscreen .gpt-new-chat-btn:hover,
+#gpt-fullscreen .gpt-btn-icon:hover,
+#gpt-fullscreen .gpt-toggle-sidebar-btn:hover,
+#gpt-fullscreen .gpt-history-item:hover,
+#gpt-fullscreen .gpt-back-home:hover {
+    background: #fff0f5 !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-btn-icon,
+#gpt-fullscreen .gpt-toggle-sidebar-btn,
+#gpt-fullscreen .gpt-history-title,
+#gpt-fullscreen .gpt-pin-mark {
+    color: #c94f82 !important;
+}
+
+#gpt-fullscreen .gpt-history-item {
+    color: #5f4b58 !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    background: #fbe3ed !important;
+    color: #9f2f5d !important;
+    font-weight: 700 !important;
+}
+
+#gpt-fullscreen .gpt-history-more:hover,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    background: #fff0f5 !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-session-menu {
+    border-color: #eadde4 !important;
+    box-shadow: 0 18px 42px rgba(67, 42, 56, 0.14) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-bottom {
+    border-top: 1px solid #eadde4 !important;
+}
+
+#gpt-fullscreen .gpt-back-home {
+    color: #5f4b58 !important;
+}
+
+#gpt-fullscreen .gpt-header {
+    background: rgba(255, 253, 253, 0.9) !important;
+    border-bottom: 1px solid #f0e6eb !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+#gpt-fullscreen .gpt-model-selector,
+#gpt-top-title {
+    color: #2a2028 !important;
+}
+
+#gpt-top-title span {
+    color: #b83268 !important;
+    background: #fff0f5 !important;
+    border: 1px solid #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-chat-area {
+    background: #fffdfd !important;
+}
+
+#gpt-fullscreen .gpt-main.drag-over::after {
+    border-color: rgba(201, 79, 130, 0.45) !important;
+    background: rgba(255, 240, 245, 0.86) !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-status-pill,
+#gpt-fullscreen .gpt-mode-chip {
+    color: #b83268 !important;
+    background: #fff0f5 !important;
+    border-color: #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip button {
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-image-select-btn,
+#gpt-fullscreen .gpt-image-options-title,
+#gpt-fullscreen .gpt-image-option,
+#gpt-fullscreen .gpt-image-option:hover,
+#gpt-fullscreen .gpt-image-option.active,
+#gpt-fullscreen .gpt-image-option.active::after,
+#gpt-fullscreen .gpt-ratio-icon {
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-image-select-btn {
+    border-color: #f4c8d9 !important;
+    background: #fff0f5 !important;
+    box-shadow: 0 10px 26px rgba(184, 50, 104, 0.12), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+}
+
+#gpt-fullscreen .gpt-image-options-menu {
+    border-color: #f4c8d9 !important;
+    box-shadow: 0 18px 46px rgba(184, 50, 104, 0.16), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+}
+
+#gpt-fullscreen .gpt-image-option.active {
+    background: #fbe3ed !important;
+}
+
+#gpt-fullscreen .gpt-image-option-muted {
+    color: #c982a0 !important;
+}
+
+#gpt-fullscreen .gpt-avatar {
+    box-shadow: 0 5px 16px rgba(201, 79, 130, 0.15) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-ai {
+    background: linear-gradient(135deg, #b83268, #e58aad) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-avatar-user {
+    color: #b83268 !important;
+    border-color: #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background: #fff0f5 !important;
+    border: 1px solid #f7d7e4 !important;
+    color: #2a2028 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .markdown-body {
+    color: #2a2028 !important;
+}
+
+#gpt-fullscreen .markdown-body h1,
+#gpt-fullscreen .markdown-body h2,
+#gpt-fullscreen .markdown-body h3,
+#gpt-fullscreen .markdown-body h4 {
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .markdown-body strong,
+#gpt-fullscreen .markdown-body a {
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .markdown-body a {
+    text-decoration-color: rgba(184, 50, 104, 0.35);
+}
+
+#gpt-fullscreen .markdown-body th {
+    background: #fff0f5 !important;
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .markdown-body code:not(pre code) {
+    background: #f7eef3 !important;
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .markdown-body blockquote {
+    border-left-color: #e58aad !important;
+    background: #fff5f8 !important;
+    color: #6b5360 !important;
+}
+
+#gpt-fullscreen .math-block {
+    border-color: #f4c8d9 !important;
+    background: #fff8fa !important;
+}
+
+#gpt-fullscreen .gpt-thinking-content,
+#gpt-fullscreen .gpt-thinking-title {
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-thinking-detail {
+    color: #8a7180 !important;
+}
+
+#gpt-fullscreen .gpt-input-wrapper {
+    background: linear-gradient(180deg, rgba(255,253,253,0) 0%, #fffdfd 30%) !important;
+}
+
+#gpt-fullscreen .gpt-input-box {
+    background: #ffffff !important;
+    border: 1px solid #eadde4 !important;
+    box-shadow: 0 12px 34px rgba(67, 42, 56, 0.10) !important;
+}
+
+#gpt-fullscreen .gpt-input-box:focus-within {
+    border-color: #e58aad !important;
+    box-shadow: 0 14px 38px rgba(201, 79, 130, 0.14) !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn {
+    color: #8a7180 !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn:hover {
+    background: #fff0f5 !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-textarea {
+    color: #2a2028 !important;
+}
+
+#gpt-fullscreen .gpt-textarea::placeholder {
+    color: #aa96a2 !important;
+}
+
+#gpt-fullscreen .gpt-send-btn {
+    background: #2a2028 !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:hover {
+    background: #b83268 !important;
+    box-shadow: 0 7px 18px rgba(184, 50, 104, 0.24) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:disabled {
+    background: #eadde4 !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-file-preview {
+    border-bottom-color: #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-preview-card .file-icon-box,
+#gpt-fullscreen .gpt-user-file-card {
+    background: #fff0f5 !important;
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .gpt-attachment-menu {
+    border: 1px solid #eadde4 !important;
+    box-shadow: 0 18px 46px rgba(67, 42, 56, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item {
+    color: #2a2028 !important;
+}
+
+#gpt-fullscreen .gpt-menu-item:hover {
+    background: #f8f1f5 !important;
+    color: #2a2028 !important;
+}
+
+#gpt-fullscreen .gpt-menu-item.active {
+    background: #fbe3ed !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-error-actions {
+    color: #6b5360 !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-sidebar,
+    #gpt-fullscreen.gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        background: #fbf7f9 !important;
+        border-right: 1px solid #eadde4 !important;
+        box-shadow: 12px 0 34px rgba(67, 42, 56, 0.15) !important;
+    }
+
+    #gpt-fullscreen .gpt-header {
+        border-bottom-color: #f0e6eb !important;
+    }
+
+    #gpt-fullscreen .gpt-back-home {
+        background: #fff0f5 !important;
+    }
+}
+
+
+        /* ===== Smart TuoTuo 账号登录 & 后台管理 ===== */
+        .ai-auth-overlay, .admin-page-overlay {
+            position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 214, 230, 0.72), rgba(255, 240, 245, 0.52) 38%, rgba(255, 255, 255, 0.25)), rgba(80, 34, 56, 0.22);
+            backdrop-filter: blur(18px); padding: 20px;
+        }
+        .ai-auth-overlay.show, .admin-page-overlay.show { display: flex; }
+        .ai-auth-card, .admin-card {
+            width: min(92vw, 390px); border-radius: 30px; padding: 26px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.86), rgba(255,240,247,0.74));
+            border: 1px solid rgba(255,255,255,0.82);
+            box-shadow: 0 24px 70px rgba(201, 79, 130, 0.24), inset 0 1px 0 rgba(255,255,255,0.9);
+            color: #b83268; animation: login-appear 0.32s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .admin-card { width: min(94vw, 860px); max-height: 86vh; overflow: hidden; display: flex; flex-direction: column; }
+        .ai-auth-title, .admin-title { font-size: 24px; font-weight: 800; color: #b83268; margin-bottom: 6px; letter-spacing: 0.02em; }
+        .ai-auth-subtitle, .admin-subtitle { font-size: 13px; color: #c982a0; margin-bottom: 18px; line-height: 1.55; }
+        .ai-auth-tabs { display: flex; gap: 8px; padding: 5px; background: rgba(255, 230, 240, 0.72); border-radius: 18px; margin-bottom: 16px; }
+        .ai-auth-tab { flex: 1; border: none; border-radius: 14px; padding: 10px 0; background: transparent; color: #c982a0; font-weight: 700; font-family: inherit; }
+        .ai-auth-tab.active { background: rgba(255,255,255,0.9); color: #b83268; box-shadow: 0 8px 20px rgba(184, 50, 104, 0.12); }
+        .ai-auth-input, .admin-input {
+            width: 100%; border: 1.5px solid #f4c8d9; background: rgba(255,255,255,0.86); color: #6f2f4a;
+            border-radius: 18px; padding: 12px 14px; outline: none; font-size: 14px; margin-bottom: 11px; font-family: inherit;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+        }
+        .ai-auth-input:focus, .admin-input:focus { border-color: #e78ab0; box-shadow: 0 0 0 4px rgba(255, 182, 193, 0.22); }
+        .ai-auth-btn, .admin-btn {
+            width: 100%; border: none; border-radius: 18px; padding: 12px 16px; color: white; font-weight: 800; font-size: 15px;
+            background: linear-gradient(135deg, #ff9fbd, #d95b8d); box-shadow: 0 12px 28px rgba(217, 91, 141, 0.28); font-family: inherit;
+        }
+        .ai-auth-btn:hover, .admin-btn:hover { transform: translateY(-1px); box-shadow: 0 15px 34px rgba(217, 91, 141, 0.34); }
+        .ai-auth-msg, .admin-msg { min-height: 20px; margin-top: 11px; color: #d64f7c; font-size: 13px; line-height: 1.45; }
+        .ai-auth-close, .admin-close { float: right; border: none; background: rgba(255,255,255,0.65); color: #b83268; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; }
+        .gpt-account-pill { display: none; align-items: center; gap: 8px; font-size: 13px; color: #b83268; background: #fff0f5; border: 1px solid #f4c8d9; border-radius: 999px; padding: 7px 10px; }
+        #gpt-fullscreen.show .gpt-account-pill { display: flex; }
+        .gpt-account-pill button { border: none; background: transparent; color: #c982a0; font-family: inherit; }
+        .admin-toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
+        .admin-table-wrap { overflow: auto; border-radius: 20px; border: 1px solid #f4c8d9; background: rgba(255,255,255,0.58); }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #6f2f4a; }
+        .admin-table th, .admin-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid rgba(244, 200, 217, 0.72); white-space: nowrap; }
+        .admin-table th { color: #b83268; background: rgba(255,240,245,0.86); font-weight: 800; position: sticky; top: 0; }
+        .admin-login-panel { max-width: 360px; margin: 0 auto; width: 100%; }
     </style>
 </head>
 <body>
@@ -1280,6 +1965,48 @@
         <img id="full-image" src="" alt="预览">
     </div>
 
+    <div class="ai-auth-overlay" id="ai-auth-overlay" onclick="if(event.target===this) closeAIAuthModal()">
+        <div class="ai-auth-card">
+            <button class="ai-auth-close" onclick="closeAIAuthModal()">×</button>
+            <div class="ai-auth-title">Smart TuoTuo</div>
+            <div class="ai-auth-subtitle">注册或登录专属账号后，就可以进入 AI 聊天页面。账号名称不能重复哦～</div>
+            <div class="ai-auth-tabs">
+                <button class="ai-auth-tab active" id="ai-auth-login-tab" onclick="setAIAuthMode('login')">登录</button>
+                <button class="ai-auth-tab" id="ai-auth-register-tab" onclick="setAIAuthMode('register')">注册</button>
+            </div>
+            <input class="ai-auth-input" id="ai-auth-username" placeholder="账号名称" maxlength="32" autocomplete="username">
+            <input class="ai-auth-input" id="ai-auth-password" placeholder="密码" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitAIAuth()">
+            <button class="ai-auth-btn" id="ai-auth-submit" onclick="submitAIAuth()">登录并进入</button>
+            <div class="ai-auth-msg" id="ai-auth-msg"></div>
+        </div>
+    </div>
+
+    <div class="admin-page-overlay" id="admin-page-overlay">
+        <div class="admin-card">
+            <button class="admin-close" onclick="location.href='/'">×</button>
+            <div class="admin-title">TuoTuo 后台</div>
+            <div class="admin-subtitle">只显示 Smart TuoTuo AI 聊天账号，以及每个账号开启过多少个聊天对话窗口。</div>
+            <div class="admin-login-panel" id="admin-login-panel">
+                <input class="admin-input" id="admin-username" placeholder="后台账号" value="admin" autocomplete="username">
+                <input class="admin-input" id="admin-password" placeholder="后台密码" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitAdminLogin()">
+                <button class="admin-btn" onclick="submitAdminLogin()">进入后台</button>
+                <div class="admin-msg" id="admin-msg"></div>
+            </div>
+            <div id="admin-users-panel" style="display:none;">
+                <div class="admin-toolbar">
+                    <div id="admin-summary" style="color:#b83268;font-weight:700;"></div>
+                    <button class="admin-btn" style="width:auto;padding:9px 14px;font-size:13px;" onclick="loadAdminUsers()">刷新</button>
+                </div>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead><tr><th>账号名称</th><th>聊天对话窗口数</th><th>注册时间</th><th>最近登录</th></tr></thead>
+                        <tbody id="admin-users-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="diary-overlay" id="diary-overlay" onclick="if(event.target===this) closeDiaryModal()">
         <div class="diary-modal">
             <div class="diary-modal-header">
@@ -1353,7 +2080,9 @@
                     </button>
                     <div class="gpt-model-selector" id="gpt-top-title">TuoTuo</div>
                 </div>
-                <div class="gpt-header-actions"></div>
+                <div class="gpt-header-actions">
+                    <div class="gpt-account-pill" id="gpt-account-pill"><span id="gpt-account-name">未登录</span><button onclick="logoutAIAccount()">退出</button></div>
+                </div>
             </div>
 
             <div class="gpt-chat-area" id="gpt-chat-area"></div>
@@ -1363,9 +2092,30 @@
                     
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
-                    <div class="gpt-mode-chip" id="gpt-mode-chip">
-                        <span id="gpt-mode-chip-text">普通</span>
-                        <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
+                    <div class="gpt-mode-row">
+                        <div class="gpt-mode-chip" id="gpt-mode-chip">
+                            <span id="gpt-mode-chip-text">普通</span>
+                            <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
+                        </div>
+
+                        <div class="gpt-image-settings" id="gpt-image-settings">
+                        <div class="gpt-image-select-wrap">
+                            <button type="button" class="gpt-image-select-btn" onclick="toggleImageRatioMenu(event)">
+                                <span class="gpt-ratio-icon ratio-auto" id="gpt-ratio-chip-icon"></span>
+                                <span id="gpt-ratio-chip-text">自动</span>
+                                <span>⌄</span>
+                            </button>
+                            <div class="gpt-image-options-menu" id="gpt-ratio-menu">
+                                <div class="gpt-image-options-title">选择图片宽高比</div>
+                                <button type="button" class="gpt-image-option" data-ratio="auto" onclick="setImageRatio('auto')"><span class="gpt-ratio-icon ratio-auto"></span><span>自动</span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="1:1" onclick="setImageRatio('1:1')"><span class="gpt-ratio-icon ratio-1-1"></span><span>方形 <span class="gpt-image-option-muted">1:1</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="3:4" onclick="setImageRatio('3:4')"><span class="gpt-ratio-icon ratio-3-4"></span><span>竖版 <span class="gpt-image-option-muted">3:4</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="9:16" onclick="setImageRatio('9:16')"><span class="gpt-ratio-icon ratio-9-16"></span><span>故事版 <span class="gpt-image-option-muted">9:16</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="4:3" onclick="setImageRatio('4:3')"><span class="gpt-ratio-icon ratio-4-3"></span><span>横版 <span class="gpt-image-option-muted">4:3</span></span></button>
+                                <button type="button" class="gpt-image-option" data-ratio="16:9" onclick="setImageRatio('16:9')"><span class="gpt-ratio-icon ratio-16-9"></span><span>宽屏 <span class="gpt-image-option-muted">16:9</span></span></button>
+                            </div>
+                        </div>
+                        </div>
                     </div>
 
                     <div class="gpt-input-controls">
@@ -2277,28 +3027,154 @@ document.addEventListener('click', (e) => {
 // ✨ 升级 1/3：初始化 IndexedDB 配置，移除同步读取 LocalStorage
 let chatSessions = [];
 let currentSessionId = null;
+let aiAccount = JSON.parse(sessionStorage.getItem('tuotuo_ai_account') || 'null');
+let aiAuthMode = 'login';
+let adminToken = sessionStorage.getItem('tuotuo_admin_token') || '';
 let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
+let currentImageRatio = 'auto';
 
-// ✨ 从后端的数据库获取【属于自己】的聊天记录
-const myUserName = getStableUserName(); // 获取当前用户身份
-fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
-    .then(res => res.json())
-    .then(data => {
-        if (data && Array.isArray(data)) {
-            chatSessions = data.map(s => ({
-                pinned: false,
-                createdAt: Date.now(),
-                updatedAt: Date.now(),
-                ...s
-            }));
-            // 如果面板已经打开，重新渲染一下历史列表
-            if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
-                renderHistoryList();
-            }
+function getAIAuthHeaders() {
+    return aiAccount && aiAccount.token ? { 'Authorization': `Bearer ${aiAccount.token}` } : {};
+}
+
+function updateAIAccountUI() {
+    const nameEl = document.getElementById('gpt-account-name');
+    if (nameEl) nameEl.textContent = aiAccount ? aiAccount.username : '未登录';
+}
+
+async function loadAISessionsFromCloud() {
+    if (!aiAccount || !aiAccount.token) return;
+    try {
+        const res = await fetch(`${TUOTUO_API_BASE}/api/sessions`, { headers: getAIAuthHeaders() });
+        if (res.status === 401) {
+            aiAccount = null;
+            sessionStorage.removeItem('tuotuo_ai_account');
+            updateAIAccountUI();
+            openAIAuthModal('login');
+            return;
         }
-    }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '读取聊天记录失败'));
+        const data = await res.json();
+        if (data && Array.isArray(data)) {
+            chatSessions = data.map(s => ({ pinned: false, createdAt: Date.now(), updatedAt: Date.now(), ...s }));
+            if (document.getElementById('gpt-fullscreen').classList.contains('show')) renderHistoryList();
+        }
+    } catch (err) {
+        console.error("从数据库读取 AI 历史失败:", err);
+    }
+}
 
+function setAIAuthMode(mode) {
+    aiAuthMode = mode === 'register' ? 'register' : 'login';
+    document.getElementById('ai-auth-login-tab').classList.toggle('active', aiAuthMode === 'login');
+    document.getElementById('ai-auth-register-tab').classList.toggle('active', aiAuthMode === 'register');
+    document.getElementById('ai-auth-submit').textContent = aiAuthMode === 'login' ? '登录并进入' : '注册并进入';
+    document.getElementById('ai-auth-msg').textContent = '';
+}
+
+function openAIAuthModal(mode = 'login') {
+    setAIAuthMode(mode);
+    document.getElementById('ai-auth-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('ai-auth-username')?.focus(), 50);
+}
+
+function closeAIAuthModal() {
+    document.getElementById('ai-auth-overlay').classList.remove('show');
+}
+
+async function submitAIAuth() {
+    const msg = document.getElementById('ai-auth-msg');
+    const username = document.getElementById('ai-auth-username').value.trim();
+    const password = document.getElementById('ai-auth-password').value;
+    if (!username || !password) { msg.textContent = '账号名称和密码都要填写哦。'; return; }
+    msg.textContent = aiAuthMode === 'login' ? '正在登录...' : '正在注册...';
+    try {
+        const res = await fetch(`${TUOTUO_API_BASE}/api/ai-auth/${aiAuthMode}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, aiAuthMode === 'login' ? '登录失败' : '注册失败'));
+        const data = await res.json();
+        aiAccount = { username: data.username, token: data.token };
+        sessionStorage.setItem('tuotuo_ai_account', JSON.stringify(aiAccount));
+        chatSessions = [];
+        currentSessionId = null;
+        updateAIAccountUI();
+        closeAIAuthModal();
+        await loadAISessionsFromCloud();
+        openGPTWorkspace();
+    } catch (err) { msg.textContent = err.message || '操作失败，请稍后再试。'; }
+}
+
+function logoutAIAccount() {
+    if (aiAccount?.token) fetch(`${TUOTUO_API_BASE}/api/ai-auth/logout`, { method: 'POST', headers: getAIAuthHeaders() }).catch(() => {});
+    aiAccount = null;
+    sessionStorage.removeItem('tuotuo_ai_account');
+    chatSessions = [];
+    currentSessionId = null;
+    updateAIAccountUI();
+    toggleFullScreenGPT();
+}
+
+async function submitAdminLogin() {
+    const msg = document.getElementById('admin-msg');
+    const username = document.getElementById('admin-username').value.trim();
+    const password = document.getElementById('admin-password').value;
+    msg.textContent = '正在登录后台...';
+    try {
+        const res = await fetch(`${TUOTUO_API_BASE}/api/admin/login`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '后台登录失败'));
+        const data = await res.json();
+        adminToken = data.token;
+        sessionStorage.setItem('tuotuo_admin_token', adminToken);
+        msg.textContent = '';
+        await loadAdminUsers();
+    } catch (err) { msg.textContent = err.message || '后台登录失败，请稍后再试。'; }
+}
+
+function formatAdminTime(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString('zh-CN', { hour12: false });
+}
+
+async function loadAdminUsers() {
+    const msg = document.getElementById('admin-msg');
+    try {
+        const res = await fetch(`${TUOTUO_API_BASE}/api/admin/ai-users`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+        if (!res.ok) throw new Error(await getErrorMessageFromResponse(res, '读取用户列表失败'));
+        const users = await res.json();
+        document.getElementById('admin-login-panel').style.display = 'none';
+        document.getElementById('admin-users-panel').style.display = 'block';
+        document.getElementById('admin-summary').textContent = `共 ${users.length} 个 AI 聊天账号`;
+        document.getElementById('admin-users-body').innerHTML = users.map(u => `
+            <tr>
+                <td>${escapeHtml(u.username)}</td>
+                <td>${Number(u.chatCount || 0)}</td>
+                <td>${formatAdminTime(u.createdAt)}</td>
+                <td>${formatAdminTime(u.lastLoginAt)}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center;color:#c982a0;">还没有用户注册</td></tr>';
+    } catch (err) {
+        document.getElementById('admin-login-panel').style.display = 'block';
+        document.getElementById('admin-users-panel').style.display = 'none';
+        if (msg) msg.textContent = err.message || '读取用户列表失败。';
+    }
+}
+
+function initAdminPageIfNeeded() {
+    if (location.pathname.replace(/\/$/, '') !== '/admin') return;
+    const overlay = document.getElementById('admin-page-overlay');
+    overlay.classList.add('show');
+    if (adminToken) loadAdminUsers();
+}
+
+loadAISessionsFromCloud();
+updateAIAccountUI();
+initAdminPageIfNeeded();
 
 function toggleGPTSidebar() {
     const container = document.getElementById('gpt-fullscreen');
@@ -2315,7 +3191,45 @@ document.addEventListener('click', (e) => {
     if (attachMenu && !e.target.closest('#gpt-attachment-menu') && !e.target.closest('.gpt-attach-btn')) {
         attachMenu.classList.remove('show');
     }
+    const ratioMenu = document.getElementById('gpt-ratio-menu');
+    if (ratioMenu && !e.target.closest('#gpt-ratio-menu') && !e.target.closest('.gpt-image-select-btn')) {
+        ratioMenu.classList.remove('show');
+    }
 });
+
+function ratioToIconClass(ratio) {
+    return 'ratio-' + String(ratio || 'auto').replace(':', '-');
+}
+
+function ratioLabel(ratio) {
+    const labels = { auto: '自动', '1:1': '方形 1:1', '3:4': '竖版 3:4', '9:16': '故事版 9:16', '4:3': '横版 4:3', '16:9': '宽屏 16:9' };
+    return labels[ratio] || labels.auto;
+}
+
+function toggleImageRatioMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('gpt-ratio-menu');
+    if (menu) menu.classList.toggle('show');
+}
+
+function setImageRatio(ratio) {
+    currentImageRatio = ['auto', '1:1', '3:4', '9:16', '4:3', '16:9'].includes(ratio) ? ratio : 'auto';
+    const chipText = document.getElementById('gpt-ratio-chip-text');
+    const chipIcon = document.getElementById('gpt-ratio-chip-icon');
+    if (chipText) chipText.textContent = ratioLabel(currentImageRatio);
+    if (chipIcon) chipIcon.className = `gpt-ratio-icon ${ratioToIconClass(currentImageRatio)}`;
+    document.querySelectorAll('.gpt-image-option[data-ratio]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.ratio === currentImageRatio);
+    });
+    const menu = document.getElementById('gpt-ratio-menu');
+    if (menu) menu.classList.remove('show');
+}
+
+function updateImageSettingsVisibility() {
+    const settings = document.getElementById('gpt-image-settings');
+    if (settings) settings.classList.toggle('show', currentGPTMode === 'image');
+    setImageRatio(currentImageRatio);
+}
 
 function setGPTReasoningMode(mode) {
     if (!['normal', 'think', 'research'].includes(mode)) mode = 'normal';
@@ -2365,6 +3279,7 @@ function switchToImageMode() {
     if (chip) chip.classList.add('show');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chipText) chipText.textContent = '绘制图片';
+    updateImageSettingsVisibility();
     const thinkItem = document.getElementById('gpt-menu-think');
     const researchItem = document.getElementById('gpt-menu-research');
     if (thinkItem) thinkItem.classList.remove('active');
@@ -2378,6 +3293,7 @@ function switchToChatMode() {
     document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
     document.getElementById('gpt-menu-chat-mode').style.display = 'none';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
+    updateImageSettingsVisibility();
     const chip = document.getElementById('gpt-mode-chip');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chip && chipText) {
@@ -2409,32 +3325,36 @@ function getCurrentSession() {
 
 async function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
+    if (!win.classList.contains('show') && (!aiAccount || !aiAccount.token)) {
+        openAIAuthModal('login');
+        return;
+    }
     win.classList.toggle('show');
 
-    if (win.classList.contains('show')) {
-        // 手机端默认收起侧栏，让聊天主体先完整显示
-        if (window.innerWidth <= 768) {
-            win.classList.add('sidebar-collapsed');
-        }
+    if (win.classList.contains('show')) await openGPTWorkspace(false);
+}
 
-        // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
-        try {
-            const data = await localforage.getItem('tuotuo_gpt_sessions');
-            if (data && Array.isArray(data)) {
-                chatSessions = data;
-            }
-        } catch(e) {}
+async function openGPTWorkspace(ensureVisible = true) {
+    const win = document.getElementById('gpt-fullscreen');
+    if (ensureVisible) win.classList.add('show');
+    if (!win.classList.contains('show')) return;
+    updateAIAccountUI();
 
-        renderHistoryList();
+    // 手机端默认收起侧栏，让聊天主体先完整显示
+    if (window.innerWidth <= 768) {
+        win.classList.add('sidebar-collapsed');
+    }
 
-        if (chatSessions.length === 0) {
-            startNewGPTChat();
-        } else if (!currentSessionId) {
-            const first = getSortedSessions()[0];
-            loadSession(first.id);
-        } else {
-            renderCurrentChat();
-        }
+    await loadAISessionsFromCloud();
+    renderHistoryList();
+
+    if (chatSessions.length === 0) {
+        startNewGPTChat();
+    } else if (!currentSessionId) {
+        const first = getSortedSessions()[0];
+        loadSession(first.id);
+    } else {
+        renderCurrentChat();
     }
 }
 
@@ -2565,12 +3485,12 @@ function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
         // ✨ 静默把聊天记录发给后端存入 Cosmos DB，并带上自己的名字
+        if (!aiAccount || !aiAccount.token) return;
         fetch(`${TUOTUO_API_BASE}/api/sessions`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                sessions: chatSessions,
-                userName: getStableUserName() // ✨ 告诉服务器这是谁的记录
+            headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
+            body: JSON.stringify({
+                sessions: chatSessions
             })
         }).catch(err => console.error("同步到云端数据库失败:", err));
     }, 1000); // 稍微防抖，避免高频发请求
@@ -2601,10 +3521,9 @@ async function processImageAsync(file, mode) {
     const ctx = canvas.getContext('2d', { alpha: true });
 
     if (mode === 'image') {
-        // 画图模式下把参考图统一转成 PNG。
-        // 不再默认附带全透明 mask；否则编辑接口会把整张图都当成可重绘区域，
-        // 生成结果就容易偏离原图，只剩“参考”而不是“修改”。
-        const maxSide = 1024;
+        // 图生图参考图只需要传 image。默认透明 mask 会让 JSON 体积翻倍，
+        // 还可能触发浏览器/代理连接中断；这里改成压缩 JPEG，不再自动附带 mask。
+        const maxSide = 768;
         let w = img.width;
         let h = img.height;
         if (w > maxSide || h > maxSide) {
@@ -2613,10 +3532,10 @@ async function processImageAsync(file, mode) {
         }
         canvas.width = w;
         canvas.height = h;
-        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
-        const imageBase64 = canvas.toDataURL('image/png');
-        return { image: imageBase64, mask: null };
+        return { image: canvas.toDataURL('image/jpeg', 0.72) };
     }
 
     const maxSide = 1568;
@@ -3327,8 +4246,11 @@ async function sendGPTMessage() {
 
     filesSnapshot.forEach(f => {
         if (f.type === 'image') {
-            if (modeAtSend === 'image') imagesToSend.push({ image: f.data, mask: f.mask || null, name: f.name });
-            else imagesToSend.push(f.data);
+            if (modeAtSend === 'image') {
+                const imagePayload = { image: f.data, name: f.name };
+                if (f.mask) imagePayload.mask = f.mask;
+                imagesToSend.push(imagePayload);
+            } else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
         } else if (f.type === 'document') {
             docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`;
@@ -3359,18 +4281,23 @@ async function sendGPTMessage() {
         if (modeAtSend === 'image') {
             const imageTimeout = setTimeout(() => {
                 if (gptAbortController) gptAbortController.abort();
-            }, 180000);
+            }, 600000);
             let response;
             try {
                 response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
                     signal: gptAbortController.signal,
-                    body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
+                    body: JSON.stringify({
+                        prompt: textToSendToBackend,
+                        images: imagesToSend,
+                        ratio: currentImageRatio
+                    })
                 });
             } catch (fetchErr) {
-                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了，请稍后再试，或先不要上传参考图直接画。');
-                throw new Error('画图请求连接失败。可能是参考图过大、后端正在重启，或图片生成接口超时。请刷新后重试，或先不要上传参考图直接画。');
+                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了（已等待约 10 分钟）。如果上传了参考图，请先换一张更小的图，或先不要上传参考图直接画。');
+                const refSizeText = imagesToSend.length ? `参考图已压缩后发送，约 ${Math.round(JSON.stringify(imagesToSend).length / 1024)}KB。` : '';
+                throw new Error(`画图请求连接失败。${refSizeText}可能是后端正在重启、接口网关中断，或 Azure 图片接口长时间未响应。请刷新后重试；如果仍失败，可以先不要上传参考图直接画。`);
             } finally {
                 clearTimeout(imageTimeout);
             }
@@ -3380,16 +4307,17 @@ async function sendGPTMessage() {
 
             outputEl = prepareAssistantOutput(thinkingObj);
             const imgHtml = `<img src="${escapeAttr(data.url)}" class="message-image" onclick="openFull(this.src)" style="max-width: min(420px, 82vw); max-height: 420px; object-fit: contain; border-radius: 14px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 8px 28px rgba(0,0,0,0.12);">`;
-            const promptHtml = data.revised_prompt ? renderMarkdownSafe(`*💡 **优化提示词:** ${data.revised_prompt}*`) : '';
+            const metaText = `比例：${data.ratio || currentImageRatio}，尺寸：${data.size || '模型默认'}`;
+            const promptHtml = renderMarkdownSafe(`${data.revised_prompt ? `*💡 **优化提示词:** ${data.revised_prompt}*\n\n` : ''}*🖼️ ${metaText}*`);
             if (outputEl) outputEl.innerHTML = imgHtml + promptHtml;
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}`;
+            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...getAIAuthHeaders() },
                 signal: gptAbortController.signal,
                 body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true, reasoningMode: currentReasoningMode })
             });
