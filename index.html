@@ -3305,9 +3305,9 @@ async function processImageAsync(file, mode) {
     const ctx = canvas.getContext('2d', { alpha: true });
 
     if (mode === 'image') {
-        // 图生图参考图只需要传 image。默认透明 mask 会让 JSON 体积翻倍，
-        // 还可能触发浏览器/代理连接中断；这里改成压缩 JPEG，不再自动附带 mask。
-        const maxSide = 768;
+        // 图生图参考图只需要传 image，不自动附带全透明 mask。
+        // 这里保留更高分辨率和质量，让编辑模型能看清原图主体、构图和细节。
+        const maxSide = 1024;
         let w = img.width;
         let h = img.height;
         if (w > maxSide || h > maxSide) {
@@ -3319,7 +3319,7 @@ async function processImageAsync(file, mode) {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
-        return { image: canvas.toDataURL('image/jpeg', 0.72) };
+        return { image: canvas.toDataURL('image/jpeg', 0.86), width: w, height: h };
     }
 
     const maxSide = 1568;
@@ -3456,7 +3456,7 @@ async function handleGPTFileSelect(e) {
             if (file.type.startsWith('image/')) {
                 showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
-                gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, name });
+                gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, name });
             } else {
                 showGPTTransientStatus(`正在读取文件：${name}`);
                 const extractedText = await extractDocumentTextFromFile(file, ext, name);
@@ -4033,6 +4033,10 @@ async function sendGPTMessage() {
             if (modeAtSend === 'image') {
                 const imagePayload = { image: f.data, name: f.name };
                 if (f.mask) imagePayload.mask = f.mask;
+                if (f.width && f.height) {
+                    imagePayload.width = f.width;
+                    imagePayload.height = f.height;
+                }
                 imagesToSend.push(imagePayload);
             } else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
@@ -4081,7 +4085,8 @@ async function sendGPTMessage() {
             } catch (fetchErr) {
                 if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了（已等待约 10 分钟）。如果上传了参考图，请先换一张更小的图，或先不要上传参考图直接画。');
                 const refSizeText = imagesToSend.length ? `参考图已压缩后发送，约 ${Math.round(JSON.stringify(imagesToSend).length / 1024)}KB。` : '';
-                throw new Error(`画图请求连接失败。${refSizeText}可能是后端正在重启、接口网关中断，或 Azure 图片接口长时间未响应。请刷新后重试；如果仍失败，可以先不要上传参考图直接画。`);
+                const browserError = fetchErr.message ? `浏览器错误：${fetchErr.message}。` : '';
+                throw new Error(`画图请求连接失败。${refSizeText}${browserError}可能是后端正在重启、接口网关中断，或 Azure 图片接口长时间未响应。请刷新后重试；如果仍失败，可以先不要上传参考图直接画。`);
             } finally {
                 clearTimeout(imageTimeout);
             }
