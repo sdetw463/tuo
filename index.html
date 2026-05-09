@@ -396,30 +396,9 @@
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%); }
         .gpt-input-box { width: 100%; max-width: 800px; background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
         .gpt-input-box:focus-within { border-color: #FF69B4; background: #fff; box-shadow: 0 4px 20px rgba(255,105,180,0.2); }
-        .gpt-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; align-self: flex-start; }
-        .gpt-mode-chip { display: none; align-items: center; gap: 8px; width: fit-content; max-width: 100%; min-height: 38px; border: 1px solid rgba(190,134,217,0.45); background: linear-gradient(135deg, rgba(255,240,250,0.72), rgba(248,244,255,0.62)); color: #7e3fa0; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 800; box-shadow: 0 10px 26px rgba(126,63,160,0.12), inset 0 1px 0 rgba(255,255,255,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .gpt-mode-chip { display: none; align-self: flex-start; align-items: center; gap: 6px; width: fit-content; max-width: 100%; border: 1px solid rgba(255,182,193,0.55); background: rgba(255,240,245,0.9); color: #c94f82; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
         .gpt-mode-chip.show { display: inline-flex; }
-        .gpt-mode-chip button { border: none; background: transparent; color: #7e3fa0; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 0 1px 2px; font-weight: 800; }
-        .gpt-image-settings { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .gpt-image-settings.show { display: flex; }
-        .gpt-image-select-wrap { position: relative; }
-        .gpt-image-select-btn { min-height: 38px; border: 1px solid rgba(190,134,217,0.45); background: linear-gradient(135deg, rgba(255,240,250,0.72), rgba(248,244,255,0.62)); color: #7e3fa0; border-radius: 999px; padding: 7px 16px; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.18s; box-shadow: 0 10px 26px rgba(126,63,160,0.12), inset 0 1px 0 rgba(255,255,255,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-        .gpt-image-select-btn:hover { background: linear-gradient(135deg, rgba(255,230,246,0.82), rgba(244,236,255,0.75)); transform: translateY(-1px); box-shadow: 0 12px 30px rgba(126,63,160,0.18); }
-        .gpt-ratio-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 4px; display: inline-block; box-sizing: border-box; background: rgba(255,255,255,0.42); color: #7e3fa0; }
-        .gpt-ratio-icon.ratio-auto { width: 18px; height: 12px; border-radius: 3px; box-shadow: -4px 4px 0 -2px currentColor; }
-        .gpt-ratio-icon.ratio-1-1 { width: 16px; height: 16px; }
-        .gpt-ratio-icon.ratio-3-4 { width: 14px; height: 18px; }
-        .gpt-ratio-icon.ratio-9-16 { width: 11px; height: 20px; }
-        .gpt-ratio-icon.ratio-4-3 { width: 19px; height: 14px; }
-        .gpt-ratio-icon.ratio-16-9 { width: 22px; height: 12px; }
-        .gpt-image-options-menu { position: absolute; bottom: 46px; left: 0; width: 216px; background: linear-gradient(135deg, rgba(255,248,252,0.78), rgba(248,244,255,0.72)); border: 1px solid rgba(190,134,217,0.36); border-radius: 19px; padding: 11px; box-shadow: 0 18px 46px rgba(126,63,160,0.16), inset 0 1px 0 rgba(255,255,255,0.72); display: none; flex-direction: column; gap: 4px; z-index: 150; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-        .gpt-image-options-menu.show { display: flex; animation: fadeIn 0.2s ease; }
-        .gpt-image-options-title { font-size: 12px; color: #7e3fa0; padding: 1px 7px 6px; font-weight: 800; }
-        .gpt-image-option { border: none; background: transparent; display: flex; align-items: center; gap: 11px; width: 100%; padding: 8px 8px; border-radius: 12px; color: #7e3fa0; cursor: pointer; font-size: 13px; text-align: left; font-weight: 800; }
-        .gpt-image-option:hover { background: rgba(255,255,255,0.5); color: #7e3fa0; }
-        .gpt-image-option.active { background: rgba(230,204,245,0.48); color: #7e3fa0; font-weight: 900; }
-        .gpt-image-option.active::after { content: '✓'; margin-left: auto; font-size: 18px; line-height: 1; color: #7e3fa0; }
-        .gpt-image-option-muted { color: #a875bd; }
+        .gpt-mode-chip button { border: none; background: transparent; color: #c94f82; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 1px 2px; }
         .gpt-input-controls { width: 100%; display: flex; align-items: flex-end; gap: 10px; position: relative; }
 
         .gpt-attach-btn { width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #FFB6C1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; transition: 0.2s; padding-bottom: 2px; }
@@ -448,13 +427,13 @@
         .gpt-disclaimer { font-size: 12px; color: #aaa; margin-top: 10px; text-align: center; }
 
         /* 附件弹出菜单样式 */
-        .gpt-attachment-menu { position: absolute; bottom: 46px; left: 0; background: linear-gradient(135deg, rgba(255,248,252,0.8), rgba(255,241,248,0.72)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,151,190,0.4); border-radius: 19px; padding: 10px; box-shadow: 0 18px 46px rgba(255,105,180,0.18), inset 0 1px 0 rgba(255,255,255,0.72); display: none; flex-direction: column; gap: 4px; z-index: 100; min-width: 191px; }
+        .gpt-attachment-menu { position: absolute; bottom: 46px; left: 0; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.09); border-radius: 20px; padding: 10px; box-shadow: 0 14px 36px rgba(0,0,0,0.14); display: none; flex-direction: column; gap: 3px; z-index: 100; min-width: 218px; }
         .gpt-attachment-menu.show { display: flex; animation: fadeIn 0.2s ease; }
-        .gpt-menu-item { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 12px; cursor: pointer; font-size: 13px; color: #ff69a6; transition: 0.18s; font-weight: 900; line-height: 1.25; }
-        .gpt-menu-item:hover { background: rgba(255,255,255,0.5); color: #ff4f99; }
-        .gpt-menu-item.active { background: rgba(255,213,231,0.58); color: #ff4f99; }
-        .gpt-menu-item svg { flex-shrink: 0; width: 17px; height: 17px; color: currentColor; }
-        .gpt-menu-divider { height: 1px; background: rgba(255,105,180,0.16); margin: 6px 4px; }
+        .gpt-menu-item { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 12px; cursor: pointer; font-size: 16px; color: #222; transition: 0.18s; font-weight: 500; line-height: 1.25; }
+        .gpt-menu-item:hover { background: rgba(0,0,0,0.055); color: #111; }
+        .gpt-menu-item.active { background: rgba(255, 182, 193, 0.22); color: #c94f82; }
+        .gpt-menu-item svg { flex-shrink: 0; width: 21px; height: 21px; color: currentColor; }
+        .gpt-menu-divider { height: 1px; background: rgba(0,0,0,0.1); margin: 5px 4px; }
 
         /* ===== 响应式 ===== */
         /* ============================================================
@@ -1147,627 +1126,6 @@
         border-radius: 0;
     }
 }
-
-/* ===================================================================
-   Smart TuoTuo AI 蓝灰系精修层：更接近 ChatGPT 的聊天工作台
-=================================================================== */
-.gpt-fullscreen {
-    background: #ffffff !important;
-    color: #172033;
-}
-
-#ai-entry-card.ai-entry-card {
-    border-color: rgba(96, 165, 250, 0.36) !important;
-    background: rgba(248, 251, 255, 0.52) !important;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12) !important;
-}
-
-#ai-entry-card.ai-entry-card:hover {
-    background: rgba(239, 246, 255, 0.68) !important;
-    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.18) !important;
-}
-
-#ai-entry-card.ai-entry-card > div:first-child {
-    background: linear-gradient(135deg, #2563eb, #38bdf8) !important;
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.28) !important;
-}
-
-#ai-entry-card.ai-entry-card > div:last-child,
-#gpt-top-title {
-    color: #172033 !important;
-}
-
-#gpt-top-title span {
-    color: #1d4ed8 !important;
-    background: #eff6ff !important;
-    border: 1px solid #bfdbfe !important;
-}
-
-.gpt-sidebar {
-    background: #f7f8fb !important;
-    border-right: 1px solid #e5e7eb !important;
-    box-shadow: none !important;
-}
-
-.gpt-new-chat-btn {
-    background: #ffffff !important;
-    border: 1px solid #d8e2f0 !important;
-    color: #172033 !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
-}
-
-.gpt-new-chat-btn:hover,
-.gpt-btn-icon:hover,
-.gpt-toggle-sidebar-btn:hover,
-.gpt-history-item:hover,
-.gpt-back-home:hover {
-    background: #eaf2ff !important;
-    color: #1d4ed8 !important;
-}
-
-.gpt-btn-icon,
-.gpt-toggle-sidebar-btn,
-.gpt-history-title,
-.gpt-pin-mark {
-    color: #2563eb !important;
-}
-
-.gpt-history-item {
-    color: #374151 !important;
-}
-
-.gpt-history-item.active {
-    background: #dbeafe !important;
-    color: #1e40af !important;
-    font-weight: 700 !important;
-}
-
-.gpt-history-more:hover,
-.gpt-session-menu button:hover {
-    background: #eaf2ff !important;
-    color: #1d4ed8 !important;
-}
-
-.gpt-session-menu {
-    border-color: #d8e2f0 !important;
-    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14) !important;
-}
-
-.gpt-sidebar-bottom {
-    border-top: 1px solid #e5e7eb !important;
-}
-
-.gpt-back-home {
-    color: #334155 !important;
-}
-
-.gpt-header {
-    background: rgba(255, 255, 255, 0.88) !important;
-    border-bottom: 1px solid #eef2f7 !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-}
-
-.gpt-model-selector {
-    color: #172033 !important;
-}
-
-.gpt-chat-area {
-    background: #ffffff !important;
-}
-
-.gpt-main.drag-over::after {
-    border-color: rgba(37, 99, 235, 0.45) !important;
-    background: rgba(239, 246, 255, 0.84) !important;
-    color: #1d4ed8 !important;
-}
-
-.gpt-status-pill,
-.gpt-mode-chip {
-    color: #1d4ed8 !important;
-    background: #eff6ff !important;
-    border-color: #bfdbfe !important;
-}
-
-.gpt-mode-chip button {
-    color: #1d4ed8 !important;
-}
-
-.gpt-avatar {
-    box-shadow: 0 5px 16px rgba(37, 99, 235, 0.16) !important;
-}
-
-.gpt-avatar-ai {
-    background: linear-gradient(135deg, #1d4ed8, #0ea5e9) !important;
-    color: #ffffff !important;
-}
-
-.gpt-avatar-user {
-    color: #1d4ed8 !important;
-    border-color: #bfdbfe !important;
-}
-
-.gpt-msg-container.user .gpt-content {
-    background: #eff6ff !important;
-    border: 1px solid #dbeafe !important;
-    color: #172033 !important;
-    box-shadow: none !important;
-}
-
-.gpt-msg-container.ai .gpt-content,
-.markdown-body {
-    color: #172033 !important;
-}
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4 {
-    color: #1e3a8a !important;
-}
-
-.markdown-body strong {
-    color: #1d4ed8 !important;
-}
-
-.markdown-body a {
-    color: #2563eb !important;
-    text-decoration-color: rgba(37, 99, 235, 0.35);
-}
-
-.markdown-body th {
-    background: #eff6ff !important;
-    color: #1e3a8a !important;
-}
-
-.markdown-body code:not(pre code) {
-    background: #edf2f7 !important;
-    color: #1e3a8a !important;
-}
-
-.markdown-body blockquote {
-    border-left-color: #60a5fa !important;
-    background: #f3f7ff !important;
-    color: #475569 !important;
-}
-
-.math-block {
-    border-color: #dbeafe !important;
-    background: #f8fbff !important;
-}
-
-.gpt-thinking-content {
-    color: #2563eb !important;
-}
-
-.gpt-thinking-title {
-    color: #1d4ed8 !important;
-}
-
-.gpt-thinking-detail {
-    color: #64748b !important;
-}
-
-.gpt-input-wrapper {
-    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%) !important;
-}
-
-.gpt-input-box {
-    background: #ffffff !important;
-    border: 1px solid #d8e2f0 !important;
-    box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10) !important;
-}
-
-.gpt-input-box:focus-within {
-    border-color: #60a5fa !important;
-    box-shadow: 0 14px 38px rgba(37, 99, 235, 0.14) !important;
-}
-
-.gpt-attach-btn {
-    color: #64748b !important;
-}
-
-.gpt-attach-btn:hover {
-    background: #eaf2ff !important;
-    color: #1d4ed8 !important;
-}
-
-.gpt-textarea {
-    color: #172033 !important;
-}
-
-.gpt-textarea::placeholder {
-    color: #94a3b8 !important;
-}
-
-.gpt-send-btn {
-    background: #172033 !important;
-    color: #ffffff !important;
-}
-
-.gpt-send-btn:hover {
-    background: #1d4ed8 !important;
-    box-shadow: 0 7px 18px rgba(37, 99, 235, 0.25) !important;
-}
-
-.gpt-send-btn:disabled {
-    background: #d8e2f0 !important;
-    color: #ffffff !important;
-}
-
-.gpt-file-preview {
-    border-bottom-color: #dbeafe !important;
-}
-
-.gpt-preview-card .file-icon-box,
-.gpt-user-file-card {
-    background: #eff6ff !important;
-    color: #1e40af !important;
-}
-
-.gpt-attachment-menu {
-    border: 1px solid #d8e2f0 !important;
-    box-shadow: 0 18px 46px rgba(15, 23, 42, 0.16) !important;
-}
-
-.gpt-menu-item {
-    color: #172033 !important;
-}
-
-.gpt-menu-item:hover {
-    background: #f1f5f9 !important;
-    color: #0f172a !important;
-}
-
-.gpt-menu-item.active {
-    background: #dbeafe !important;
-    color: #1d4ed8 !important;
-}
-
-.gpt-error-actions {
-    color: #475569 !important;
-}
-
-@media (max-width: 768px) {
-    .gpt-sidebar,
-    .gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
-        background: #f7f8fb !important;
-        border-right: 1px solid #e5e7eb !important;
-        box-shadow: 12px 0 34px rgba(15, 23, 42, 0.16) !important;
-    }
-
-    .gpt-header {
-        border-bottom-color: #eef2f7 !important;
-    }
-
-    .gpt-back-home {
-        background: #eaf2ff !important;
-    }
-}
-
-/* ===================================================================
-   Smart TuoTuo AI 柔粉精修层：恢复主页入口，仅重绘全屏聊天界面
-=================================================================== */
-#ai-entry-card.ai-entry-card {
-    background: rgba(255,255,255,0.3) !important;
-    border: 1px solid rgba(255,255,255,0.5) !important;
-    box-shadow: 0 4px 15px rgba(255,182,193,0.2) !important;
-}
-
-#ai-entry-card.ai-entry-card:hover {
-    background: rgba(255,255,255,0.5) !important;
-    box-shadow: 0 8px 20px rgba(255,105,180,0.3) !important;
-}
-
-#ai-entry-card.ai-entry-card > div:first-child {
-    background: none !important;
-    box-shadow: none !important;
-}
-
-#ai-entry-card.ai-entry-card > div:last-child {
-    color: #c94f82 !important;
-}
-
-#gpt-fullscreen.gpt-fullscreen {
-    background: #fffdfd !important;
-    color: #2a2028;
-}
-
-#gpt-fullscreen .gpt-sidebar {
-    background: #fbf7f9 !important;
-    border-right: 1px solid #eadde4 !important;
-    box-shadow: none !important;
-}
-
-#gpt-fullscreen .gpt-new-chat-btn {
-    background: #ffffff !important;
-    border: 1px solid #eadde4 !important;
-    color: #33242d !important;
-    box-shadow: 0 1px 2px rgba(67, 42, 56, 0.04) !important;
-}
-
-#gpt-fullscreen .gpt-new-chat-btn:hover,
-#gpt-fullscreen .gpt-btn-icon:hover,
-#gpt-fullscreen .gpt-toggle-sidebar-btn:hover,
-#gpt-fullscreen .gpt-history-item:hover,
-#gpt-fullscreen .gpt-back-home:hover {
-    background: #fff0f5 !important;
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-btn-icon,
-#gpt-fullscreen .gpt-toggle-sidebar-btn,
-#gpt-fullscreen .gpt-history-title,
-#gpt-fullscreen .gpt-pin-mark {
-    color: #c94f82 !important;
-}
-
-#gpt-fullscreen .gpt-history-item {
-    color: #5f4b58 !important;
-}
-
-#gpt-fullscreen .gpt-history-item.active {
-    background: #fbe3ed !important;
-    color: #9f2f5d !important;
-    font-weight: 700 !important;
-}
-
-#gpt-fullscreen .gpt-history-more:hover,
-#gpt-fullscreen .gpt-session-menu button:hover {
-    background: #fff0f5 !important;
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-session-menu {
-    border-color: #eadde4 !important;
-    box-shadow: 0 18px 42px rgba(67, 42, 56, 0.14) !important;
-}
-
-#gpt-fullscreen .gpt-sidebar-bottom {
-    border-top: 1px solid #eadde4 !important;
-}
-
-#gpt-fullscreen .gpt-back-home {
-    color: #5f4b58 !important;
-}
-
-#gpt-fullscreen .gpt-header {
-    background: rgba(255, 253, 253, 0.9) !important;
-    border-bottom: 1px solid #f0e6eb !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-}
-
-#gpt-fullscreen .gpt-model-selector,
-#gpt-top-title {
-    color: #2a2028 !important;
-}
-
-#gpt-top-title span {
-    color: #b83268 !important;
-    background: #fff0f5 !important;
-    border: 1px solid #f4c8d9 !important;
-}
-
-#gpt-fullscreen .gpt-chat-area {
-    background: #fffdfd !important;
-}
-
-#gpt-fullscreen .gpt-main.drag-over::after {
-    border-color: rgba(201, 79, 130, 0.45) !important;
-    background: rgba(255, 240, 245, 0.86) !important;
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-status-pill,
-#gpt-fullscreen .gpt-mode-chip {
-    color: #b83268 !important;
-    background: #fff0f5 !important;
-    border-color: #f4c8d9 !important;
-}
-
-#gpt-fullscreen .gpt-mode-chip button {
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-image-select-btn,
-#gpt-fullscreen .gpt-image-options-title,
-#gpt-fullscreen .gpt-image-option,
-#gpt-fullscreen .gpt-image-option:hover,
-#gpt-fullscreen .gpt-image-option.active,
-#gpt-fullscreen .gpt-image-option.active::after,
-#gpt-fullscreen .gpt-ratio-icon {
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-image-select-btn {
-    border-color: #f4c8d9 !important;
-    background: #fff0f5 !important;
-    box-shadow: 0 10px 26px rgba(184, 50, 104, 0.12), inset 0 1px 0 rgba(255,255,255,0.7) !important;
-}
-
-#gpt-fullscreen .gpt-image-options-menu {
-    border-color: #f4c8d9 !important;
-    box-shadow: 0 18px 46px rgba(184, 50, 104, 0.16), inset 0 1px 0 rgba(255,255,255,0.72) !important;
-}
-
-#gpt-fullscreen .gpt-image-option.active {
-    background: #fbe3ed !important;
-}
-
-#gpt-fullscreen .gpt-image-option-muted {
-    color: #c982a0 !important;
-}
-
-#gpt-fullscreen .gpt-avatar {
-    box-shadow: 0 5px 16px rgba(201, 79, 130, 0.15) !important;
-}
-
-#gpt-fullscreen .gpt-avatar-ai {
-    background: linear-gradient(135deg, #b83268, #e58aad) !important;
-    color: #ffffff !important;
-}
-
-#gpt-fullscreen .gpt-avatar-user {
-    color: #b83268 !important;
-    border-color: #f4c8d9 !important;
-}
-
-#gpt-fullscreen .gpt-msg-container.user .gpt-content {
-    background: #fff0f5 !important;
-    border: 1px solid #f7d7e4 !important;
-    color: #2a2028 !important;
-    box-shadow: none !important;
-}
-
-#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
-#gpt-fullscreen .markdown-body {
-    color: #2a2028 !important;
-}
-
-#gpt-fullscreen .markdown-body h1,
-#gpt-fullscreen .markdown-body h2,
-#gpt-fullscreen .markdown-body h3,
-#gpt-fullscreen .markdown-body h4 {
-    color: #9f2f5d !important;
-}
-
-#gpt-fullscreen .markdown-body strong,
-#gpt-fullscreen .markdown-body a {
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .markdown-body a {
-    text-decoration-color: rgba(184, 50, 104, 0.35);
-}
-
-#gpt-fullscreen .markdown-body th {
-    background: #fff0f5 !important;
-    color: #9f2f5d !important;
-}
-
-#gpt-fullscreen .markdown-body code:not(pre code) {
-    background: #f7eef3 !important;
-    color: #9f2f5d !important;
-}
-
-#gpt-fullscreen .markdown-body blockquote {
-    border-left-color: #e58aad !important;
-    background: #fff5f8 !important;
-    color: #6b5360 !important;
-}
-
-#gpt-fullscreen .math-block {
-    border-color: #f4c8d9 !important;
-    background: #fff8fa !important;
-}
-
-#gpt-fullscreen .gpt-thinking-content,
-#gpt-fullscreen .gpt-thinking-title {
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-thinking-detail {
-    color: #8a7180 !important;
-}
-
-#gpt-fullscreen .gpt-input-wrapper {
-    background: linear-gradient(180deg, rgba(255,253,253,0) 0%, #fffdfd 30%) !important;
-}
-
-#gpt-fullscreen .gpt-input-box {
-    background: #ffffff !important;
-    border: 1px solid #eadde4 !important;
-    box-shadow: 0 12px 34px rgba(67, 42, 56, 0.10) !important;
-}
-
-#gpt-fullscreen .gpt-input-box:focus-within {
-    border-color: #e58aad !important;
-    box-shadow: 0 14px 38px rgba(201, 79, 130, 0.14) !important;
-}
-
-#gpt-fullscreen .gpt-attach-btn {
-    color: #8a7180 !important;
-}
-
-#gpt-fullscreen .gpt-attach-btn:hover {
-    background: #fff0f5 !important;
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-textarea {
-    color: #2a2028 !important;
-}
-
-#gpt-fullscreen .gpt-textarea::placeholder {
-    color: #aa96a2 !important;
-}
-
-#gpt-fullscreen .gpt-send-btn {
-    background: #2a2028 !important;
-    color: #ffffff !important;
-}
-
-#gpt-fullscreen .gpt-send-btn:hover {
-    background: #b83268 !important;
-    box-shadow: 0 7px 18px rgba(184, 50, 104, 0.24) !important;
-}
-
-#gpt-fullscreen .gpt-send-btn:disabled {
-    background: #eadde4 !important;
-    color: #ffffff !important;
-}
-
-#gpt-fullscreen .gpt-file-preview {
-    border-bottom-color: #f4c8d9 !important;
-}
-
-#gpt-fullscreen .gpt-preview-card .file-icon-box,
-#gpt-fullscreen .gpt-user-file-card {
-    background: #fff0f5 !important;
-    color: #9f2f5d !important;
-}
-
-#gpt-fullscreen .gpt-attachment-menu {
-    border: 1px solid #eadde4 !important;
-    box-shadow: 0 18px 46px rgba(67, 42, 56, 0.16) !important;
-}
-
-#gpt-fullscreen .gpt-menu-item {
-    color: #2a2028 !important;
-}
-
-#gpt-fullscreen .gpt-menu-item:hover {
-    background: #f8f1f5 !important;
-    color: #2a2028 !important;
-}
-
-#gpt-fullscreen .gpt-menu-item.active {
-    background: #fbe3ed !important;
-    color: #b83268 !important;
-}
-
-#gpt-fullscreen .gpt-error-actions {
-    color: #6b5360 !important;
-}
-
-@media (max-width: 768px) {
-    #gpt-fullscreen .gpt-sidebar,
-    #gpt-fullscreen.gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
-        background: #fbf7f9 !important;
-        border-right: 1px solid #eadde4 !important;
-        box-shadow: 12px 0 34px rgba(67, 42, 56, 0.15) !important;
-    }
-
-    #gpt-fullscreen .gpt-header {
-        border-bottom-color: #f0e6eb !important;
-    }
-
-    #gpt-fullscreen .gpt-back-home {
-        background: #fff0f5 !important;
-    }
-}
-
     </style>
 </head>
 <body>
@@ -2005,30 +1363,9 @@
                     
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
-                    <div class="gpt-mode-row">
-                        <div class="gpt-mode-chip" id="gpt-mode-chip">
-                            <span id="gpt-mode-chip-text">普通</span>
-                            <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
-                        </div>
-
-                        <div class="gpt-image-settings" id="gpt-image-settings">
-                        <div class="gpt-image-select-wrap">
-                            <button type="button" class="gpt-image-select-btn" onclick="toggleImageRatioMenu(event)">
-                                <span class="gpt-ratio-icon ratio-auto" id="gpt-ratio-chip-icon"></span>
-                                <span id="gpt-ratio-chip-text">自动</span>
-                                <span>⌄</span>
-                            </button>
-                            <div class="gpt-image-options-menu" id="gpt-ratio-menu">
-                                <div class="gpt-image-options-title">选择图片宽高比</div>
-                                <button type="button" class="gpt-image-option" data-ratio="auto" onclick="setImageRatio('auto')"><span class="gpt-ratio-icon ratio-auto"></span><span>自动</span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="1:1" onclick="setImageRatio('1:1')"><span class="gpt-ratio-icon ratio-1-1"></span><span>方形 <span class="gpt-image-option-muted">1:1</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="3:4" onclick="setImageRatio('3:4')"><span class="gpt-ratio-icon ratio-3-4"></span><span>竖版 <span class="gpt-image-option-muted">3:4</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="9:16" onclick="setImageRatio('9:16')"><span class="gpt-ratio-icon ratio-9-16"></span><span>故事版 <span class="gpt-image-option-muted">9:16</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="4:3" onclick="setImageRatio('4:3')"><span class="gpt-ratio-icon ratio-4-3"></span><span>横版 <span class="gpt-image-option-muted">4:3</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="16:9" onclick="setImageRatio('16:9')"><span class="gpt-ratio-icon ratio-16-9"></span><span>宽屏 <span class="gpt-image-option-muted">16:9</span></span></button>
-                            </div>
-                        </div>
-                        </div>
+                    <div class="gpt-mode-chip" id="gpt-mode-chip">
+                        <span id="gpt-mode-chip-text">普通</span>
+                        <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
                     </div>
 
                     <div class="gpt-input-controls">
@@ -2942,7 +2279,6 @@ let chatSessions = [];
 let currentSessionId = null;
 let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
-let currentImageRatio = 'auto';
 
 // ✨ 从后端的数据库获取【属于自己】的聊天记录
 const myUserName = getStableUserName(); // 获取当前用户身份
@@ -2979,45 +2315,7 @@ document.addEventListener('click', (e) => {
     if (attachMenu && !e.target.closest('#gpt-attachment-menu') && !e.target.closest('.gpt-attach-btn')) {
         attachMenu.classList.remove('show');
     }
-    const ratioMenu = document.getElementById('gpt-ratio-menu');
-    if (ratioMenu && !e.target.closest('#gpt-ratio-menu') && !e.target.closest('.gpt-image-select-btn')) {
-        ratioMenu.classList.remove('show');
-    }
 });
-
-function ratioToIconClass(ratio) {
-    return 'ratio-' + String(ratio || 'auto').replace(':', '-');
-}
-
-function ratioLabel(ratio) {
-    const labels = { auto: '自动', '1:1': '方形 1:1', '3:4': '竖版 3:4', '9:16': '故事版 9:16', '4:3': '横版 4:3', '16:9': '宽屏 16:9' };
-    return labels[ratio] || labels.auto;
-}
-
-function toggleImageRatioMenu(e) {
-    e.stopPropagation();
-    const menu = document.getElementById('gpt-ratio-menu');
-    if (menu) menu.classList.toggle('show');
-}
-
-function setImageRatio(ratio) {
-    currentImageRatio = ['auto', '1:1', '3:4', '9:16', '4:3', '16:9'].includes(ratio) ? ratio : 'auto';
-    const chipText = document.getElementById('gpt-ratio-chip-text');
-    const chipIcon = document.getElementById('gpt-ratio-chip-icon');
-    if (chipText) chipText.textContent = ratioLabel(currentImageRatio);
-    if (chipIcon) chipIcon.className = `gpt-ratio-icon ${ratioToIconClass(currentImageRatio)}`;
-    document.querySelectorAll('.gpt-image-option[data-ratio]').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.ratio === currentImageRatio);
-    });
-    const menu = document.getElementById('gpt-ratio-menu');
-    if (menu) menu.classList.remove('show');
-}
-
-function updateImageSettingsVisibility() {
-    const settings = document.getElementById('gpt-image-settings');
-    if (settings) settings.classList.toggle('show', currentGPTMode === 'image');
-    setImageRatio(currentImageRatio);
-}
 
 function setGPTReasoningMode(mode) {
     if (!['normal', 'think', 'research'].includes(mode)) mode = 'normal';
@@ -3067,7 +2365,6 @@ function switchToImageMode() {
     if (chip) chip.classList.add('show');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chipText) chipText.textContent = '绘制图片';
-    updateImageSettingsVisibility();
     const thinkItem = document.getElementById('gpt-menu-think');
     const researchItem = document.getElementById('gpt-menu-research');
     if (thinkItem) thinkItem.classList.remove('active');
@@ -3081,7 +2378,6 @@ function switchToChatMode() {
     document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
     document.getElementById('gpt-menu-chat-mode').style.display = 'none';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
-    updateImageSettingsVisibility();
     const chip = document.getElementById('gpt-mode-chip');
     const chipText = document.getElementById('gpt-mode-chip-text');
     if (chip && chipText) {
@@ -3305,8 +2601,9 @@ async function processImageAsync(file, mode) {
     const ctx = canvas.getContext('2d', { alpha: true });
 
     if (mode === 'image') {
-        // gpt-image-2 图片编辑按官方示例使用 image + mask 的 multipart 输入。
-        // 这里统一转成 1024 内的 PNG，并提供全透明 mask，让模型可以重绘整张参考图。
+        // 画图模式下把参考图统一转成 PNG。
+        // 不再默认附带全透明 mask；否则编辑接口会把整张图都当成可重绘区域，
+        // 生成结果就容易偏离原图，只剩“参考”而不是“修改”。
         const maxSide = 1024;
         let w = img.width;
         let h = img.height;
@@ -3319,10 +2616,7 @@ async function processImageAsync(file, mode) {
         ctx.clearRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
         const imageBase64 = canvas.toDataURL('image/png');
-
-        ctx.clearRect(0, 0, w, h);
-        const maskBase64 = canvas.toDataURL('image/png');
-        return { image: imageBase64, mask: maskBase64 };
+        return { image: imageBase64, mask: null };
     }
 
     const maxSide = 1568;
@@ -3616,7 +2910,7 @@ function handleGPTKey(e) {
 
 function getThinkingSteps(text, files) {
     if (currentGPTMode === 'image') {
-        return ['正在准备画笔和颜料', '正在构思唯美的画面', '正在后台努力画画'];
+        return ['正在准备画笔和颜料 🎨', '正在构思唯美的画面 ✨', '正在为您渲染高质量图像 🖼️'];
     }
 
     const steps = [];
@@ -4065,21 +3359,17 @@ async function sendGPTMessage() {
         if (modeAtSend === 'image') {
             const imageTimeout = setTimeout(() => {
                 if (gptAbortController) gptAbortController.abort();
-            }, 600000);
+            }, 180000);
             let response;
             try {
                 response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     signal: gptAbortController.signal,
-                    body: JSON.stringify({
-                        prompt: textToSendToBackend,
-                        images: imagesToSend,
-                        ratio: currentImageRatio
-                    })
+                    body: JSON.stringify({ prompt: textToSendToBackend, images: imagesToSend })
                 });
             } catch (fetchErr) {
-                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了（已等待约 10 分钟），请稍后再试，或先不要上传参考图直接画。');
+                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了，请稍后再试，或先不要上传参考图直接画。');
                 throw new Error('画图请求连接失败。可能是参考图过大、后端正在重启，或图片生成接口超时。请刷新后重试，或先不要上传参考图直接画。');
             } finally {
                 clearTimeout(imageTimeout);
@@ -4090,13 +3380,12 @@ async function sendGPTMessage() {
 
             outputEl = prepareAssistantOutput(thinkingObj);
             const imgHtml = `<img src="${escapeAttr(data.url)}" class="message-image" onclick="openFull(this.src)" style="max-width: min(420px, 82vw); max-height: 420px; object-fit: contain; border-radius: 14px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 8px 28px rgba(0,0,0,0.12);">`;
-            const metaText = `比例：${data.ratio || currentImageRatio}，尺寸：${data.size || '模型默认'}`;
-            const promptHtml = renderMarkdownSafe(`${data.revised_prompt ? `*💡 **优化提示词:** ${data.revised_prompt}*\n\n` : ''}*🖼️ ${metaText}*`);
+            const promptHtml = data.revised_prompt ? renderMarkdownSafe(`*💡 **优化提示词:** ${data.revised_prompt}*`) : '';
             if (outputEl) outputEl.innerHTML = imgHtml + promptHtml;
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
-            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
+            finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}`;
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
                 method: 'POST',
