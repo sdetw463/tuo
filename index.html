@@ -2680,6 +2680,12 @@ function openDiaryModal(key, day) {
     const today = new Date();
     const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
     const composeArea = document.getElementById('diary-compose-area');
+    if (key === todayKey) {
+        composeArea.style.display = 'block';
+    } else {
+        composeArea.style.display = 'none';
+    }
+    
     
 
     const savedAuthor = localStorage.getItem('diary_author') || '';
