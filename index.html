@@ -4094,9 +4094,7 @@ async function sendGPTMessage() {
 
             outputEl = prepareAssistantOutput(thinkingObj);
             const imgHtml = `<img src="${escapeAttr(data.url)}" class="message-image" onclick="openFull(this.src)" style="max-width: min(420px, 82vw); max-height: 420px; object-fit: contain; border-radius: 14px; margin-bottom: 10px; cursor: zoom-in; box-shadow: 0 8px 28px rgba(0,0,0,0.12);">`;
-            const metaText = `比例：${data.ratio || currentImageRatio}，尺寸：${data.size || '模型默认'}`;
-            const promptHtml = renderMarkdownSafe(`${data.revised_prompt ? `*💡 **优化提示词:** ${data.revised_prompt}*\n\n` : ''}*🖼️ ${metaText}*`);
-            if (outputEl) outputEl.innerHTML = imgHtml + promptHtml;
+            if (outputEl) outputEl.innerHTML = imgHtml;
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
