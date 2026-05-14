@@ -2229,8 +2229,8 @@ function openFull(src) {
 const CHAT_CONFIG = { wsHost: 'tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net', reconnectInterval: 3000 };
 const TUOTUO_API_BASE = 'https://tuotuo-c2bvb3agbqh0c3ce.eastasia-01.azurewebsites.net';
 let chatSocket = null;
-let chatNickname = sessionStorage.getItem('chat_nickname') || '';
-let chatAvatar = sessionStorage.getItem('chat_avatar') || '';
+let chatNickname = localStorage.getItem('chat_nickname') || '';
+let chatAvatar = localStorage.getItem('chat_avatar') || '';
 let unreadCount = 0, isChatWindowOpen = false, reconnectTimer = null;
 
 const badge = document.getElementById('msg-badge');
@@ -2387,9 +2387,9 @@ function enterStarName() {
     const n=document.getElementById('star-nickname-input').value.trim();
     if(n){
         chatNickname=n;
-        sessionStorage.setItem('chat_nickname',n);
+        localStorage.setItem('chat_nickname',n);
         chatAvatar = n.charAt(0) || ' ✨ ';
-        sessionStorage.setItem('chat_avatar', chatAvatar);
+        localStorage.setItem('chat_avatar', chatAvatar);
         document.getElementById('star-login-overlay').classList.remove('show');
         if(chatSocket)chatSocket.close();
         connectWebSocket(false);
@@ -2536,8 +2536,8 @@ function enterChat() {
     if(n){
         chatNickname=n;
         chatAvatar = n.charAt(0) || ' 🐰 ';
-        sessionStorage.setItem('chat_nickname',n);
-        sessionStorage.setItem('chat_avatar',chatAvatar);
+        localStorage.setItem('chat_nickname',n);
+        localStorage.setItem('chat_avatar',chatAvatar);
         document.getElementById('chat-login-overlay').classList.remove('show');
         if(chatSocket)chatSocket.close();
         connectWebSocket(false);
@@ -3118,14 +3118,6 @@ async function toggleFullScreenGPT() {
         if (window.innerWidth <= 768) {
             win.classList.add('sidebar-collapsed');
         }
-
-        // ✨ 为了防止用户打开太快导致数据还没读完，这里再次确认数据已加载
-        try {
-            const data = await localforage.getItem('tuotuo_gpt_sessions');
-            if (data && Array.isArray(data)) {
-                chatSessions = data;
-            }
-        } catch(e) {}
 
         renderHistoryList();
 
