@@ -3965,6 +3965,13 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                     } else if (obj.content) {
                         streamState.fullText += obj.content;
                         render();
+                    } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
+                        const sourceText = obj.sources.map((src, index) => {
+                            const title = src.title || src.url || src.type || `来源 ${index + 1}`;
+                            return src.url ? `${index + 1}. [${title}](${src.url})` : `${index + 1}. ${title}`;
+                        }).join('\n');
+                        streamState.fullText += `\n\n**参考来源**\n${sourceText}`;
+                        render(true);
                     }
                 } catch {
                     streamState.fullText += payload;
@@ -4015,6 +4022,7 @@ async function sendGPTMessage() {
     }
 
     let imagesToSend = [];
+    let documentsToSend = [];
     let docsText = '';
     let mediaHtml = '';
 
@@ -4031,12 +4039,14 @@ async function sendGPTMessage() {
             } else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
         } else if (f.type === 'document') {
+            documentsToSend.push({ name: f.name, content: f.data });
             docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`;
             mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`;
         }
     });
 
     const textToSendToBackend = text + docsText;
+    const cleanMessageToBackend = text || (documentsToSend.length ? '请分析我上传的附件。' : '');
     session.messages.push({ role: 'user', content: textToSendToBackend, userText: text, mediaHtml });
     session.updatedAt = Date.now();
     saveSessions();
@@ -4090,13 +4100,22 @@ async function sendGPTMessage() {
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+            const metaText = data.size ? `${data.size} / ${data.ratio || currentImageRatio}` : (data.ratio || currentImageRatio || 'auto');
             finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 signal: gptAbortController.signal,
-                body: JSON.stringify({ message: textToSendToBackend, sessionId: currentSessionId, images: imagesToSend, stream: true, reasoningMode: currentReasoningMode })
+                body: JSON.stringify({
+                    message: cleanMessageToBackend,
+                    sessionId: currentSessionId,
+                    userName: getStableUserName(),
+                    images: imagesToSend,
+                    documents: documentsToSend,
+                    stream: true,
+                    reasoningMode: currentReasoningMode
+                })
             });
             if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '网络请求失败'));
 
