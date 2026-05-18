@@ -300,7 +300,6 @@
         .gpt-history-item:hover { background: rgba(255,182,193,0.2); color: #FF69B4; }
         .gpt-history-item.active { background: rgba(255,182,193,0.4); font-weight: bold; color: #c94f82; }
         .gpt-history-title-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .gpt-branch-mark { color: #d46b97; font-size: 12px; margin-right: 6px; }
         
         /* 历史记录三点菜单 */
         .gpt-history-more { width: 26px; height: 26px; border: none; background: transparent; color: #999; border-radius: 7px; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 18px; line-height: 1; flex-shrink: 0; }
@@ -351,8 +350,8 @@
         /* 用户与 AI 气泡颜色区分 */
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
         .gpt-msg-container.user .gpt-content { background: #e6f4ff !important; border: 1px solid #bae0ff !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; border-radius: 20px !important; border-bottom-right-radius: 5px !important; padding: 12px 18px !important; color: #2f2f2f !important; white-space: pre-wrap; text-align: left; }
-        .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; }
-        .gpt-ai-message-shell { width: 100%; max-width: 78%; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+        .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; max-width: 100% !important; }
+        .gpt-ai-message-shell { width: 100%; max-width: min(100%, 1500px); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
         .gpt-msg-actions { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(-2px); transition: 0.18s; }
         .gpt-ai-message-shell:hover .gpt-msg-actions, .gpt-msg-actions:focus-within { opacity: 1; transform: translateY(0); }
         .gpt-msg-action-btn { position: relative; width: 30px; height: 30px; border-radius: 999px; border: 1px solid rgba(255,182,193,0.45); background: rgba(255,255,255,0.9); color: #c94f82; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.18s; }
@@ -1016,7 +1015,7 @@
     }
 
     .gpt-ai-message-shell {
-        max-width: calc(100vw - 74px);
+        max-width: calc(100vw - 56px);
     }
 
     .gpt-msg-actions {
@@ -3361,7 +3360,6 @@ function renderHistoryList() {
         item.innerHTML = `
             <div class="gpt-history-title-text" title="${escapeHtml(session.title)}">
                 ${session.pinned ? '<span class="gpt-pin-mark">📌</span>' : ''}
-                ${session.parentSessionId ? '<span class="gpt-branch-mark">↳</span>' : ''}
                 ${escapeHtml(session.title)}
             </div>
             <button class="gpt-history-more" title="更多" onclick="toggleSessionMenu(event, '${session.id}')">⋯</button>
