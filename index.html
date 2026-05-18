@@ -331,16 +331,16 @@
         .gpt-fullscreen.sidebar-collapsed #gpt-reopen-btn { display: block !important; }
 
         /* 聊天消息流 */
-        .gpt-chat-area { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; background: #ffffff !important; }
+        .gpt-chat-area { --gpt-composer-width: 800px; --gpt-ai-avatar-size: 36px; --gpt-ai-avatar-gap: 16px; flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; background: #ffffff !important; }
         .gpt-main.drag-over::after { content: '松开即可添加到对话'; position: absolute; inset: 72px 28px 110px 28px; border: 2px dashed rgba(255,105,180,0.55); background: rgba(255,240,245,0.78); color: #c94f82; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; pointer-events: none; z-index: 10; backdrop-filter: blur(8px); }
         .gpt-status-pill { font-size: 12px; color: #c94f82; background: rgba(255,240,245,0.9); border: 1px solid rgba(255,182,193,0.45); padding: 6px 10px; border-radius: 999px; width: fit-content; margin-top: 8px; }
         .gpt-error-actions { margin-top: 8px; font-size: 12px; color: #8c4355; line-height: 1.6; }
         .gpt-msg-container { width: 100%; max-width: 850px; padding: 16px 24px !important; gap: 16px !important; display: flex; animation: fadeIn 0.3s ease; }
         .gpt-msg-container.user { justify-content: flex-end !important; }
-        .gpt-msg-container.ai { justify-content: flex-start !important; }
+        .gpt-msg-container.ai { position: relative; justify-content: flex-start !important; display: block; width: min(100%, var(--gpt-composer-width)); max-width: var(--gpt-composer-width); padding: 16px 0 !important; }
         
         /* 动态炫彩光环头像 */
-        .gpt-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,182,193,0.3); font-weight: bold; }
+        .gpt-avatar { width: var(--gpt-ai-avatar-size); height: var(--gpt-ai-avatar-size); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,182,193,0.3); font-weight: bold; }
         .gpt-avatar-ai { background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; }
         .gpt-avatar-user { background: white; color: #FF69B4; border: 2px solid #FFB6C1; }
         
@@ -350,7 +350,8 @@
         /* 用户与 AI 气泡颜色区分 */
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
         .gpt-msg-container.user .gpt-content { background: #e6f4ff !important; border: 1px solid #bae0ff !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; border-radius: 20px !important; border-bottom-right-radius: 5px !important; padding: 12px 18px !important; color: #2f2f2f !important; white-space: pre-wrap; text-align: left; }
-        .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; max-width: 100% !important; }
+        .gpt-msg-container.ai .gpt-avatar { position: absolute; left: calc(-1 * (var(--gpt-ai-avatar-size) + var(--gpt-ai-avatar-gap))); top: 16px; }
+        .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; width: 100%; max-width: 100% !important; }
         .gpt-ai-message-shell { width: 100%; max-width: min(100%, 1500px); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
         .gpt-msg-actions { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(-2px); transition: 0.18s; }
         .gpt-ai-message-shell:hover .gpt-msg-actions, .gpt-msg-actions:focus-within { opacity: 1; transform: translateY(0); }
@@ -405,7 +406,7 @@
 
         /* 底部输入区 - 白底渐变 */
         .gpt-input-wrapper { width: 100%; padding: 15px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 30%); }
-        .gpt-input-box { width: 100%; max-width: 800px; background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
+        .gpt-input-box { width: 100%; max-width: var(--gpt-composer-width); background: rgba(255,255,255,0.8); border-radius: 25px; padding: 12px 15px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,182,193,0.5); transition: 0.2s; box-shadow: 0 4px 15px rgba(255,182,193,0.15); backdrop-filter: blur(10px); }
         .gpt-input-box:focus-within { border-color: #FF69B4; background: #fff; box-shadow: 0 4px 20px rgba(255,105,180,0.2); }
         .gpt-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; align-self: flex-start; }
         .gpt-mode-chip { display: none; align-items: center; gap: 8px; width: fit-content; max-width: 100%; min-height: 38px; border: 1px solid rgba(190,134,217,0.45); background: linear-gradient(135deg, rgba(255,240,250,0.72), rgba(248,244,255,0.62)); color: #7e3fa0; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 800; box-shadow: 0 10px 26px rgba(126,63,160,0.12), inset 0 1px 0 rgba(255,255,255,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
@@ -1000,10 +1001,20 @@
         gap: 10px !important;
     }
 
+    .gpt-msg-container.ai {
+        display: flex;
+        max-width: none;
+        padding: 12px 14px !important;
+    }
+
     .gpt-avatar {
         width: 32px;
         height: 32px;
         font-size: 17px;
+    }
+
+    .gpt-msg-container.ai .gpt-avatar {
+        position: static;
     }
 
     .gpt-content,
