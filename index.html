@@ -294,10 +294,13 @@
         /* 历史记录 */
         .gpt-history { flex: 1; overflow-y: auto; padding-right: 5px; }
         .gpt-history-title { font-size: 12px; color: #FF69B4; margin: 10px 8px 5px; font-weight: bold; opacity: 0.8; }
+        .gpt-history-node { position: relative; padding-left: calc(var(--branch-depth, 0) * 22px); }
+        .gpt-history-node.branch-child::before { content: ''; position: absolute; left: calc(var(--branch-depth, 0) * 22px - 12px); top: -8px; width: 12px; height: calc(50% + 8px); border-left: 1px solid rgba(201,79,130,0.28); border-bottom: 1px solid rgba(201,79,130,0.28); border-bottom-left-radius: 10px; pointer-events: none; }
         .gpt-history-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 8px 8px 8px 12px; font-size: 14px; color: #555; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .gpt-history-item:hover { background: rgba(255,182,193,0.2); color: #FF69B4; }
         .gpt-history-item.active { background: rgba(255,182,193,0.4); font-weight: bold; color: #c94f82; }
         .gpt-history-title-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gpt-branch-mark { color: #d46b97; font-size: 12px; margin-right: 6px; }
         
         /* 历史记录三点菜单 */
         .gpt-history-more { width: 26px; height: 26px; border: none; background: transparent; color: #999; border-radius: 7px; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 18px; line-height: 1; flex-shrink: 0; }
@@ -349,6 +352,15 @@
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
         .gpt-msg-container.user .gpt-content { background: #e6f4ff !important; border: 1px solid #bae0ff !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; border-radius: 20px !important; border-bottom-right-radius: 5px !important; padding: 12px 18px !important; color: #2f2f2f !important; white-space: pre-wrap; text-align: left; }
         .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; }
+        .gpt-ai-message-shell { width: 100%; max-width: 78%; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+        .gpt-msg-actions { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(-2px); transition: 0.18s; }
+        .gpt-ai-message-shell:hover .gpt-msg-actions, .gpt-msg-actions:focus-within { opacity: 1; transform: translateY(0); }
+        .gpt-msg-action-btn { position: relative; width: 30px; height: 30px; border-radius: 999px; border: 1px solid rgba(255,182,193,0.45); background: rgba(255,255,255,0.9); color: #c94f82; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.18s; }
+        .gpt-msg-action-btn:hover { background: rgba(255,240,245,0.96); border-color: rgba(201,79,130,0.32); color: #b83268; transform: translateY(-1px); }
+        .gpt-msg-action-btn svg { width: 15px; height: 15px; }
+        .gpt-msg-action-tip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 5px 8px; border-radius: 8px; background: rgba(42,32,40,0.92); color: #fff; font-size: 11px; line-height: 1; opacity: 0; pointer-events: none; transition: 0.18s; }
+        .gpt-msg-action-tip::after { content: ''; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: rgba(42,32,40,0.92); }
+        .gpt-msg-action-btn:hover .gpt-msg-action-tip, .gpt-msg-action-btn:focus-visible .gpt-msg-action-tip { opacity: 1; }
 
         /* Markdown 专属样式定制 */
         .gpt-msg-container.ai .markdown-body { width: 100%; }
@@ -962,6 +974,15 @@
         font-size: 14px;
     }
 
+    .gpt-history-node {
+        padding-left: calc(var(--branch-depth, 0) * 16px);
+    }
+
+    .gpt-history-node.branch-child::before {
+        left: calc(var(--branch-depth, 0) * 16px - 9px);
+        width: 9px;
+    }
+
     .gpt-back-home {
         padding: 13px 12px;
         border-radius: 12px;
@@ -992,6 +1013,15 @@
         max-width: calc(100vw - 74px) !important;
         font-size: 14px !important;
         line-height: 1.7 !important;
+    }
+
+    .gpt-ai-message-shell {
+        max-width: calc(100vw - 74px);
+    }
+
+    .gpt-msg-actions {
+        opacity: 1;
+        transform: none;
     }
 
     .gpt-msg-container.user .gpt-content {
@@ -1512,6 +1542,11 @@
     font-weight: 700 !important;
 }
 
+#gpt-fullscreen .gpt-history-node.branch-child::before {
+    border-left-color: rgba(184, 50, 104, 0.22) !important;
+    border-bottom-color: rgba(184, 50, 104, 0.22) !important;
+}
+
 #gpt-fullscreen .gpt-history-more:hover,
 #gpt-fullscreen .gpt-session-menu button:hover {
     background: #fff0f5 !important;
@@ -1623,6 +1658,16 @@
 #gpt-fullscreen .gpt-msg-container.ai .gpt-content,
 #gpt-fullscreen .markdown-body {
     color: #2a2028 !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn {
+    border-color: #f4c8d9 !important;
+    background: #fffafc !important;
+    color: #b83268 !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn:hover {
+    background: #fff0f5 !important;
 }
 
 #gpt-fullscreen .markdown-body h1,
@@ -2942,18 +2987,191 @@ let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
 let currentImageRatio = 'auto';
 
+function generateSessionId() {
+    return `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function summarizeBranchText(text, maxLength = 20) {
+    const plain = String(text || '')
+        .replace(/!\[[^\]]*\]\([^)]+\)/g, '图片')
+        .replace(/\[[^\]]+\]\([^)]+\)/g, '$1')
+        .replace(/[#>*`_~-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (!plain) return '新的分叉';
+    return plain.length > maxLength ? `${plain.slice(0, maxLength)}...` : plain;
+}
+
+function deepCloneSessionMessages(messages) {
+    return JSON.parse(JSON.stringify(Array.isArray(messages) ? messages : []));
+}
+
+function normalizeSessionRecord(raw = {}) {
+    const session = {
+        ...raw,
+        id: String(raw.id || generateSessionId()),
+        title: String(raw.title || '新聊天'),
+        pinned: !!raw.pinned,
+        createdAt: Number(raw.createdAt) || Date.now(),
+        updatedAt: Number(raw.updatedAt) || Date.now(),
+        messages: Array.isArray(raw.messages) ? raw.messages : [],
+        parentSessionId: raw.parentSessionId ? String(raw.parentSessionId) : null,
+        rootSessionId: raw.rootSessionId ? String(raw.rootSessionId) : null,
+        branchDepth: Number.isFinite(raw.branchDepth) ? Number(raw.branchDepth) : 0,
+        branchedFromMessageIndex: Number.isInteger(raw.branchedFromMessageIndex) ? raw.branchedFromMessageIndex : null,
+        branchedFromMessagePreview: String(raw.branchedFromMessagePreview || ''),
+        needsHistorySeed: !!raw.needsHistorySeed
+    };
+    return session;
+}
+
+function repairSessionTree() {
+    const sessionMap = new Map(chatSessions.map(session => [session.id, session]));
+
+    function resolveSessionMeta(session, trail = new Set()) {
+        if (trail.has(session.id)) {
+            session.parentSessionId = null;
+            session.rootSessionId = session.id;
+            session.branchDepth = 0;
+            session.__treeResolved = true;
+            return;
+        }
+
+        if (!session.parentSessionId) {
+            session.rootSessionId = session.id;
+            session.branchDepth = 0;
+            session.__treeResolved = true;
+            return;
+        }
+
+        const parent = sessionMap.get(session.parentSessionId);
+        if (!parent || parent.id === session.id) {
+            session.parentSessionId = null;
+            session.rootSessionId = session.id;
+            session.branchDepth = 0;
+            session.__treeResolved = true;
+            return;
+        }
+
+        if (!parent.__treeResolved) {
+            const nextTrail = new Set(trail);
+            nextTrail.add(session.id);
+            resolveSessionMeta(parent, nextTrail);
+        }
+
+        session.rootSessionId = parent.rootSessionId || parent.id;
+        session.branchDepth = Math.min((parent.branchDepth || 0) + 1, 12);
+        session.__treeResolved = true;
+    }
+
+    chatSessions.forEach(session => {
+        delete session.__treeResolved;
+    });
+
+    chatSessions.forEach(session => {
+        if (!session.__treeResolved) resolveSessionMeta(session);
+    });
+
+    chatSessions.forEach(session => {
+        delete session.__treeResolved;
+    });
+}
+
+function createSessionRecord(overrides = {}) {
+    const session = normalizeSessionRecord({
+        id: generateSessionId(),
+        title: '新聊天',
+        pinned: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        messages: [],
+        parentSessionId: null,
+        rootSessionId: null,
+        branchDepth: 0,
+        branchedFromMessageIndex: null,
+        branchedFromMessagePreview: '',
+        needsHistorySeed: false,
+        ...overrides
+    });
+    if (!session.rootSessionId) session.rootSessionId = session.parentSessionId || session.id;
+    return session;
+}
+
+function getSessionById(id) {
+    return chatSessions.find(session => session.id === id);
+}
+
+function getDirectChildSessions(parentId) {
+    return chatSessions.filter(session => session.parentSessionId === parentId);
+}
+
+function getDescendantSessionIds(sessionId) {
+    const descendants = [];
+    const stack = [sessionId];
+    while (stack.length) {
+        const current = stack.pop();
+        const children = getDirectChildSessions(current);
+        children.forEach(child => {
+            descendants.push(child.id);
+            stack.push(child.id);
+        });
+    }
+    return descendants;
+}
+
+function getOrderedSessions() {
+    repairSessionTree();
+    const sessionMap = new Map(chatSessions.map(session => [session.id, session]));
+    const childrenMap = new Map();
+    const roots = [];
+
+    chatSessions.forEach(session => {
+        childrenMap.set(session.id, []);
+    });
+
+    chatSessions.forEach(session => {
+        if (session.parentSessionId && sessionMap.has(session.parentSessionId)) {
+            childrenMap.get(session.parentSessionId).push(session);
+        } else {
+            roots.push(session);
+        }
+    });
+
+    const sortRoots = (a, b) => {
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        return (b.updatedAt || 0) - (a.updatedAt || 0) || (b.createdAt || 0) - (a.createdAt || 0);
+    };
+
+    const sortChildren = (a, b) => {
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        return (a.createdAt || 0) - (b.createdAt || 0) || (a.updatedAt || 0) - (b.updatedAt || 0);
+    };
+
+    roots.sort(sortRoots);
+    childrenMap.forEach(children => children.sort(sortChildren));
+
+    const ordered = [];
+    function walk(session) {
+        ordered.push(session);
+        (childrenMap.get(session.id) || []).forEach(walk);
+    }
+    roots.forEach(walk);
+    return ordered;
+}
+
 // ✨ 从后端的数据库获取【属于自己】的聊天记录
 const myUserName = getStableUserName(); // 获取当前用户身份
 fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data)) {
-            chatSessions = data.map(s => ({
+            chatSessions = data.map(s => normalizeSessionRecord({
                 pinned: false,
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 ...s
             }));
+            repairSessionTree();
             // 如果面板已经打开，重新渲染一下历史列表
             if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
                 renderHistoryList();
@@ -3098,15 +3316,8 @@ let gptPendingFiles = [];
 let gptIsSending = false;
 let gptAbortController = null;
 
-function getSortedSessions() {
-    return [...chatSessions].sort((a, b) => {
-        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-        return (b.updatedAt || 0) - (a.updatedAt || 0);
-    });
-}
-
 function getCurrentSession() {
-    return chatSessions.find(s => s.id === currentSessionId);
+    return getSessionById(currentSessionId);
 }
 
 async function toggleFullScreenGPT() {
@@ -3124,7 +3335,7 @@ async function toggleFullScreenGPT() {
         if (chatSessions.length === 0) {
             startNewGPTChat();
         } else if (!currentSessionId) {
-            const first = getSortedSessions()[0];
+            const first = getOrderedSessions()[0];
             loadSession(first.id);
         } else {
             renderCurrentChat();
@@ -3136,9 +3347,13 @@ function renderHistoryList() {
     const listEl = document.getElementById('gpt-history-list');
     listEl.innerHTML = '';
 
-    const sorted = getSortedSessions();
+    const sorted = getOrderedSessions();
 
     sorted.forEach(session => {
+        const node = document.createElement('div');
+        node.className = `gpt-history-node ${session.parentSessionId ? 'branch-child' : 'branch-root'}`;
+        node.style.setProperty('--branch-depth', String(session.branchDepth || 0));
+
         const item = document.createElement('div');
         item.className = `gpt-history-item ${session.id === currentSessionId ? 'active' : ''}`;
         item.onclick = () => loadSession(session.id);
@@ -3146,12 +3361,14 @@ function renderHistoryList() {
         item.innerHTML = `
             <div class="gpt-history-title-text" title="${escapeHtml(session.title)}">
                 ${session.pinned ? '<span class="gpt-pin-mark">📌</span>' : ''}
+                ${session.parentSessionId ? '<span class="gpt-branch-mark">↳</span>' : ''}
                 ${escapeHtml(session.title)}
             </div>
             <button class="gpt-history-more" title="更多" onclick="toggleSessionMenu(event, '${session.id}')">⋯</button>
         `;
 
-        listEl.appendChild(item);
+        node.appendChild(item);
+        listEl.appendChild(node);
     });
 }
 
@@ -3210,13 +3427,19 @@ function renameSession(e, id) {
 
 function deleteSession(e, id) {
     if (e) e.stopPropagation();
-    if (!confirm('确定要删除这段聊天吗？')) return;
-    chatSessions = chatSessions.filter(s => s.id !== id);
+    const descendantIds = getDescendantSessionIds(id);
+    const deleteCount = descendantIds.length + 1;
+    const confirmText = deleteCount > 1
+        ? `确定要删除这段聊天以及它的 ${descendantIds.length} 个分叉子聊天吗？`
+        : '确定要删除这段聊天吗？';
+    if (!confirm(confirmText)) return;
+    const blockedIds = new Set([id, ...descendantIds]);
+    chatSessions = chatSessions.filter(s => !blockedIds.has(s.id));
     saveSessions();
     closeAllSessionMenus();
-    if (currentSessionId === id) {
+    if (blockedIds.has(currentSessionId)) {
         if (chatSessions.length > 0) {
-            loadSession(getSortedSessions()[0].id);
+            loadSession(getOrderedSessions()[0].id);
         } else {
             startNewGPTChat();
         }
@@ -3232,15 +3455,9 @@ document.addEventListener('click', (e) => {
 });
 
 function startNewGPTChat() {
-    currentSessionId = 'session_' + Date.now();
-    chatSessions.unshift({
-        id: currentSessionId,
-        title: '新聊天',
-        pinned: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        messages: []
-    });
+    const session = createSessionRecord();
+    currentSessionId = session.id;
+    chatSessions.unshift(session);
     saveSessions();
     renderHistoryList();
     renderCurrentChat();
@@ -3248,6 +3465,7 @@ function startNewGPTChat() {
 }
 
 function loadSession(id) {
+    if (!getSessionById(id)) return;
     currentSessionId = id;
     renderHistoryList();
     renderCurrentChat();
@@ -3258,6 +3476,7 @@ let saveSessionsTimer = null;
 function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
+        repairSessionTree();
         // ✨ 静默把聊天记录发给后端存入 Cosmos DB，并带上自己的名字
         fetch(`${TUOTUO_API_BASE}/api/sessions`, {
             method: 'POST',
@@ -3523,8 +3742,8 @@ function renderCurrentChat() {
             </div>
         `;
     } else {
-        session.messages.forEach(msg => {
-            appendGPTMessageToDOM(msg, false);
+        session.messages.forEach((msg, index) => {
+            appendGPTMessageToDOM(msg, false, session, index);
         });
     }
 
@@ -3533,7 +3752,21 @@ function renderCurrentChat() {
     }, 50);
 }
 
-function appendGPTMessageToDOM(msg, shouldScroll = true) {
+function buildAssistantActionButton(action, label, sessionId, messageIndex) {
+    const safeSessionId = escapeAttr(sessionId);
+    const icon = action === 'copy'
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h9v11H9z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 15H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7v10a2 2 0 0 0 2 2h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7h7a3 3 0 0 1 3 3v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7L4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    const handler = action === 'copy' ? 'copyAssistantMessage' : 'branchSessionFromReply';
+    return `
+        <button class="gpt-msg-action-btn" type="button" onclick="${handler}(event, '${safeSessionId}', ${messageIndex})" aria-label="${label}" data-tip="${label}">
+            ${icon}
+            <span class="gpt-msg-action-tip">${label}</span>
+        </button>
+    `;
+}
+
+function appendGPTMessageToDOM(msg, shouldScroll = true, session = null, messageIndex = -1) {
     const chatArea = document.getElementById('gpt-chat-area');
 
     if (msg.role === 'user') {
@@ -3551,12 +3784,21 @@ function appendGPTMessageToDOM(msg, shouldScroll = true) {
         `);
 
     } else if (msg.role === 'assistant') {
+        const actionsHtml = session && messageIndex >= 0 ? `
+            <div class="gpt-msg-actions">
+                ${buildAssistantActionButton('copy', '复制', session.id, messageIndex)}
+                ${buildAssistantActionButton('branch', '分叉', session.id, messageIndex)}
+            </div>
+        ` : '';
         chatArea.insertAdjacentHTML('beforeend', `
             <div class="gpt-msg-container ai">
                 <div class="gpt-avatar gpt-avatar-ai">
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
-                <div class="gpt-content markdown-body">${renderMarkdownSafe(msg.content || '')}</div>
+                <div class="gpt-ai-message-shell">
+                    <div class="gpt-content markdown-body">${renderMarkdownSafe(msg.content || '')}</div>
+                    ${actionsHtml}
+                </div>
             </div>
         `);
     }
@@ -3564,6 +3806,63 @@ function appendGPTMessageToDOM(msg, shouldScroll = true) {
     if (shouldScroll) {
         chatArea.scrollTop = chatArea.scrollHeight;
     }
+}
+
+function flashMessageAction(button, text) {
+    if (!button) return;
+    const tip = button.querySelector('.gpt-msg-action-tip');
+    button.dataset.tip = text;
+    if (tip) tip.textContent = text;
+    clearTimeout(button.__actionTimer);
+    button.__actionTimer = setTimeout(() => {
+        const fallback = button.getAttribute('aria-label') || text;
+        button.dataset.tip = fallback;
+        if (tip) tip.textContent = fallback;
+    }, 1400);
+}
+
+async function copyAssistantMessage(event, sessionId, messageIndex) {
+    event.preventDefault();
+    event.stopPropagation();
+    const session = getSessionById(sessionId);
+    const message = session && session.messages && session.messages[messageIndex];
+    if (!message || message.role !== 'assistant') return;
+
+    try {
+        await navigator.clipboard.writeText(String(message.content || '').trim());
+        flashMessageAction(event.currentTarget, '已复制');
+    } catch {
+        flashMessageAction(event.currentTarget, '复制失败');
+    }
+}
+
+function branchSessionFromReply(event, sessionId, messageIndex) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const parentSession = getSessionById(sessionId);
+    const sourceMessage = parentSession && parentSession.messages && parentSession.messages[messageIndex];
+    if (!parentSession || !sourceMessage || sourceMessage.role !== 'assistant') return;
+
+    const siblingCount = getDirectChildSessions(parentSession.id).length + 1;
+    const branchSession = createSessionRecord({
+        title: `${parentSession.title} · 分叉 ${siblingCount}`,
+        messages: deepCloneSessionMessages(parentSession.messages.slice(0, messageIndex + 1)),
+        parentSessionId: parentSession.id,
+        rootSessionId: parentSession.rootSessionId || parentSession.id,
+        branchDepth: (parentSession.branchDepth || 0) + 1,
+        branchedFromMessageIndex: messageIndex,
+        branchedFromMessagePreview: summarizeBranchText(sourceMessage.content, 36),
+        needsHistorySeed: true
+    });
+
+    chatSessions.push(branchSession);
+    currentSessionId = branchSession.id;
+    saveSessions();
+    renderHistoryList();
+    renderCurrentChat();
+    clearGPTFile();
+    flashMessageAction(event.currentTarget, '已分叉');
 }
 
 function autoResizeGPT(el) {
@@ -4111,6 +4410,10 @@ async function sendGPTMessage() {
                     message: cleanMessageToBackend,
                     sessionId: currentSessionId,
                     userName: getStableUserName(),
+                    historyMessages: session.needsHistorySeed ? session.messages.slice(0, -1).map(msg => ({
+                        role: msg.role,
+                        content: msg.content || msg.userText || ''
+                    })) : [],
                     images: imagesToSend,
                     documents: documentsToSend,
                     stream: true,
@@ -4151,6 +4454,7 @@ async function sendGPTMessage() {
         gptIsSending = false;
         autoResizeGPT(inputEl);
         if (finalReply) {
+            session.needsHistorySeed = false;
             session.messages.push({ role: 'assistant', content: finalReply });
             session.updatedAt = Date.now();
             saveSessions();
