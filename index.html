@@ -339,13 +339,10 @@
         .gpt-msg-container.user { justify-content: flex-end !important; }
         .gpt-msg-container.ai { position: relative; justify-content: flex-start !important; display: block; width: min(100%, var(--gpt-composer-width)); max-width: var(--gpt-composer-width); padding: 16px 0 !important; }
         
-        /* 动态炫彩光环头像 */
+        /* 头像 */
         .gpt-avatar { width: var(--gpt-ai-avatar-size); height: var(--gpt-ai-avatar-size); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,182,193,0.3); font-weight: bold; }
         .gpt-avatar-ai { background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; }
         .gpt-avatar-user { background: white; color: #FF69B4; border: 2px solid #FFB6C1; }
-        
-        .gpt-avatar-ai.thinking-mode { position: relative; z-index: 1; overflow: visible; }
-        .thinking-ring-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: -1; }
 
         /* 用户与 AI 气泡颜色区分 */
         .gpt-content { font-size: 15px !important; line-height: 1.75 !important; max-width: 78% !important; overflow: visible !important; display: flex; flex-direction: column; justify-content: center; }
@@ -2238,8 +2235,85 @@ function enhanceCodeBlocks(root) {
 }
 
 // 安全 Markdown 渲染：marked + DOMPurify + KaTeX + highlight.js
-function renderMarkdownSafe(text) {
-    const { protectedText, math } = protectMathSegments(text || '');
+function escapeMarkdownLinkText(text) {
+    return String(text || '').replace(/[\[\]]/g, '\\$&');
+}
+
+function normalizeAssistantSources(sources) {
+    if (!Array.isArray(sources)) return [];
+    const seen = new Set();
+    return sources.map((src, index) => {
+        if (!src || typeof src !== 'object') return null;
+        const url = typeof src.url === 'string' && /^https?:\/\//i.test(src.url) ? src.url : '';
+        const title = String(src.title || src.url || src.type || `来源 ${index + 1}`).trim();
+        const key = `${url}::${title}`;
+        if (seen.has(key)) return null;
+        seen.add(key);
+        return { title: title.slice(0, 180), url, type: src.type || '' };
+    }).filter(Boolean);
+}
+
+function mergeAssistantSources(existingSources, incomingSources) {
+    return normalizeAssistantSources([...(existingSources || []), ...(incomingSources || [])]);
+}
+
+function buildAssistantSourcesMarkdown(sources) {
+    const normalizedSources = normalizeAssistantSources(sources);
+    if (!normalizedSources.length) return '';
+    const lines = normalizedSources.map((src, index) => {
+        const title = escapeMarkdownLinkText(src.title || src.url || src.type || `来源 ${index + 1}`);
+        return src.url ? `${index + 1}. [${title}](${src.url})` : `${index + 1}. ${title}`;
+    });
+    return `**参考来源**\n${lines.join('\n')}`;
+}
+
+function replaceCitationPlaceholders(text, sources) {
+    const normalizedSources = normalizeAssistantSources(sources);
+    if (!text) return '';
+
+    let cursor = 0;
+    const refMap = new Map();
+
+    function getReferenceEntry(refId) {
+        const key = refId || `__auto_${cursor}`;
+        if (refMap.has(key)) return refMap.get(key);
+        const source = normalizedSources[cursor] || null;
+        const entry = source ? { ...source, index: cursor + 1 } : null;
+        refMap.set(key, entry);
+        if (source) cursor += 1;
+        return entry;
+    }
+
+    function buildCitationMarkdown(refIds) {
+        const ids = Array.isArray(refIds) ? refIds.filter(Boolean) : [];
+        const entries = (ids.length ? ids : [null])
+            .map(id => getReferenceEntry(id))
+            .filter(Boolean);
+        if (!entries.length) return '';
+        return entries.map(entry => entry.url ? `[${entry.index}](${entry.url})` : `[${entry.index}]`).join(' ');
+    }
+
+    let output = String(text);
+
+    output = output.replace(/cite([^]+)|(?:\[\s*)?cite\s+turn\d+\w+\d+(?:\s*(?:,|，)?\s*cite\s+turn\d+\w+\d+)*\s*\]?/gi, (match, refChunk) => {
+        const refs = refChunk
+            ? String(refChunk || '').split('').map(item => item.trim()).filter(Boolean)
+            : (match.match(/turn\d+\w+\d+/gi) || []);
+        return buildCitationMarkdown(refs);
+    });
+
+    output = output.replace(/\(\s*\[([^\]]+)\]\((https?:\/\/[^)]+)\)\s*\)/g, '[$1]($2)');
+    output = output.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+    return output.trim();
+}
+
+function renderMarkdownSafe(text, sources = []) {
+    const normalizedSources = normalizeAssistantSources(sources);
+    const replacedText = replaceCitationPlaceholders(text || '', normalizedSources);
+    const renderedMarkdown = normalizedSources.length && !/(\*\*参考来源\*\*|(?:^|\n)参考来源(?:\n|$))/m.test(replacedText)
+        ? `${replacedText}\n\n${buildAssistantSourcesMarkdown(normalizedSources)}`.trim()
+        : replacedText;
+    const { protectedText, math } = protectMathSegments(renderedMarkdown);
     if (window.marked) {
         marked.setOptions({ breaks: true, gfm: true, mangle: false, headerIds: false });
     }
@@ -3805,7 +3879,7 @@ function appendGPTMessageToDOM(msg, shouldScroll = true, session = null, message
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
                 <div class="gpt-ai-message-shell">
-                    <div class="gpt-content markdown-body">${renderMarkdownSafe(msg.content || '')}</div>
+                    <div class="gpt-content markdown-body">${renderMarkdownSafe(msg.content || '', msg.sources || [])}</div>
                     ${actionsHtml}
                 </div>
             </div>
@@ -3949,6 +4023,7 @@ function getThinkingSteps(text, files) {
    彩虹重力光环动画（Canvas版）
 ============================================================ */
 function startThinkingRing(avatarEl) {
+    return function stop() {};
     // 修复1：使用 devicePixelRatio 高清渲染，消除模糊
     const DPR = window.devicePixelRatio || 1;
     const CSS_SIZE = 56; // CSS显示尺寸（px）
@@ -4140,7 +4215,7 @@ function createThinkingMessage(text, files) {
 
     chatArea.insertAdjacentHTML('beforeend', `
         <div class="gpt-msg-container ai" id="${id}">
-            <div class="gpt-avatar gpt-avatar-ai thinking-mode">
+            <div class="gpt-avatar gpt-avatar-ai">
                 <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
             </div>
             <div class="gpt-content gpt-thinking-content">
@@ -4228,7 +4303,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
         
         const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
 
-        streamState.outputEl.innerHTML = renderMarkdownSafe(streamState.fullText);
+        streamState.outputEl.innerHTML = renderMarkdownSafe(streamState.fullText, streamState.sources || []);
         
         if (!isScrolledUp || force) {
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -4274,11 +4349,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                         streamState.fullText += obj.content;
                         render();
                     } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
-                        const sourceText = obj.sources.map((src, index) => {
-                            const title = src.title || src.url || src.type || `来源 ${index + 1}`;
-                            return src.url ? `${index + 1}. [${title}](${src.url})` : `${index + 1}. ${title}`;
-                        }).join('\n');
-                        streamState.fullText += `\n\n**参考来源**\n${sourceText}`;
+                        streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
                         render(true);
                     }
                 } catch {
@@ -4293,7 +4364,10 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
     }
 
     render(true);
-    return streamState.fullText;
+    return {
+        text: streamState.fullText,
+        sources: normalizeAssistantSources(streamState.sources || [])
+    };
 }
 
 function getErrorMessageFromResponse(response, fallback) {
@@ -4370,8 +4444,9 @@ async function sendGPTMessage() {
     autoResizeGPT(inputEl);
 
     let finalReply = '';
+    let finalSources = [];
     let outputEl = null;
-    const streamState = { outputEl: null, fullText: '' };
+    const streamState = { outputEl: null, fullText: '', sources: [] };
 
     try {
         if (modeAtSend === 'image') {
@@ -4433,18 +4508,24 @@ async function sendGPTMessage() {
 
             if ((response.headers.get('content-type') || '').includes('application/json')) {
                 outputEl = prepareAssistantOutput(thinkingObj);
-                finalReply = (await response.json()).reply || '';
+                const data = await response.json();
+                finalReply = data.reply || '';
+                finalSources = normalizeAssistantSources(data.sources || []);
                 await typewriterMarkdown(outputEl, finalReply);
+                outputEl.innerHTML = renderMarkdownSafe(finalReply, finalSources);
             } else {
-                finalReply = await consumeGPTStream(response, thinkingObj, streamState);
+                const streamResult = await consumeGPTStream(response, thinkingObj, streamState);
+                finalReply = streamResult.text || '';
+                finalSources = normalizeAssistantSources(streamResult.sources || []);
             }
         }
     } catch (err) {
         thinkingObj.stop();
         if (err.name === 'AbortError') {
             outputEl = streamState.outputEl || outputEl || prepareAssistantOutput(thinkingObj);
+            finalSources = normalizeAssistantSources(streamState.sources || []);
             finalReply = (streamState.fullText || outputEl.innerText || '') + "\n\n*[已停止生成]*";
-            outputEl.innerHTML = renderMarkdownSafe(finalReply);
+            outputEl.innerHTML = renderMarkdownSafe(finalReply, finalSources);
         } else {
             if (thinkingObj.el) thinkingObj.el.remove();
             const chatArea = document.getElementById('gpt-chat-area');
@@ -4464,7 +4545,7 @@ async function sendGPTMessage() {
         autoResizeGPT(inputEl);
         if (finalReply) {
             session.needsHistorySeed = false;
-            session.messages.push({ role: 'assistant', content: finalReply });
+            session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources });
             session.updatedAt = Date.now();
             saveSessions();
             renderHistoryList();
