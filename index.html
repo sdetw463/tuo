@@ -1820,6 +1820,890 @@
     }
 }
 
+
+/* ============================================================
+   ChatGPT 官网风格 · 柔粉 TuoTuo AI 整合补丁
+   - 左侧仅保留 TuoTuo / 新聊天 / 搜索聊天 / 最近 / 返回主页
+   - 空聊天输入框居中，开始聊天后回到底部
+============================================================ */
+#gpt-fullscreen {
+    --tuo-bg: #ffffff;
+    --tuo-sidebar: #f8f2f6;
+    --tuo-panel: #ffffff;
+    --tuo-line: #eadde4;
+    --tuo-text: #2a2028;
+    --tuo-muted: #8a7180;
+    --tuo-pink: #d94686;
+    --tuo-pink-strong: #b83268;
+    --tuo-pink-soft: #fff0f6;
+    --tuo-pink-softer: #fff7fa;
+    background: var(--tuo-bg) !important;
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-step-text,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
+    display: none !important;
+}
+
+#gpt-fullscreen ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+#gpt-fullscreen ::-webkit-scrollbar-track {
+    background: transparent;
+}
+#gpt-fullscreen ::-webkit-scrollbar-thumb {
+    background: rgba(217, 70, 134, 0.2);
+    border-radius: 3px;
+}
+#gpt-fullscreen ::-webkit-scrollbar-thumb:hover {
+    background: rgba(217, 70, 134, 0.4);
+}
+
+#gpt-fullscreen .gpt-sidebar {
+    width: 278px !important;
+    background: var(--tuo-sidebar) !important;
+    border-right: 1px solid var(--tuo-line) !important;
+    box-shadow: none !important;
+    padding: 14px 12px !important;
+}
+
+#gpt-fullscreen .gpt-brand {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px 8px;
+    font-size: 21px;
+    font-weight: 850;
+    color: var(--tuo-text);
+    letter-spacing: -0.03em;
+}
+
+#gpt-fullscreen .gpt-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+
+#gpt-fullscreen .gpt-nav-item {
+    width: 100%;
+    min-height: 42px;
+    border: none;
+    background: transparent;
+    color: var(--tuo-text);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 10px;
+    font-size: 14px;
+    font-weight: normal;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: 0.16s ease;
+}
+
+#gpt-fullscreen .gpt-nav-item:hover {
+    background: #ffffff;
+}
+
+#gpt-fullscreen .gpt-nav-item svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+#gpt-fullscreen .gpt-sidebar-search {
+    display: none;
+    margin: -5px 0 14px;
+}
+
+#gpt-fullscreen .gpt-sidebar-search.show {
+    display: block;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--tuo-line);
+    border-radius: 12px;
+    background: #ffffff;
+    outline: none;
+    padding: 0 12px;
+    color: var(--tuo-text);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input:focus {
+    border-color: #e58aad;
+    box-shadow: 0 0 0 3px rgba(217, 70, 134, 0.12);
+}
+
+#gpt-fullscreen .gpt-history {
+    padding-right: 2px !important;
+}
+
+#gpt-fullscreen .gpt-history-title {
+    color: var(--tuo-muted) !important;
+    margin: 10px 8px 6px !important;
+}
+
+#gpt-fullscreen .gpt-history-item {
+    color: #5f4b58 !important;
+    border-radius: 10px !important;
+    min-height: 38px;
+}
+
+#gpt-fullscreen .gpt-history-item:hover {
+    background: #ffffff !important;
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    background: #fbe3ed !important;
+    color: var(--tuo-pink-strong) !important;
+    font-weight: 750 !important;
+}
+
+#gpt-fullscreen .gpt-history-more:hover,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    background: #fff0f5 !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-session-menu {
+    border-color: var(--tuo-line) !important;
+    box-shadow: 0 18px 42px rgba(67, 42, 56, 0.14) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-bottom {
+    border-top: 1px solid var(--tuo-line) !important;
+}
+
+#gpt-fullscreen .gpt-back-home {
+    color: #5f4b58 !important;
+    border-radius: 12px !important;
+}
+
+#gpt-fullscreen .gpt-back-home:hover {
+    background: #fff0f5 !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-main {
+    background: var(--tuo-bg) !important;
+}
+
+#gpt-fullscreen .gpt-header {
+    background: rgba(255, 250, 253, 0.92) !important;
+    border-bottom: 1px solid #f3e7ed !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+#gpt-fullscreen .gpt-model-selector,
+#gpt-top-title {
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-chat-area {
+    background: var(--tuo-bg) !important;
+}
+
+#gpt-fullscreen.gpt-empty .gpt-chat-area {
+    justify-content: center;
+    padding-bottom: 170px !important;
+}
+
+#gpt-fullscreen .gpt-empty-hero {
+    width: min(100%, 880px);
+    text-align: center;
+    padding: 0 24px;
+    pointer-events: none;
+}
+
+#gpt-fullscreen .gpt-empty-title {
+    font-size: clamp(26px, 3vw, 36px);
+    line-height: 1.25;
+    font-weight: normal;
+    color: var(--tuo-text);
+    letter-spacing: -0.04em;
+}
+
+#gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% + 42px);
+    bottom: auto;
+    transform: none;
+    background: transparent !important;
+    pointer-events: none;
+    padding: 0 20px !important;
+}
+
+#gpt-fullscreen.gpt-empty .gpt-input-box,
+#gpt-fullscreen.gpt-empty .gpt-disclaimer {
+    pointer-events: auto;
+}
+
+#gpt-fullscreen .gpt-input-wrapper {
+    background: linear-gradient(180deg, rgba(255,250,253,0) 0%, var(--tuo-bg) 30%) !important;
+}
+
+#gpt-fullscreen .gpt-input-box {
+    max-width: 820px !important;
+    border-radius: 26px !important;
+    border: 1px solid var(--tuo-line) !important;
+    background: #ffffff !important;
+    box-shadow: 0 16px 42px rgba(67, 42, 56, 0.12) !important;
+}
+
+#gpt-fullscreen .gpt-input-box:focus-within {
+    border-color: #e58aad !important;
+    box-shadow: 0 18px 48px rgba(217, 70, 134, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-textarea {
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-textarea::placeholder {
+    color: #aa96a2 !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn {
+    color: var(--tuo-muted) !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn:hover {
+    background: #fff0f5 !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn {
+    background: var(--tuo-text) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:hover {
+    background: var(--tuo-pink-strong) !important;
+    box-shadow: 0 7px 18px rgba(184, 50, 104, 0.24) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:disabled {
+    background: #eadde4 !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background: var(--tuo-pink-soft) !important;
+    border: 1px solid #f7d7e4 !important;
+    color: var(--tuo-text) !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .markdown-body {
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-ai {
+    background: linear-gradient(135deg, var(--tuo-pink-strong), #f09abc) !important;
+    color: #ffffff !important;
+    box-shadow: 0 5px 16px rgba(201, 79, 130, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-user {
+    color: var(--tuo-pink-strong) !important;
+    border-color: #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn {
+    border-color: #f4c8d9 !important;
+    background: #fffafc !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn:hover {
+    background: #fff0f5 !important;
+}
+
+#gpt-fullscreen .markdown-body h1,
+#gpt-fullscreen .markdown-body h2,
+#gpt-fullscreen .markdown-body h3,
+#gpt-fullscreen .markdown-body h4,
+#gpt-fullscreen .markdown-body strong,
+#gpt-fullscreen .markdown-body a {
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .markdown-body th {
+    background: #fff0f5 !important;
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .markdown-body code:not(pre code) {
+    background: #f7eef3 !important;
+    color: #9f2f5d !important;
+}
+
+#gpt-fullscreen .markdown-body blockquote {
+    border-left-color: #e58aad !important;
+    background: #fff5f8 !important;
+    color: #6b5360 !important;
+}
+
+#gpt-fullscreen .math-block {
+    border-color: #f4c8d9 !important;
+    background: #fff8fa !important;
+}
+
+#gpt-fullscreen .gpt-thinking-content,
+#gpt-fullscreen .gpt-thinking-title {
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-detail {
+    color: var(--tuo-muted) !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip,
+#gpt-fullscreen .gpt-status-pill {
+    color: var(--tuo-pink-strong) !important;
+    background: #fff0f5 !important;
+    border-color: #f4c8d9 !important;
+}
+
+#gpt-fullscreen .gpt-image-select-btn,
+#gpt-fullscreen .gpt-image-options-title,
+#gpt-fullscreen .gpt-image-option,
+#gpt-fullscreen .gpt-image-option:hover,
+#gpt-fullscreen .gpt-image-option.active,
+#gpt-fullscreen .gpt-image-option.active::after,
+#gpt-fullscreen .gpt-ratio-icon {
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-image-select-btn,
+#gpt-fullscreen .gpt-image-options-menu,
+#gpt-fullscreen .gpt-attachment-menu {
+    border-color: #f4c8d9 !important;
+    box-shadow: 0 18px 46px rgba(184, 50, 104, 0.14), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item {
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item:hover {
+    background: #f8f1f5 !important;
+    color: var(--tuo-text) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item.active,
+#gpt-fullscreen .gpt-image-option.active {
+    background: #fbe3ed !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-sidebar,
+    #gpt-fullscreen.gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        width: min(84vw, 320px) !important;
+        background: var(--tuo-sidebar) !important;
+        border-right: 1px solid var(--tuo-line) !important;
+        box-shadow: 12px 0 34px rgba(67, 42, 56, 0.15) !important;
+    }
+
+    #gpt-fullscreen .gpt-header {
+        border-bottom-color: #f0e6eb !important;
+    }
+
+    #gpt-fullscreen.gpt-empty .gpt-chat-area {
+        padding-bottom: 150px !important;
+    }
+
+    #gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+        top: calc(50% + 34px);
+        padding: 0 10px !important;
+    }
+
+    #gpt-fullscreen .gpt-empty-title {
+        font-size: 25px;
+    }
+
+    #gpt-fullscreen .gpt-input-box {
+        max-width: none !important;
+        border-radius: 22px !important;
+    }
+
+    #gpt-fullscreen .gpt-back-home {
+        background: #fff0f5 !important;
+    }
+}
+
+    
+
+/* ============================================================
+   最终补丁：右侧无顶栏、实时思考状态、统一粉色控件风格
+============================================================ */
+#gpt-fullscreen .gpt-header {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    right: auto !important;
+    z-index: 12 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen #gpt-top-title,
+#gpt-fullscreen .gpt-header-actions {
+    display: none !important;
+}
+
+#gpt-fullscreen .gpt-chat-area {
+    padding-top: 20px !important;
+}
+
+#gpt-fullscreen .gpt-empty-title {
+    font-weight: 400 !important;
+    letter-spacing: -0.02em !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message {
+    position: relative !important;
+    display: block !important;
+    width: min(100%, var(--gpt-composer-width)) !important;
+    max-width: var(--gpt-composer-width) !important;
+    padding: 16px 0 !important;
+    min-height: 42px !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar {
+    background: transparent !important;
+    color: var(--tuo-pink-strong) !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar img,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-title,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-detail {
+    display: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
+    min-height: var(--gpt-ai-avatar-size) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    color: var(--tuo-muted) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-dots {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: var(--gpt-ai-avatar-size) !important;
+    height: var(--gpt-ai-avatar-size) !important;
+    padding: 0 !important;
+}
+
+#gpt-fullscreen .gpt-thinking-dots span {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #c94f82 !important;
+    opacity: 0.42;
+    animation: tuoThinkingDotBounce 1.05s infinite ease-in-out;
+}
+
+#gpt-fullscreen .gpt-thinking-dots span:nth-child(2) {
+    animation-delay: 0.15s;
+    opacity: 0.62;
+}
+
+#gpt-fullscreen .gpt-thinking-dots span:nth-child(3) {
+    animation-delay: 0.3s;
+    opacity: 0.82;
+}
+
+#gpt-fullscreen .gpt-thinking-step-text {
+    display: inline-block;
+    margin-left: 0;
+    color: var(--tuo-muted) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#gpt-fullscreen .gpt-thinking-step-text.show:not([hidden]) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes tuoThinkingDotBounce {
+    0%, 80%, 100% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-6px) scale(1.08); }
+}
+
+#gpt-fullscreen .gpt-mode-chip,
+#gpt-fullscreen .gpt-image-select-btn {
+    min-height: 42px !important;
+    height: 42px !important;
+    border: 1px solid #f5bdd2 !important;
+    border-radius: 999px !important;
+    background: rgba(255, 240, 246, 0.92) !important;
+    color: var(--tuo-pink-strong) !important;
+    padding: 0 18px !important;
+    gap: 10px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    box-shadow: 0 12px 30px rgba(184, 50, 104, 0.10) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip button {
+    color: var(--tuo-pink-strong) !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    padding: 0 0 1px 4px !important;
+}
+
+#gpt-fullscreen .gpt-image-select-btn:hover,
+#gpt-fullscreen .gpt-mode-chip:hover {
+    background: #ffe8f1 !important;
+    border-color: #ee9fc0 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 34px rgba(184, 50, 104, 0.14) !important;
+}
+
+#gpt-fullscreen .gpt-image-options-menu,
+#gpt-fullscreen .gpt-attachment-menu {
+    background: rgba(255, 250, 253, 0.94) !important;
+    border: 1px solid #f5bdd2 !important;
+    border-radius: 22px !important;
+    padding: 10px !important;
+    gap: 4px !important;
+    box-shadow: 0 20px 54px rgba(67, 42, 56, 0.16) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+}
+
+#gpt-fullscreen .gpt-attachment-menu {
+    min-width: 220px !important;
+}
+
+#gpt-fullscreen .gpt-image-options-menu {
+    width: 232px !important;
+}
+
+#gpt-fullscreen .gpt-menu-item,
+#gpt-fullscreen .gpt-image-option {
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 14px !important;
+    color: var(--tuo-text) !important;
+    background: transparent !important;
+    font-size: 14px !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0 !important;
+}
+
+#gpt-fullscreen .gpt-menu-item:hover,
+#gpt-fullscreen .gpt-image-option:hover {
+    background: #fff0f5 !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item.active,
+#gpt-fullscreen .gpt-image-option.active {
+    background: #fbe3ed !important;
+    color: var(--tuo-pink-strong) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item svg {
+    width: 20px !important;
+    height: 20px !important;
+    color: currentColor !important;
+    flex-shrink: 0 !important;
+}
+
+#gpt-fullscreen .gpt-image-options-title {
+    color: var(--tuo-muted) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    padding: 4px 8px 8px !important;
+}
+
+#gpt-fullscreen .gpt-ratio-icon {
+    color: currentColor !important;
+    flex-shrink: 0 !important;
+}
+
+#gpt-fullscreen .gpt-menu-divider {
+    height: 1px !important;
+    background: rgba(184, 50, 104, 0.14) !important;
+    margin: 6px 4px !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message {
+        display: flex !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding: 12px 14px !important;
+        gap: 10px !important;
+    }
+
+    #gpt-fullscreen .gpt-thinking-message .gpt-avatar {
+        position: static !important;
+        flex-shrink: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
+        width: auto !important;
+        max-width: calc(100vw - 74px) !important;
+    }
+
+    #gpt-fullscreen .gpt-thinking-step-text {
+        white-space: normal;
+        font-size: 13px !important;
+    }
+}
+
+
+
+
+    
+
+/* ============================================================
+   终版修正：绘画模式工具项改为 ChatGPT 式内联文本按钮
+   目标：+  图片  自动⌄ 位于同一行，去掉大胶囊按钮外框
+============================================================ */
+#gpt-fullscreen .gpt-input-controls {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+    width: 32px !important;
+    height: 36px !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #b83268 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn:hover {
+    background: transparent !important;
+    color: #d94686 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-mode-row {
+    order: 2 !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    align-self: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#gpt-fullscreen .gpt-textarea {
+    order: 3 !important;
+    flex: 1 1 auto !important;
+    min-width: 140px !important;
+}
+
+#gpt-fullscreen .gpt-send-btn {
+    order: 4 !important;
+    flex: 0 0 auto !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-chip,
+#gpt-fullscreen.gpt-image-mode .gpt-image-settings.show,
+#gpt-fullscreen.gpt-image-mode .gpt-image-select-wrap,
+#gpt-fullscreen.gpt-image-mode .gpt-image-select-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-chip,
+#gpt-fullscreen.gpt-image-mode .gpt-image-select-btn {
+    width: auto !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: #b83268 !important;
+    padding: 0 2px !important;
+    margin: 0 !important;
+    gap: 6px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-chip:hover,
+#gpt-fullscreen.gpt-image-mode .gpt-image-select-btn:hover {
+    background: rgba(255, 240, 246, 0.72) !important;
+    color: #d94686 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-chip .gpt-mode-exit {
+    display: none !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-chip #gpt-mode-chip-text,
+#gpt-fullscreen.gpt-image-mode .gpt-image-select-btn #gpt-ratio-chip-text {
+    color: currentColor !important;
+    font: inherit !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-inline-icon,
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    color: currentColor !important;
+    flex: 0 0 20px !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-mode-inline-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon {
+    position: relative !important;
+    display: inline-block !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon::before,
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon::after {
+    content: '' !important;
+    position: absolute !important;
+    box-sizing: border-box !important;
+    border: 1.5px solid currentColor !important;
+    border-radius: 3px !important;
+    background: transparent !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon::before {
+    width: 14px !important;
+    height: 10px !important;
+    left: 1px !important;
+    top: 4px !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-ratio-icon::after {
+    width: 10px !important;
+    height: 7px !important;
+    left: 7px !important;
+    top: 8px !important;
+    background: #fffafd !important;
+}
+
+#gpt-fullscreen.gpt-image-mode .gpt-select-chevron {
+    display: inline-block !important;
+    color: currentColor !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    margin-left: 2px !important;
+    transform: translateY(1px) !important;
+}
+
+#gpt-fullscreen:not(.gpt-image-mode) .gpt-image-settings:not(.show) {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-input-controls {
+        gap: 9px !important;
+    }
+
+    #gpt-fullscreen.gpt-image-mode .gpt-mode-row {
+        gap: 8px !important;
+    }
+
+    #gpt-fullscreen.gpt-image-mode .gpt-mode-chip,
+    #gpt-fullscreen.gpt-image-mode .gpt-image-select-btn {
+        font-size: 14px !important;
+        gap: 4px !important;
+    }
+
+    #gpt-fullscreen.gpt-image-mode .gpt-mode-inline-icon,
+    #gpt-fullscreen.gpt-image-mode .gpt-ratio-icon {
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        flex-basis: 18px !important;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -2016,14 +2900,21 @@
 
     <div id="gpt-fullscreen" class="gpt-fullscreen">
         <div class="gpt-sidebar">
-            <div class="gpt-sidebar-top">
-                <button class="gpt-new-chat-btn" onclick="startNewGPTChat()">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg> 
+            <div class="gpt-brand">TuoTuo</div>
+
+            <div class="gpt-sidebar-nav">
+                <button class="gpt-nav-item" type="button" onclick="startNewGPTChat()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
                     新聊天
                 </button>
-                <button class="gpt-btn-icon" title="收起侧边栏" onclick="toggleGPTSidebar()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                <button class="gpt-nav-item" type="button" onclick="toggleGPTSearch()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+                    搜索聊天
                 </button>
+            </div>
+
+            <div class="gpt-sidebar-search" id="gpt-sidebar-search">
+                <input id="gpt-history-search" type="search" placeholder="搜索聊天..." oninput="renderHistoryList()">
             </div>
             
             <div class="gpt-history">
@@ -2057,32 +2948,6 @@
                     
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
-                    <div class="gpt-mode-row">
-                        <div class="gpt-mode-chip" id="gpt-mode-chip">
-                            <span id="gpt-mode-chip-text">普通</span>
-                            <button type="button" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
-                        </div>
-
-                        <div class="gpt-image-settings" id="gpt-image-settings">
-                        <div class="gpt-image-select-wrap">
-                            <button type="button" class="gpt-image-select-btn" onclick="toggleImageRatioMenu(event)">
-                                <span class="gpt-ratio-icon ratio-auto" id="gpt-ratio-chip-icon"></span>
-                                <span id="gpt-ratio-chip-text">自动</span>
-                                <span>⌄</span>
-                            </button>
-                            <div class="gpt-image-options-menu" id="gpt-ratio-menu">
-                                <div class="gpt-image-options-title">选择图片宽高比</div>
-                                <button type="button" class="gpt-image-option" data-ratio="auto" onclick="setImageRatio('auto')"><span class="gpt-ratio-icon ratio-auto"></span><span>自动</span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="1:1" onclick="setImageRatio('1:1')"><span class="gpt-ratio-icon ratio-1-1"></span><span>方形 <span class="gpt-image-option-muted">1:1</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="3:4" onclick="setImageRatio('3:4')"><span class="gpt-ratio-icon ratio-3-4"></span><span>竖版 <span class="gpt-image-option-muted">3:4</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="9:16" onclick="setImageRatio('9:16')"><span class="gpt-ratio-icon ratio-9-16"></span><span>故事版 <span class="gpt-image-option-muted">9:16</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="4:3" onclick="setImageRatio('4:3')"><span class="gpt-ratio-icon ratio-4-3"></span><span>横版 <span class="gpt-image-option-muted">4:3</span></span></button>
-                                <button type="button" class="gpt-image-option" data-ratio="16:9" onclick="setImageRatio('16:9')"><span class="gpt-ratio-icon ratio-16-9"></span><span>宽屏 <span class="gpt-image-option-muted">16:9</span></span></button>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-
                     <div class="gpt-input-controls">
                         <input type="file" id="gpt-image-upload" accept="image/*,.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.xml,.yaml,.yml,.py,.java,.c,.cpp,.h,.hpp,.cs,.go,.rs,.php,.rb,.swift,.kt,.sql,.sh,.bat,.ps1,.ini,.toml,.log,.doc,.docx,.xls,.xlsx,.pptx,.pdf" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
                         
@@ -2110,7 +2975,35 @@
                             </div>
                         </div>
 
-                        <button class="gpt-attach-btn" title="附加功能" onclick="toggleAttachmentMenu(event)">＋</button>
+                        <button class="gpt-attach-btn" title="附加功能" onclick="toggleAttachmentMenu(event)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+
+                        <div class="gpt-mode-row">
+                            <div class="gpt-mode-chip" id="gpt-mode-chip">
+                                <span id="gpt-mode-chip-text">普通</span>
+                                <button type="button" class="gpt-mode-exit" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
+                            </div>
+
+                            <div class="gpt-image-settings" id="gpt-image-settings">
+                                <div class="gpt-image-select-wrap">
+                                    <button type="button" class="gpt-image-select-btn" onclick="toggleImageRatioMenu(event)">
+                                        <span class="gpt-ratio-icon ratio-auto" id="gpt-ratio-chip-icon"></span>
+                                        <span id="gpt-ratio-chip-text">自动</span>
+                                        <span class="gpt-select-chevron">⌄</span>
+                                    </button>
+                                    <div class="gpt-image-options-menu" id="gpt-ratio-menu">
+                                        <div class="gpt-image-options-title">选择图片宽高比</div>
+                                        <button type="button" class="gpt-image-option" data-ratio="auto" onclick="setImageRatio('auto')"><span class="gpt-ratio-icon ratio-auto"></span><span>自动</span></button>
+                                        <button type="button" class="gpt-image-option" data-ratio="1:1" onclick="setImageRatio('1:1')"><span class="gpt-ratio-icon ratio-1-1"></span><span>方形 <span class="gpt-image-option-muted">1:1</span></span></button>
+                                        <button type="button" class="gpt-image-option" data-ratio="3:4" onclick="setImageRatio('3:4')"><span class="gpt-ratio-icon ratio-3-4"></span><span>竖版 <span class="gpt-image-option-muted">3:4</span></span></button>
+                                        <button type="button" class="gpt-image-option" data-ratio="9:16" onclick="setImageRatio('9:16')"><span class="gpt-ratio-icon ratio-9-16"></span><span>故事版 <span class="gpt-image-option-muted">9:16</span></span></button>
+                                        <button type="button" class="gpt-image-option" data-ratio="4:3" onclick="setImageRatio('4:3')"><span class="gpt-ratio-icon ratio-4-3"></span><span>横版 <span class="gpt-image-option-muted">4:3</span></span></button>
+                                        <button type="button" class="gpt-image-option" data-ratio="16:9" onclick="setImageRatio('16:9')"><span class="gpt-ratio-icon ratio-16-9"></span><span>宽屏 <span class="gpt-image-option-muted">16:9</span></span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <textarea class="gpt-textarea" id="gpt-input-el" placeholder="有什么想问 TuoTuo 的？" rows="1" oninput="autoResizeGPT(this)" onkeydown="handleGPTKey(event)"></textarea>
                         
@@ -3249,16 +4142,25 @@ fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data)) {
+            const localUnsaved = chatSessions.filter(s => s.messages.length === 0);
             chatSessions = data.map(s => normalizeSessionRecord({
                 pinned: false,
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 ...s
             }));
+            localUnsaved.forEach(ls => {
+                if (!chatSessions.find(s => s.id === ls.id)) {
+                    chatSessions.unshift(ls);
+                }
+            });
             repairSessionTree();
             // 如果面板已经打开，重新渲染一下历史列表
             if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
                 renderHistoryList();
+                if (!currentSessionId && chatSessions.length > 0) {
+                    loadSession(getOrderedSessions()[0].id);
+                }
             }
         }
     }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
@@ -3267,6 +4169,30 @@ fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)
 function toggleGPTSidebar() {
     const container = document.getElementById('gpt-fullscreen');
     container.classList.toggle('sidebar-collapsed');
+}
+
+function toggleGPTSearch() {
+    const box = document.getElementById('gpt-sidebar-search');
+    const input = document.getElementById('gpt-history-search');
+    if (!box) return;
+
+    box.classList.toggle('show');
+
+    if (box.classList.contains('show') && input) {
+        setTimeout(() => input.focus(), 50);
+    } else if (input) {
+        input.value = '';
+        renderHistoryList();
+    }
+}
+
+function getTuoTimeGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 0 && hour < 5) return '深夜了哦，还在陪TuoTuo吗？';
+    if (hour >= 5 && hour < 11) return '早上好呀，想和TuoTuo聊点什么吗？';
+    if (hour >= 11 && hour < 13) return '中午好呀，想和TuoTuo聊点什么吗？';
+    if (hour >= 13 && hour < 18) return '下午好呀，想和TuoTuo聊点什么吗？';
+    return '晚上好呀，想和TuoTuo聊点什么吗？';
 }
 
 function toggleAttachmentMenu(e) {
@@ -3319,6 +4245,34 @@ function updateImageSettingsVisibility() {
     setImageRatio(currentImageRatio);
 }
 
+
+function setGPTModeChipContent(label, variant = 'reasoning') {
+    const chip = document.getElementById('gpt-mode-chip');
+    if (!chip) return;
+    chip.classList.toggle('is-image-mode', variant === 'image');
+    if (variant === 'image') {
+        chip.innerHTML = `
+            <span class="gpt-mode-inline-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="14" height="14" rx="2.6"></rect>
+                    <path d="M3 14l4-4a2 2 0 0 1 2.8 0l4.2 4.2"></path>
+                    <circle cx="7.5" cy="9.5" r="1.5"></circle>
+                    <path d="M19 3v4"></path>
+                    <path d="M21 5h-4"></path>
+                    <path d="M21 12v3"></path>
+                    <path d="M22.5 13.5h-3"></path>
+                </svg>
+            </span>
+            <span id="gpt-mode-chip-text">${escapeHtml(label)}</span>
+        `;
+    } else {
+        chip.innerHTML = `
+            <span id="gpt-mode-chip-text">${escapeHtml(label)}</span>
+            <button type="button" class="gpt-mode-exit" onclick="setGPTReasoningMode('normal')" title="退出当前模式">×</button>
+        `;
+    }
+}
+
 function setGPTReasoningMode(mode) {
     if (!['normal', 'think', 'research'].includes(mode)) mode = 'normal';
     currentReasoningMode = mode;
@@ -3330,14 +4284,13 @@ function setGPTReasoningMode(mode) {
     if (researchItem) researchItem.classList.toggle('active', mode === 'research');
 
     const chip = document.getElementById('gpt-mode-chip');
-    const chipText = document.getElementById('gpt-mode-chip-text');
-    if (chip && chipText) {
+    if (chip) {
         if (mode === 'normal') {
-            chip.classList.remove('show');
-            chipText.textContent = '普通';
+            chip.classList.remove('show', 'is-image-mode');
+            setGPTModeChipContent('普通', 'reasoning');
         } else {
             chip.classList.add('show');
-            chipText.textContent = mode === 'think' ? '思考一下' : '深度研究';
+            setGPTModeChipContent(mode === 'think' ? '思考一下' : '深度研究', 'reasoning');
         }
     }
 
@@ -3361,12 +4314,14 @@ function switchToImageMode() {
     currentGPTMode = 'image';
     currentReasoningMode = 'normal';
     document.getElementById('gpt-input-el').placeholder = '让全能画家 TuoTuo 来帮你实现愿望吧...';
+    document.getElementById('gpt-fullscreen')?.classList.add('gpt-image-mode');
     document.getElementById('gpt-menu-chat-mode').style.display = 'flex';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo <span style="font-size:12px;color:#FFB6C1;background:#FFF0F5;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:normal;">绘画模式</span>';
     const chip = document.getElementById('gpt-mode-chip');
-    if (chip) chip.classList.add('show');
-    const chipText = document.getElementById('gpt-mode-chip-text');
-    if (chipText) chipText.textContent = '绘制图片';
+    if (chip) {
+        chip.classList.add('show', 'is-image-mode');
+        setGPTModeChipContent('图片', 'image');
+    }
     updateImageSettingsVisibility();
     const thinkItem = document.getElementById('gpt-menu-think');
     const researchItem = document.getElementById('gpt-menu-research');
@@ -3379,18 +4334,19 @@ function switchToImageMode() {
 function switchToChatMode() {
     currentGPTMode = 'chat';
     document.getElementById('gpt-input-el').placeholder = '有什么想问 TuoTuo 的？';
+    document.getElementById('gpt-fullscreen')?.classList.remove('gpt-image-mode');
     document.getElementById('gpt-menu-chat-mode').style.display = 'none';
     document.getElementById('gpt-top-title').innerHTML = 'TuoTuo';
     updateImageSettingsVisibility();
     const chip = document.getElementById('gpt-mode-chip');
-    const chipText = document.getElementById('gpt-mode-chip-text');
-    if (chip && chipText) {
+    if (chip) {
+        chip.classList.remove('is-image-mode');
         if (currentReasoningMode === 'normal') {
             chip.classList.remove('show');
-            chipText.textContent = '普通';
+            setGPTModeChipContent('普通', 'reasoning');
         } else {
             chip.classList.add('show');
-            chipText.textContent = currentReasoningMode === 'think' ? '思考一下' : '深度研究';
+            setGPTModeChipContent(currentReasoningMode === 'think' ? '思考一下' : '深度研究', 'reasoning');
         }
     }
     document.getElementById('gpt-attachment-menu').classList.remove('show');
@@ -3429,9 +4385,27 @@ async function toggleFullScreenGPT() {
 
 function renderHistoryList() {
     const listEl = document.getElementById('gpt-history-list');
+    if (!listEl) return;
+
     listEl.innerHTML = '';
 
-    const sorted = getOrderedSessions();
+    const query = (document.getElementById('gpt-history-search')?.value || '').trim().toLowerCase();
+    const sorted = getOrderedSessions().filter(session => {
+        if (!query) return true;
+
+        const title = String(session.title || '').toLowerCase();
+        const content = (session.messages || [])
+            .map(msg => `${msg.userText || ''} ${msg.content || ''}`)
+            .join(' ')
+            .toLowerCase();
+
+        return title.includes(query) || content.includes(query);
+    });
+
+    if (sorted.length === 0) {
+        listEl.innerHTML = '<div style="padding:12px;color:#8a7180;font-size:13px;">没有找到相关聊天</div>';
+        return;
+    }
 
     sorted.forEach(session => {
         const node = document.createElement('div');
@@ -3442,12 +4416,13 @@ function renderHistoryList() {
         item.className = `gpt-history-item ${session.id === currentSessionId ? 'active' : ''}`;
         item.onclick = () => loadSession(session.id);
 
+        const safeId = escapeAttr(session.id);
         item.innerHTML = `
-            <div class="gpt-history-title-text" title="${escapeHtml(session.title)}">
+            <div class="gpt-history-title-text" title="${escapeAttr(session.title)}">
                 ${session.pinned ? '<span class="gpt-pin-mark">📌</span>' : ''}
                 ${escapeHtml(session.title)}
             </div>
-            <button class="gpt-history-more" title="更多" onclick="toggleSessionMenu(event, '${session.id}')">⋯</button>
+            <button class="gpt-history-more" title="更多" onclick="toggleSessionMenu(event, '${safeId}')">⋯</button>
         `;
 
         node.appendChild(item);
@@ -3717,7 +4692,7 @@ async function extractDocumentTextFromFile(file, ext, name) {
 }
 
 async function handleGPTFileSelect(e) {
-    const files = Array.from(e.target.files || e.dataTransfer?.files || []);
+    const files = Array.from(e.target?.files || e.dataTransfer?.files || []);
     if (!files.length) return;
 
     const remainingSlots = 5 - gptPendingFiles.length;
@@ -3809,19 +4784,19 @@ function clearGPTFile() {
 
 function renderCurrentChat() {
     const chatArea = document.getElementById('gpt-chat-area');
+    const shell = document.getElementById('gpt-fullscreen');
+    if (!chatArea) return;
+
     chatArea.innerHTML = '';
 
     const session = getCurrentSession();
+    const isEmpty = !session || session.messages.length === 0;
+    if (shell) shell.classList.toggle('gpt-empty', isEmpty);
 
-    if (!session || session.messages.length === 0) {
+    if (isEmpty) {
         chatArea.innerHTML = `
-            <div class="gpt-msg-container ai">
-                <div class="gpt-avatar gpt-avatar-ai">
-                    <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
-                </div>
-                <div class="gpt-content markdown-body">
-                    你好呀～我是TuoTuo，一个基于OpenAI的GPT-5.5模型打造的全能AI小助手～想和我聊聊天吗？
-                </div>
+            <div class="gpt-empty-hero">
+                <div class="gpt-empty-title">${escapeHtml(getTuoTimeGreeting())}</div>
             </div>
         `;
     } else {
@@ -3977,6 +4952,7 @@ function autoResizeGPT(el) {
 }
 
 function handleGPTKey(e) {
+    if (e.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendGPTMessage();
@@ -4023,7 +4999,7 @@ function getThinkingSteps(text, files) {
    彩虹重力光环动画（Canvas版）
 ============================================================ */
 function startThinkingRing(avatarEl) {
-    return function stop() {};
+    if (!avatarEl) return function stop() {};
     // 修复1：使用 devicePixelRatio 高清渲染，消除模糊
     const DPR = window.devicePixelRatio || 1;
     const CSS_SIZE = 56; // CSS显示尺寸（px）
@@ -4208,21 +5184,16 @@ function startThinkingRing(avatarEl) {
 function createThinkingMessage(text, files) {
     const chatArea = document.getElementById('gpt-chat-area');
     const id = 'gpt_thinking_' + Date.now();
-    const steps = getThinkingSteps(text, files);
-    let index = 0;
-
-    const titleText = currentGPTMode === 'image' ? 'TuoTuo正在竭力创作中' : 'TuoTuo正在努力思考ing';
 
     chatArea.insertAdjacentHTML('beforeend', `
-        <div class="gpt-msg-container ai" id="${id}">
-            <div class="gpt-avatar gpt-avatar-ai">
-                <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
-            </div>
-            <div class="gpt-content gpt-thinking-content">
-                <div class="gpt-thinking-title">
-                    ${titleText}<span class="gpt-thinking-dot"></span>
+        <div class="gpt-msg-container ai gpt-thinking-message" id="${id}">
+            <div class="gpt-avatar gpt-avatar-ai gpt-thinking-dot-avatar" aria-hidden="true">
+                <div class="gpt-thinking-dots">
+                    <span></span><span></span><span></span>
                 </div>
-                <div class="gpt-thinking-detail">${escapeHtml(steps[index])}</div>
+            </div>
+            <div class="gpt-content gpt-thinking-content" aria-live="polite">
+                <span class="gpt-thinking-step-text" hidden></span>
             </div>
         </div>
     `);
@@ -4230,36 +5201,41 @@ function createThinkingMessage(text, files) {
     chatArea.scrollTop = chatArea.scrollHeight;
     
     const el = document.getElementById(id);
-    const avatarEl = el.querySelector('.gpt-avatar-ai');
-
-    // 启动Canvas光环动画
-    const stopRing = startThinkingRing(avatarEl);
-
-    const timer = setInterval(() => {
-        if (index < steps.length - 1) {
-            index++;
-            const detailEl = el.querySelector('.gpt-thinking-detail');
-            if (detailEl) detailEl.textContent = steps[index];
-        }
-    }, 1600);
+    const avatarEl = el ? el.querySelector('.gpt-avatar-ai') : null;
+    const detailEl = el ? el.querySelector('.gpt-thinking-step-text') : null;
 
     return {
         id,
         el,
         avatarEl,
-        contentBox: el.querySelector('.gpt-content'),
-        detailEl: el.querySelector('.gpt-thinking-detail'),
-        stop() { clearInterval(timer); stopRing(); }
+        contentBox: el ? el.querySelector('.gpt-content') : null,
+        detailEl,
+        stop() {}
     };
 }
 
+function updateThinkingStep(thinkingObj, text) {
+    const step = thinkingObj && thinkingObj.detailEl;
+    const value = String(text || '').trim();
+    if (!step || !value) return;
+    step.textContent = value;
+    step.hidden = false;
+    step.classList.add('show');
+}
+
 function prepareAssistantOutput(thinkingObj) {
-    thinkingObj.stop();
-    if(thinkingObj.avatarEl) {
-        thinkingObj.avatarEl.classList.remove('thinking-mode');
+    if (thinkingObj && typeof thinkingObj.stop === 'function') thinkingObj.stop();
+    if (thinkingObj && thinkingObj.el) {
+        thinkingObj.el.classList.remove('gpt-thinking-message');
     }
-    const contentBox = thinkingObj.contentBox;
+    if (thinkingObj && thinkingObj.avatarEl) {
+        thinkingObj.avatarEl.classList.remove('gpt-thinking-dot-avatar');
+        thinkingObj.avatarEl.innerHTML = `<img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">`;
+    }
+    const contentBox = thinkingObj && thinkingObj.contentBox;
+    if (!contentBox) return document.createElement('div');
     contentBox.className = 'gpt-content markdown-body';
+    contentBox.removeAttribute('aria-live');
     contentBox.innerHTML = '';
     return contentBox;
 }
@@ -4333,12 +5309,8 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
 
                 try {
                     const obj = JSON.parse(payload);
-                    if (obj.status && thinkingObj.detailEl) {
-                        thinkingObj.detailEl.textContent = obj.status;
-                    }
-                    if (obj.tool === 'search' && thinkingObj.detailEl) {
-                        thinkingObj.detailEl.textContent = '正在搜索网络';
-                    }
+                    const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
+                    if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
                     if (obj.delta) {
                         streamState.fullText += obj.delta;
                         render();
@@ -4390,12 +5362,21 @@ async function sendGPTMessage() {
     }
 
     const text = inputEl.value.trim();
-    if ((!text && gptPendingFiles.length === 0) || !currentSessionId) return;
+    if (!text && gptPendingFiles.length === 0) return;
+
+    if (!currentSessionId || !getCurrentSession()) {
+        const newSession = createSessionRecord();
+        currentSessionId = newSession.id;
+        chatSessions.unshift(newSession);
+        saveSessions();
+        renderHistoryList();
+    }
 
     const session = getCurrentSession();
     if (!session) return;
 
     const modeAtSend = currentGPTMode;
+    const imageRatioAtSend = currentImageRatio;
     const filesSnapshot = [...gptPendingFiles];
 
     if (session.messages.length === 0) {
@@ -4462,7 +5443,7 @@ async function sendGPTMessage() {
                     body: JSON.stringify({
                         prompt: textToSendToBackend,
                         images: imagesToSend,
-                        ratio: currentImageRatio
+                        ratio: imageRatioAtSend
                     })
                 });
             } catch (fetchErr) {
@@ -4483,7 +5464,7 @@ async function sendGPTMessage() {
 
             const chatArea = document.getElementById('gpt-chat-area');
             if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
-            const metaText = data.size ? `${data.size} / ${data.ratio || currentImageRatio}` : (data.ratio || currentImageRatio || 'auto');
+            const metaText = data.size ? `${data.size} / ${data.ratio || imageRatioAtSend}` : (data.ratio || imageRatioAtSend || 'auto');
             finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
             const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
