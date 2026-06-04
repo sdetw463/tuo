@@ -2704,6 +2704,136 @@
     }
 }
 
+/* =================厦门篇============== */
+.xiamen-entry-btn {
+    background: linear-gradient(135deg, #ffc2d1, #ff9eb5);
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    box-sizing: border-box;
+}
+.xiamen-entry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 182, 193, 0.6);
+}
+
+.xiamen-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(255, 240, 245, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.xiamen-modal-overlay.show {
+    opacity: 1;
+}
+
+.xiamen-modal-content {
+    width: 90%;
+    max-width: 900px;
+    height: 85vh;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 182, 193, 0.6);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(217, 70, 134, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.xiamen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.xiamen-close {
+    background: none; border: none; font-size: 32px;
+    color: #d94686; cursor: pointer; line-height: 1;
+    transition: transform 0.2s;
+}
+.xiamen-close:hover { transform: scale(1.1); color: #b83268; }
+
+.xiamen-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+}
+.xiamen-scroll-area::-webkit-scrollbar { width: 8px; }
+.xiamen-scroll-area::-webkit-scrollbar-track { background: transparent; }
+.xiamen-scroll-area::-webkit-scrollbar-thumb { background: rgba(255, 182, 193, 0.8); border-radius: 4px; }
+
+.xiamen-day-section {
+    margin-bottom: 50px;
+}
+.xiamen-day-title {
+    font-size: 24px; font-weight: bold; color: #d94686;
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-left: 5px solid #ffb6c1;
+}
+
+.xiamen-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    padding: 10px;
+}
+
+.xiamen-polaroid {
+    background: white;
+    padding: 10px 10px 30px 10px;
+    border-radius: 4px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    transform: rotate(var(--r));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, z-index 0.3s;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 220px;
+}
+.xiamen-polaroid:hover {
+    transform: rotate(0deg) scale(1.15);
+    box-shadow: 0 15px 35px rgba(217, 70, 134, 0.2);
+    z-index: 10;
+}
+
+.polaroid-img-box {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 2px;
+    background: #f0e6eb;
+}
+
+.polaroid-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
     </style>
 </head>
 <body>
@@ -2789,6 +2919,7 @@
             <div class="album-nav-btn" onclick="openAlbum('album_scenery','全是好看的')">美景</div>
             <div class="album-nav-btn" onclick="openAlbum('album_portrait','全是最美的')">美人</div>
         </div>
+        <div class="xiamen-entry-btn" onclick="openXiamenModal()">🏖️ 厦门篇回忆录</div>
         <h1>TuoTuo</h1>
         <div class="quote" style="color:#666;">生活原本沉闷，但跑起来就有风。</div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,182,193,0.3);">
@@ -3465,6 +3596,56 @@ function addStar(data) {
 ============================================================ */
 function openAlbum(type,title) { currentOpenAlbumType=type; document.getElementById('album-title').innerText=title; renderAlbumGrid(); document.getElementById('album-modal').classList.add('show'); }
 function closeAlbum() { document.getElementById('album-modal').classList.remove('show'); currentOpenAlbumType=''; }
+
+function openXiamenModal() {
+    let modal = document.getElementById('xiamen-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'xiamen-modal-overlay';
+        modal.id = 'xiamen-modal';
+        modal.onclick = (e) => { if (e.target === modal) closeXiamenModal(); };
+        
+        let html = `
+            <div class="xiamen-modal-content">
+                <div class="xiamen-header">
+                    <h2 style="margin: 0; color: #d94686; font-size: 24px;">🏖️ 我们的厦门回忆录</h2>
+                    <button class="xiamen-close" onclick="closeXiamenModal()">×</button>
+                </div>
+                <div class="xiamen-scroll-area">
+        `;
+        
+        const days = ['Day 0: 启程', 'Day 1: 初见', 'Day 2: 漫步', 'Day 3: 看海', 'Day 4: 阳光', 'Day 5: 晚风', 'Day 6: 返程'];
+        days.forEach((dayTitle, i) => {
+            html += `<div class="xiamen-day-section">
+                <div class="xiamen-day-title">${dayTitle}</div>
+                <div class="xiamen-photo-grid">`;
+            for (let j = 1; j <= 4; j++) {
+                const rot = (Math.random() * 8 - 4).toFixed(1);
+                html += `<div class="xiamen-polaroid" style="--r: ${rot}deg">
+                    <div class="polaroid-img-box">
+                        <img src="./xiamen/day${i}-${j}中.jpeg" alt="Day ${i} 照片 ${j}" onerror="this.src='https://via.placeholder.com/200x260/ffc0cb/ffffff?text=Day${i}-${j}'">
+                    </div>
+                </div>`;
+            }
+            html += `</div></div>`;
+        });
+        
+        html += `</div></div>`;
+        modal.innerHTML = html;
+        document.body.appendChild(modal);
+    }
+    
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('show'); }, 10);
+}
+
+function closeXiamenModal() {
+    const modal = document.getElementById('xiamen-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+}
 function scrollGallery(dir) { document.getElementById('album-grid').scrollBy({left:dir*256,behavior:'smooth'}); }
 function toggleHeart(e,imgId,albumType) {
     e.stopPropagation();
