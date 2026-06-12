@@ -2835,6 +2835,276 @@
 }
 
     </style>
+    <style id="transparent-glass-theme">
+        :root {
+            --glass-surface: rgba(7, 9, 8, 0.38);
+            --glass-surface-soft: rgba(7, 9, 8, 0.24);
+            --glass-border: rgba(255, 255, 255, 0.36);
+            --glass-border-soft: rgba(255, 255, 255, 0.20);
+            --glass-text: rgba(255, 255, 255, 0.95);
+            --glass-muted: rgba(255, 255, 255, 0.62);
+            --glass-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+        }
+
+        html,
+        body {
+            background: #0d100e !important;
+            color: var(--glass-text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        #star-field,
+        .floating-bubble,
+        .heart-trail {
+            display: none !important;
+        }
+
+        .left-panel-card,
+        #ai-entry-card.ai-entry-card,
+        #diary-card.diary-card,
+        #main-card.main-card {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(6px) saturate(105%) !important;
+            -webkit-backdrop-filter: blur(6px) saturate(105%) !important;
+            color: var(--glass-text) !important;
+        }
+
+        .left-panel-card::before,
+        .left-panel-card::after,
+        .music-player-pro::before,
+        .music-player-pro::after,
+        .chat-window::before,
+        .chat-window::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        #ai-entry-card.ai-entry-card {
+            border-radius: 24px !important;
+        }
+
+        #ai-entry-card.ai-entry-card:hover {
+            background: rgba(7, 9, 8, 0.46) !important;
+            border-color: rgba(255, 255, 255, 0.48) !important;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28) !important;
+        }
+
+        #ai-entry-card.ai-entry-card > div:first-child {
+            background: transparent !important;
+            box-shadow: none !important;
+            color: var(--glass-text) !important;
+        }
+
+        #ai-entry-card.ai-entry-card > div:last-child {
+            color: var(--glass-text) !important;
+        }
+
+        #diary-card.diary-card {
+            border-radius: 24px !important;
+            overflow: hidden;
+        }
+
+        .diary-cal-header {
+            background: transparent !important;
+            border-bottom: 1px solid var(--glass-border-soft) !important;
+        }
+
+        .diary-cal-year,
+        .diary-cal-month-name,
+        .diary-cal-nav,
+        .diary-cal-wd,
+        .diary-day-num {
+            color: var(--glass-text) !important;
+        }
+
+        .diary-cal-year,
+        .diary-cal-wd {
+            color: var(--glass-muted) !important;
+        }
+
+        .diary-cal-nav {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            border-radius: 999px !important;
+            box-shadow: none !important;
+        }
+
+        .diary-day:hover {
+            background: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        .diary-day.today .diary-day-num {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #121512 !important;
+        }
+
+        .diary-day-dot {
+            background: rgba(255, 255, 255, 0.72) !important;
+        }
+
+        #main-card.main-card {
+            border-radius: 24px !important;
+        }
+
+        #main-card h1,
+        #main-card .quote,
+        #main-card #love-days {
+            color: var(--glass-text) !important;
+        }
+
+        #main-card .quote {
+            color: var(--glass-muted) !important;
+        }
+
+        #main-card .album-nav,
+        #main-card > div:last-child {
+            border-color: var(--glass-border-soft) !important;
+        }
+
+        .album-nav-btn,
+        .xiamen-entry-btn,
+        .age-btn {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .album-nav-btn:hover,
+        .xiamen-entry-btn:hover,
+        .age-btn:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: var(--glass-border) !important;
+            color: #fff !important;
+        }
+
+        .age-btn.active {
+            background: rgba(255, 255, 255, 0.90) !important;
+            border-color: rgba(255, 255, 255, 0.92) !important;
+            color: #131613 !important;
+            box-shadow: none !important;
+        }
+
+        .dot {
+            background: rgba(255, 255, 255, 0.18) !important;
+            border-color: rgba(255, 255, 255, 0.32) !important;
+            box-shadow: none !important;
+        }
+
+        .dot.active {
+            background: rgba(255, 255, 255, 0.92) !important;
+            box-shadow: none !important;
+        }
+
+        .music-player-pro,
+        #ws-status,
+        .star-trigger-btn,
+        .chat-bubble-btn {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(6px) saturate(105%) !important;
+            -webkit-backdrop-filter: blur(6px) saturate(105%) !important;
+            color: var(--glass-text) !important;
+        }
+
+        .song-title-text,
+        .btn-ctrl {
+            color: var(--glass-text) !important;
+        }
+
+        .btn-ctrl {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .album-container,
+        .chat-window,
+        .wish-box,
+        .chat-login-box,
+        .star-login-box,
+        .diary-modal,
+        .emoji-picker,
+        .diary-emoji-picker {
+            background: rgba(7, 9, 8, 0.72) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 20px 54px rgba(0, 0, 0, 0.36) !important;
+            backdrop-filter: blur(10px) saturate(105%) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(105%) !important;
+            color: var(--glass-text) !important;
+        }
+
+        .album-header,
+        .chat-header,
+        .chat-bottom-wrapper,
+        .diary-modal-header,
+        .diary-compose {
+            background: transparent !important;
+            border-color: var(--glass-border-soft) !important;
+        }
+
+        .album-header h3,
+        .chat-header-info h3,
+        .diary-modal-title,
+        .diary-entry-name,
+        .diary-entry-body {
+            color: var(--glass-text) !important;
+        }
+
+        .chat-header-info span,
+        .diary-modal-date,
+        .diary-entry-time,
+        .diary-empty {
+            color: var(--glass-muted) !important;
+        }
+
+        .message-bubble,
+        .diary-entry {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .message-item.right .message-bubble {
+            background: rgba(255, 255, 255, 0.16) !important;
+            color: #fff !important;
+        }
+
+        .chat-input,
+        .wish-input,
+        .chat-login-input,
+        .star-login-input,
+        .diary-compose-name-input,
+        .diary-compose-text {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .chat-input::placeholder,
+        .wish-input::placeholder,
+        .chat-login-input::placeholder,
+        .star-login-input::placeholder,
+        .diary-compose-name-input::placeholder,
+        .diary-compose-text::placeholder {
+            color: rgba(255, 255, 255, 0.46) !important;
+        }
+
+        @media (max-width: 768px) {
+            .chat-window {
+                background: rgba(7, 9, 8, 0.82) !important;
+            }
+
+            #ai-entry-card.ai-entry-card,
+            #main-card.main-card {
+                background: var(--glass-surface) !important;
+            }
+        }
+    </style>
 </head>
 <body>
 <div id="app">
@@ -5781,12 +6051,6 @@ function switchAge(age) { if(currentAge===age)return;currentAge=age;currentImage
 const emojiList = "😀,😁,😂,🤣,😊,🥰,😍,🤩,😘,😗,😋,😛,😜,🤪,😝,🤑,🤗,🤭,🤫,🤔,🤐,🤨,😐,😑,😶,😏,😒,🙄,😬,🤥,😌,😔,😪,🤤,😴,😷,🤒,🤕,🤢,🤮,🤧,🥵,🥶,🥴,😵,🤯,🤠,🥳,😎,🤓,🧐,😕,😟,🙁,☹️,😮,😯,😲,😳,🥺,😦,😧,😨,😰,😥,😢,😭,😱,😖,😣,😞,😓,😩,😫,🥱,😤,😡,😠,🤬,😈,👿,💀,☠️,💩,🤡,👹,👺,👻,👽,👾,🤖,❤️,✨,🐱,🐶".split(',');
 const emojiPicker = document.getElementById('emoji-picker');
 emojiList.forEach(e=>{const s=document.createElement('span');s.style.cursor='pointer';s.style.fontSize='20px';s.innerText=e;s.onclick=()=>insertEmoji(e);emojiPicker.appendChild(s);});
-
-/* ============================================================
-   鼠标特效 & 气泡
-============================================================ */
-setInterval(()=>{const c=Math.floor(Math.random()*2)+1;for(let i=0;i<c;i++)createBubble();},1000);
-function createBubble(){const bubble=document.createElement('div');bubble.className='floating-bubble';const size=Math.random()*30+15;bubble.style.width=size+'px';bubble.style.height=size+'px';bubble.style.left=Math.random()*window.innerWidth+'px';const dur=Math.random()*4+6;bubble.style.animationDuration=dur+'s';bubble.addEventListener('mouseenter',()=>{bubble.style.animation='none';bubble.style.transition='all 0.15s ease-out';bubble.style.transform='scale(1.5)';bubble.style.opacity='0';setTimeout(()=>{if(bubble.parentElement)bubble.remove();},150);});document.getElementById('app').appendChild(bubble);setTimeout(()=>{if(bubble.parentElement)bubble.remove();},dur*1000);}
 
 /* ============================================================
    Esc 关闭弹窗
