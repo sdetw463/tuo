@@ -2837,13 +2837,13 @@
     </style>
     <style id="transparent-glass-theme">
         :root {
-            --glass-surface: rgba(7, 9, 8, 0.38);
-            --glass-surface-soft: rgba(7, 9, 8, 0.24);
-            --glass-border: rgba(255, 255, 255, 0.36);
-            --glass-border-soft: rgba(255, 255, 255, 0.20);
-            --glass-text: rgba(255, 255, 255, 0.95);
-            --glass-muted: rgba(255, 255, 255, 0.62);
-            --glass-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+            --glass-surface: rgba(255, 255, 255, 0.08);
+            --glass-surface-soft: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.64);
+            --glass-border-soft: rgba(255, 255, 255, 0.34);
+            --glass-text: rgba(255, 255, 255, 0.96);
+            --glass-muted: rgba(255, 255, 255, 0.64);
+            --glass-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 18px 34px rgba(0, 0, 0, 0.16);
         }
 
         html,
@@ -2866,9 +2866,10 @@
             background: var(--glass-surface) !important;
             border: 1px solid var(--glass-border) !important;
             box-shadow: var(--glass-shadow) !important;
-            backdrop-filter: blur(6px) saturate(105%) !important;
-            -webkit-backdrop-filter: blur(6px) saturate(105%) !important;
+            backdrop-filter: blur(18px) saturate(175%) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(175%) !important;
             color: var(--glass-text) !important;
+            background-clip: padding-box;
         }
 
         .left-panel-card::before,
@@ -2886,9 +2887,9 @@
         }
 
         #ai-entry-card.ai-entry-card:hover {
-            background: rgba(7, 9, 8, 0.46) !important;
-            border-color: rgba(255, 255, 255, 0.48) !important;
-            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28) !important;
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: rgba(255, 255, 255, 0.62) !important;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24), 0 18px 42px rgba(0, 0, 0, 0.18) !important;
         }
 
         #ai-entry-card.ai-entry-card > div:first-child {
@@ -3005,8 +3006,8 @@
             background: var(--glass-surface) !important;
             border: 1px solid var(--glass-border) !important;
             box-shadow: var(--glass-shadow) !important;
-            backdrop-filter: blur(6px) saturate(105%) !important;
-            -webkit-backdrop-filter: blur(6px) saturate(105%) !important;
+            backdrop-filter: blur(18px) saturate(175%) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(175%) !important;
             color: var(--glass-text) !important;
         }
 
@@ -3021,19 +3022,19 @@
         }
 
         .album-container,
-        .chat-window,
         .wish-box,
         .chat-login-box,
         .star-login-box,
         .diary-modal,
         .emoji-picker,
         .diary-emoji-picker {
-            background: rgba(7, 9, 8, 0.72) !important;
+            background: var(--glass-surface) !important;
             border: 1px solid var(--glass-border) !important;
-            box-shadow: 0 20px 54px rgba(0, 0, 0, 0.36) !important;
-            backdrop-filter: blur(10px) saturate(105%) !important;
-            -webkit-backdrop-filter: blur(10px) saturate(105%) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(18px) saturate(175%) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(175%) !important;
             color: var(--glass-text) !important;
+            background-clip: padding-box;
         }
 
         .album-header,
@@ -3095,10 +3096,6 @@
         }
 
         @media (max-width: 768px) {
-            .chat-window {
-                background: rgba(7, 9, 8, 0.82) !important;
-            }
-
             #ai-entry-card.ai-entry-card,
             #main-card.main-card {
                 background: var(--glass-surface) !important;
