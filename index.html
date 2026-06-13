@@ -327,8 +327,8 @@
         .gpt-msg-container.ai .gpt-avatar { position: absolute; left: calc(-1 * (var(--gpt-ai-avatar-size) + var(--gpt-ai-avatar-gap))); top: 16px; }
         .gpt-msg-container.ai .gpt-content { background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; color: #2f2f2f !important; width: 100%; max-width: 100% !important; }
         .gpt-ai-message-shell { width: 100%; max-width: min(100%, 1500px); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-        .gpt-msg-actions { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(-2px); transition: 0.18s; }
-        .gpt-ai-message-shell:hover .gpt-msg-actions, .gpt-msg-actions:focus-within { opacity: 1; transform: translateY(0); }
+        .gpt-msg-actions { display: flex; align-items: center; gap: 8px; opacity: 1; transform: translateY(0); transition: 0.18s; }
+        .gpt-ai-message-shell:hover .gpt-msg-actions, .gpt-msg-actions:focus-within { transform: translateY(-1px); }
         .gpt-msg-action-btn { position: relative; width: 30px; height: 30px; border-radius: 999px; border: 1px solid rgba(255,182,193,0.45); background: rgba(255,255,255,0.9); color: #c94f82; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.18s; }
         .gpt-msg-action-btn:hover { background: rgba(255,240,245,0.96); border-color: rgba(201,79,130,0.32); color: #b83268; transform: translateY(-1px); }
         .gpt-msg-action-btn svg { width: 15px; height: 15px; }
@@ -1291,13 +1291,113 @@
 }
 
 #gpt-fullscreen .gpt-back-home {
-    color: #5f4b58 !important;
+    color: rgba(255,255,255,0.96) !important;
     border-radius: 12px !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.24) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.28);
 }
 
 #gpt-fullscreen .gpt-back-home:hover {
-    background: #fff0f5 !important;
-    color: var(--tuo-pink-strong) !important;
+    background: rgba(255,255,255,0.14) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-nav-item,
+#gpt-fullscreen .gpt-history-item,
+#gpt-fullscreen .gpt-history-more,
+#gpt-fullscreen .gpt-back-home,
+#gpt-fullscreen .gpt-toggle-sidebar-btn,
+#gpt-fullscreen .gpt-session-menu button {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    transition:
+        transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 260ms ease,
+        background-color 260ms ease,
+        color 260ms ease,
+        border-color 260ms ease,
+        letter-spacing 260ms ease;
+}
+
+#gpt-fullscreen .gpt-nav-item::before,
+#gpt-fullscreen .gpt-history-item::before,
+#gpt-fullscreen .gpt-history-more::before,
+#gpt-fullscreen .gpt-back-home::before,
+#gpt-fullscreen .gpt-toggle-sidebar-btn::before,
+#gpt-fullscreen .gpt-session-menu button::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(255,255,255,0.8), transparent 28%),
+        linear-gradient(120deg, rgba(255,255,255,0.22), transparent 30%, transparent 70%, rgba(255,255,255,0.08));
+    opacity: 0;
+    transform: translateY(8%) scale(0.98);
+    transition:
+        opacity 220ms ease,
+        transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1);
+    pointer-events: none;
+}
+
+#gpt-fullscreen .gpt-nav-item:hover,
+#gpt-fullscreen .gpt-history-item:hover,
+#gpt-fullscreen .gpt-history-more:hover,
+#gpt-fullscreen .gpt-back-home:hover,
+#gpt-fullscreen .gpt-toggle-sidebar-btn:hover,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.16) inset,
+        0 10px 24px rgba(67, 42, 56, 0.08);
+}
+
+#gpt-fullscreen .gpt-nav-item:hover::before,
+#gpt-fullscreen .gpt-history-item:hover::before,
+#gpt-fullscreen .gpt-history-more:hover::before,
+#gpt-fullscreen .gpt-back-home:hover::before,
+#gpt-fullscreen .gpt-toggle-sidebar-btn:hover::before,
+#gpt-fullscreen .gpt-session-menu button:hover::before {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+#gpt-fullscreen .gpt-nav-item:active,
+#gpt-fullscreen .gpt-history-item:active,
+#gpt-fullscreen .gpt-history-more:active,
+#gpt-fullscreen .gpt-back-home:active,
+#gpt-fullscreen .gpt-toggle-sidebar-btn:active,
+#gpt-fullscreen .gpt-session-menu button:active {
+    transform: translateY(0) scale(0.985);
+}
+
+#gpt-fullscreen .gpt-nav-item:hover {
+    background: rgba(255,255,255,0.92) !important;
+}
+
+#gpt-fullscreen .gpt-history-item:hover {
+    background: rgba(255,255,255,0.88) !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.18) inset,
+        0 10px 24px rgba(217, 70, 134, 0.12) !important;
+}
+
+#gpt-fullscreen .gpt-back-home:hover {
+    background: rgba(255,255,255,0.18) !important;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.18) inset,
+        0 12px 28px rgba(67, 42, 56, 0.10) !important;
+}
+
+#gpt-fullscreen .gpt-history-more:hover,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    background: rgba(255,240,245,0.92) !important;
 }
 
 #gpt-fullscreen .gpt-main {
@@ -1549,7 +1649,7 @@
     }
 
     #gpt-fullscreen .gpt-back-home {
-        background: #fff0f5 !important;
+        background: rgba(255,255,255,0.08) !important;
     }
 }
 
@@ -2128,13 +2228,13 @@
     </style>
     <style id="transparent-glass-theme">
         :root {
-            --glass-surface: rgba(255, 255, 255, 0.018);
-            --glass-surface-soft: rgba(255, 255, 255, 0.01);
-            --glass-border: rgba(255, 255, 255, 0.42);
-            --glass-border-soft: rgba(255, 255, 255, 0.18);
+            --glass-surface: rgba(255, 255, 255, 0.02);
+            --glass-surface-soft: rgba(255, 255, 255, 0.012);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-border-soft: rgba(255, 255, 255, 0.22);
             --glass-text: rgba(255, 255, 255, 0.96);
             --glass-muted: rgba(255, 255, 255, 0.58);
-            --glass-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 12px 24px rgba(0, 0, 0, 0.10);
+            --glass-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 16px 30px rgba(0, 0, 0, 0.12);
             --glass-hover: rgba(255, 255, 255, 0.08);
         }
 
@@ -2158,20 +2258,50 @@
             background: var(--glass-surface) !important;
             border: 1px solid var(--glass-border) !important;
             box-shadow: var(--glass-shadow) !important;
-            backdrop-filter: blur(1px) saturate(108%) !important;
-            -webkit-backdrop-filter: blur(1px) saturate(108%) !important;
+            backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
             color: var(--glass-text) !important;
             background-clip: padding-box;
         }
 
-        .left-panel-card::before,
-        .left-panel-card::after,
-        .music-player-pro::before,
-        .music-player-pro::after,
-        .chat-window::before,
-        .chat-window::after {
-            content: none !important;
-            display: none !important;
+        .left-panel-card,
+        #ai-entry-card.ai-entry-card,
+        #diary-card.diary-card,
+        #main-card.main-card,
+        .music-player-pro,
+        #ws-status,
+        .star-trigger-btn,
+        .chat-bubble-btn,
+        .chat-window,
+        .album-container,
+        .wish-box,
+        .chat-login-box,
+        .star-login-box,
+        .diary-modal,
+        .emoji-picker,
+        .diary-emoji-picker,
+        .album-modal,
+        .wish-modal,
+        .chat-login-overlay,
+        .star-login-overlay,
+        .diary-overlay,
+        #gpt-fullscreen .gpt-header,
+        #gpt-fullscreen .gpt-input-box,
+        #gpt-fullscreen .gpt-mode-chip,
+        #gpt-fullscreen .gpt-image-select-btn,
+        #gpt-fullscreen .gpt-image-options-menu,
+        #gpt-fullscreen .gpt-attachment-menu,
+        #gpt-fullscreen .gpt-sidebar,
+        #gpt-fullscreen .gpt-back-home {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+                0 12px 28px rgba(0, 0, 0, 0.10) !important;
+            backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            color: var(--glass-text) !important;
+            background-clip: padding-box;
         }
 
         #ai-entry-card.ai-entry-card {
@@ -2525,10 +2655,22 @@
             background: rgba(255, 255, 255, 0.05) !important;
         }
 
-        #gpt-fullscreen .gpt-mode-chip button,
-        #gpt-fullscreen .gpt-textarea,
-        #gpt-fullscreen .gpt-attach-btn,
-        #gpt-fullscreen .gpt-send-btn,
+        #gpt-fullscreen .gpt-mode-chip button {
+            color: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        #gpt-fullscreen .gpt-textarea {
+            color: rgba(45, 28, 36, 0.96) !important;
+        }
+
+        #gpt-fullscreen .gpt-attach-btn {
+            color: #b83268 !important;
+        }
+
+        #gpt-fullscreen .gpt-send-btn {
+            color: #ffffff !important;
+        }
+
         #gpt-fullscreen .gpt-header,
         #gpt-fullscreen .gpt-back-home {
             color: rgba(255, 255, 255, 0.96) !important;
