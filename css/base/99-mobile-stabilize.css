@@ -1,0 +1,224 @@
+/* ===== mobile emergency stabilizer 2026-06-16 =====
+   Purpose: keep the original mobile layout from 10-main.css as the source of truth,
+   and only patch actual mobile overflow/stacking issues. Do not add broad .container rules here. */
+
+@media (max-width: 768px) {
+    html,
+    body,
+    #app {
+        width: 100vw !important;
+        min-width: 0 !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        overflow: hidden !important;
+        overscroll-behavior: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    #ws-status {
+        max-width: 46vw;
+        white-space: nowrap;
+    }
+
+    #main-card.main-card {
+        box-sizing: border-box !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    #ai-entry-card.ai-entry-card {
+        box-sizing: border-box !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    #diary-card.diary-card {
+        display: none !important;
+    }
+
+    .age-selector {
+        width: auto !important;
+        max-width: calc(100vw - 24px) !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .age-btn {
+        flex: 0 0 auto !important;
+        min-width: 0 !important;
+    }
+
+    .music-player-pro {
+        left: 12px !important;
+        right: auto !important;
+        width: calc(100vw - 86px) !important;
+        max-width: none !important;
+        transform: none !important;
+    }
+
+    .chat-bubble-btn {
+        right: 12px !important;
+        bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+        z-index: 120 !important;
+    }
+
+    .star-trigger-btn {
+        right: 14px !important;
+        bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+        z-index: 110 !important;
+    }
+
+    .chat-window {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: min(82dvh, 720px) !important;
+        max-height: 82dvh !important;
+        border-radius: 24px 24px 0 0 !important;
+        overflow: hidden !important;
+    }
+
+    .chat-messages,
+    .diary-entries,
+    .album-grid,
+    .gpt-chat-area {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .album-modal,
+    .diary-overlay,
+    .wish-modal,
+    .chat-login-overlay,
+    .star-login-overlay {
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
+    }
+
+    .album-container {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: min(82dvh, 760px) !important;
+        max-height: 82dvh !important;
+        border-radius: 24px 24px 0 0 !important;
+    }
+
+    .diary-modal {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+    }
+
+    #gpt-fullscreen.gpt-fullscreen {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+    }
+
+    #gpt-fullscreen .gpt-main {
+        width: 100vw !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: min(84vw, 320px) !important;
+        max-width: 320px !important;
+        height: 100dvh !important;
+        padding: calc(14px + env(safe-area-inset-top)) 10px calc(14px + env(safe-area-inset-bottom)) !important;
+        opacity: 1 !important;
+        margin: 0 !important;
+        z-index: 5020 !important;
+        transform: translateX(0) !important;
+    }
+
+    #gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        transform: translateX(-105%) !important;
+    }
+
+    #gpt-fullscreen .gpt-header {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-chat-area {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+
+    #gpt-fullscreen .gpt-input-wrapper {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    #gpt-fullscreen .gpt-input-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-input-controls {
+        min-width: 0 !important;
+        flex-wrap: nowrap !important;
+    }
+
+    #gpt-fullscreen .gpt-textarea {
+        min-width: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-mode-row {
+        min-width: 0 !important;
+        flex: 0 1 auto !important;
+    }
+
+    #gpt-fullscreen .gpt-attachment-menu,
+    #gpt-fullscreen .gpt-image-options-menu {
+        max-width: calc(100vw - 24px) !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .music-player-pro {
+        width: calc(100vw - 82px) !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .song-marquee-box {
+        min-width: 0 !important;
+    }
+
+    .music-controls {
+        gap: 6px !important;
+    }
+}
