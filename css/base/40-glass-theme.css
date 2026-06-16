@@ -1,0 +1,470 @@
+/* ===== extracted from <style id="transparent-glass-theme"> ===== */
+:root {
+            --glass-surface: rgba(255, 255, 255, 0.02);
+            --glass-surface-soft: rgba(255, 255, 255, 0.012);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-border-soft: rgba(255, 255, 255, 0.22);
+            --glass-text: rgba(255, 255, 255, 0.96);
+            --glass-muted: rgba(255, 255, 255, 0.58);
+            --glass-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 16px 30px rgba(0, 0, 0, 0.12);
+            --glass-hover: rgba(255, 255, 255, 0.08);
+        }
+
+        html,
+        body {
+            background: #0d100e !important;
+            color: var(--glass-text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        .floating-bubble,
+        .heart-trail {
+            display: none !important;
+        }
+
+        .left-panel-card,
+        #ai-entry-card.ai-entry-card,
+        #diary-card.diary-card,
+        #main-card.main-card {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            color: var(--glass-text) !important;
+            background-clip: padding-box;
+        }
+
+        .left-panel-card,
+        #ai-entry-card.ai-entry-card,
+        #diary-card.diary-card,
+        #main-card.main-card,
+        .music-player-pro,
+        #ws-status,
+        .star-trigger-btn,
+        .chat-bubble-btn,
+        .chat-window,
+        .album-container,
+        .wish-box,
+        .chat-login-box,
+        .star-login-box,
+        .diary-modal,
+        .emoji-picker,
+        .diary-emoji-picker,
+        .album-modal,
+        .wish-modal,
+        .chat-login-overlay,
+        .star-login-overlay,
+        .diary-overlay,
+        #gpt-fullscreen .gpt-header,
+        #gpt-fullscreen .gpt-input-box,
+        #gpt-fullscreen .gpt-mode-chip,
+        #gpt-fullscreen .gpt-image-select-btn,
+        #gpt-fullscreen .gpt-image-options-menu,
+        #gpt-fullscreen .gpt-attachment-menu,
+        #gpt-fullscreen .gpt-sidebar,
+        #gpt-fullscreen .gpt-back-home {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+                0 12px 28px rgba(0, 0, 0, 0.10) !important;
+            backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(112%) contrast(1.02) !important;
+            color: var(--glass-text) !important;
+            background-clip: padding-box;
+        }
+
+        #ai-entry-card.ai-entry-card {
+            border-radius: 24px !important;
+        }
+
+        #ai-entry-card.ai-entry-card:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 14px 34px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        #ai-entry-card.ai-entry-card > div:first-child {
+            background: transparent !important;
+            box-shadow: none !important;
+            color: var(--glass-text) !important;
+        }
+
+        #ai-entry-card.ai-entry-card > div:last-child {
+            color: var(--glass-text) !important;
+        }
+
+        #diary-card.diary-card {
+            border-radius: 24px !important;
+            overflow: hidden;
+        }
+
+        .diary-cal-header {
+            background: transparent !important;
+            border-bottom: 1px solid var(--glass-border-soft) !important;
+        }
+
+        .diary-cal-year,
+        .diary-cal-month-name,
+        .diary-cal-nav,
+        .diary-cal-wd,
+        .diary-day-num {
+            color: var(--glass-text) !important;
+        }
+
+        .diary-cal-year,
+        .diary-cal-wd {
+            color: var(--glass-muted) !important;
+        }
+
+        .diary-cal-nav {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            border-radius: 999px !important;
+            box-shadow: none !important;
+        }
+
+        .diary-day:hover {
+            background: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        .diary-day.today .diary-day-num {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #121512 !important;
+        }
+
+        .diary-day-dot {
+            background: rgba(255, 255, 255, 0.72) !important;
+        }
+
+        #main-card.main-card {
+            border-radius: 24px !important;
+        }
+
+        #main-card h1,
+        #main-card .quote,
+        #main-card #love-days {
+            color: var(--glass-text) !important;
+        }
+
+        #main-card .quote {
+            color: var(--glass-muted) !important;
+        }
+
+        #main-card .album-nav,
+        #main-card > div:last-child {
+            border-color: var(--glass-border-soft) !important;
+        }
+
+        .album-nav-btn,
+        .xiamen-entry-btn,
+        .age-btn {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .album-nav-btn:hover,
+        .xiamen-entry-btn:hover,
+        .age-btn:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.56) !important;
+            color: #fff !important;
+        }
+
+        .age-btn.active {
+            background: rgba(255, 255, 255, 0.90) !important;
+            border-color: rgba(255, 255, 255, 0.92) !important;
+            color: #131613 !important;
+            box-shadow: none !important;
+        }
+
+        .dot {
+            background: rgba(255, 255, 255, 0.18) !important;
+            border-color: rgba(255, 255, 255, 0.32) !important;
+            box-shadow: none !important;
+        }
+
+        .dot.active {
+            background: rgba(255, 255, 255, 0.92) !important;
+            box-shadow: none !important;
+        }
+
+        .music-player-pro,
+        #ws-status,
+        .star-trigger-btn,
+        .chat-bubble-btn,
+        .chat-window {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(1px) saturate(108%) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(108%) !important;
+            color: var(--glass-text) !important;
+        }
+
+        .song-title-text,
+        .btn-ctrl {
+            color: var(--glass-text) !important;
+        }
+
+        .btn-ctrl {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .album-container,
+        .wish-box,
+        .chat-login-box,
+        .star-login-box,
+        .diary-modal,
+        .emoji-picker,
+        .diary-emoji-picker,
+        .album-modal,
+        .wish-modal,
+        .chat-login-overlay,
+        .star-login-overlay,
+        .diary-overlay {
+            background: var(--glass-surface) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            backdrop-filter: blur(1px) saturate(108%) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(108%) !important;
+            color: var(--glass-text) !important;
+            background-clip: padding-box;
+        }
+
+        .album-header,
+        .chat-header,
+        .chat-bottom-wrapper,
+        .diary-modal-header,
+        .diary-compose {
+            background: transparent !important;
+            border-color: var(--glass-border-soft) !important;
+        }
+
+        .chat-window,
+        .album-modal,
+        .wish-modal,
+        .chat-login-overlay,
+        .star-login-overlay,
+        .diary-overlay {
+            background-color: rgba(0, 0, 0, 0.22) !important;
+        }
+
+        .album-header h3,
+        .chat-header-info h3,
+        .diary-modal-title,
+        .diary-entry-name,
+        .diary-entry-body {
+            color: var(--glass-text) !important;
+        }
+
+        .chat-header-info span,
+        .diary-modal-date,
+        .diary-entry-time,
+        .diary-empty {
+            color: var(--glass-muted) !important;
+        }
+
+        .message-bubble,
+        .diary-entry {
+            background: var(--glass-surface-soft) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .message-item.right .message-bubble {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+        }
+
+        .chat-input,
+        .wish-input,
+        .chat-login-input,
+        .star-login-input,
+        .diary-compose-name-input,
+        .diary-compose-text {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid var(--glass-border-soft) !important;
+            color: var(--glass-text) !important;
+            box-shadow: none !important;
+        }
+
+        .chat-input::placeholder,
+        .wish-input::placeholder,
+        .chat-login-input::placeholder,
+        .star-login-input::placeholder,
+        .diary-compose-name-input::placeholder,
+        .diary-compose-text::placeholder {
+            color: rgba(255, 255, 255, 0.46) !important;
+        }
+
+        .album-nav-btn,
+        .xiamen-entry-btn,
+        .age-btn,
+        .diary-cal-nav,
+        .btn-ctrl,
+        .chat-header-close,
+        .chat-send-btn,
+        .chat-login-btn,
+        .star-login-btn,
+        .diary-submit-btn,
+        .nav-btn,
+        .heart-icon {
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+            transition:
+                transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 260ms ease,
+                box-shadow 260ms ease,
+                background-color 260ms ease,
+                color 260ms ease,
+                letter-spacing 260ms ease;
+        }
+
+        .album-nav-btn::before,
+        .xiamen-entry-btn::before,
+        .age-btn::before,
+        .diary-cal-nav::before,
+        .btn-ctrl::before,
+        .chat-header-close::before,
+        .chat-send-btn::before,
+        .chat-login-btn::before,
+        .star-login-btn::before,
+        .diary-submit-btn::before,
+        .nav-btn::before,
+        .heart-icon::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.65), transparent 28%),
+                radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.24), transparent 18%),
+                linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 36%, transparent 64%, rgba(255, 255, 255, 0.06));
+            opacity: 0;
+            transform: translateY(10%) scale(0.94);
+            transition:
+                opacity 240ms ease,
+                transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
+                filter 320ms ease;
+            filter: blur(0.4px);
+            pointer-events: none;
+        }
+
+        .album-nav-btn:hover,
+        .xiamen-entry-btn:hover,
+        .age-btn:hover,
+        .diary-cal-nav:hover,
+        .btn-ctrl:hover,
+        .chat-header-close:hover,
+        .chat-send-btn:hover,
+        .chat-login-btn:hover,
+        .star-login-btn:hover,
+        .diary-submit-btn:hover,
+        .nav-btn:hover,
+        .heart-icon:hover {
+            transform: translateY(-1px) scaleX(1.08) scaleY(1.04);
+            border-color: rgba(255, 255, 255, 0.74) !important;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.24),
+                0 14px 28px rgba(0, 0, 0, 0.16) !important;
+        }
+
+        .album-nav-btn:hover::before,
+        .xiamen-entry-btn:hover::before,
+        .age-btn:hover::before,
+        .diary-cal-nav:hover::before,
+        .btn-ctrl:hover::before,
+        .chat-header-close:hover::before,
+        .chat-send-btn:hover::before,
+        .chat-login-btn:hover::before,
+        .star-login-btn:hover::before,
+        .diary-submit-btn:hover::before,
+        .nav-btn:hover::before,
+        .heart-icon:hover::before {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        #gpt-fullscreen .gpt-header,
+        #gpt-fullscreen .gpt-input-box,
+        #gpt-fullscreen .gpt-mode-chip,
+        #gpt-fullscreen .gpt-image-select-btn,
+        #gpt-fullscreen .gpt-image-options-menu,
+        #gpt-fullscreen .gpt-attachment-menu,
+        #gpt-fullscreen .gpt-sidebar,
+        #gpt-fullscreen .gpt-main,
+        #gpt-fullscreen .gpt-chat-area {
+            backdrop-filter: blur(1px) saturate(108%) !important;
+            -webkit-backdrop-filter: blur(1px) saturate(108%) !important;
+        }
+
+        #gpt-fullscreen .gpt-header,
+        #gpt-fullscreen .gpt-input-wrapper,
+        #gpt-fullscreen .gpt-main,
+        #gpt-fullscreen .gpt-chat-area,
+        #gpt-fullscreen .gpt-sidebar {
+            background: rgba(255, 255, 255, 0.02) !important;
+        }
+
+        #gpt-fullscreen .gpt-input-box,
+        #gpt-fullscreen .gpt-mode-chip,
+        #gpt-fullscreen .gpt-image-select-btn,
+        #gpt-fullscreen .gpt-image-options-menu,
+        #gpt-fullscreen .gpt-attachment-menu {
+            background: rgba(255, 255, 255, 0.035) !important;
+            border-color: rgba(255, 255, 255, 0.28) !important;
+        }
+
+        #gpt-fullscreen .gpt-input-box:focus-within {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        #gpt-fullscreen .gpt-mode-chip button {
+            color: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        #gpt-fullscreen .gpt-textarea {
+            color: rgba(45, 28, 36, 0.96) !important;
+        }
+
+        #gpt-fullscreen .gpt-attach-btn {
+            color: #b83268 !important;
+        }
+
+        #gpt-fullscreen .gpt-send-btn {
+            color: #ffffff !important;
+        }
+
+        #gpt-fullscreen .gpt-header,
+        #gpt-fullscreen .gpt-back-home {
+            color: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        .album-nav-btn:active,
+        .xiamen-entry-btn:active,
+        .age-btn:active,
+        .diary-cal-nav:active,
+        .btn-ctrl:active,
+        .chat-header-close:active,
+        .chat-send-btn:active,
+        .chat-login-btn:active,
+        .star-login-btn:active,
+        .diary-submit-btn:active,
+        .nav-btn:active,
+        .heart-icon:active {
+            transform: translateY(0) scaleX(0.99) scaleY(0.98);
+        }
+
+        @media (max-width: 768px) {
+            #ai-entry-card.ai-entry-card,
+            #main-card.main-card {
+                background: var(--glass-surface) !important;
+            }
+        }

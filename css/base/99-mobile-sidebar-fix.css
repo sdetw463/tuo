@@ -1,0 +1,12 @@
+/* ===== mobile GPT sidebar state fix after extraction ===== */
+@media (max-width: 760px) {
+    #gpt-fullscreen:not(.sidebar-collapsed) .gpt-sidebar {
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+    }
+
+    #gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        transform: translateX(-105%) !important;
+        opacity: 1 !important;
+    }
+}

@@ -1,0 +1,13 @@
+/* Design tokens: shared visual variables for TuoTuo.
+   Existing feature CSS may still define more specific variables later. */
+:root {
+    --tuo-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --tuo-color-bg: #0d100e;
+    --tuo-color-pink: #ff7eb8;
+    --tuo-color-pink-strong: #d64f90;
+    --tuo-radius-sm: 12px;
+    --tuo-radius-md: 18px;
+    --tuo-radius-lg: 26px;
+    --tuo-shadow-soft: 0 18px 48px rgba(210, 80, 140, 0.20);
+    --tuo-glass-border: 1px solid rgba(255, 255, 255, 0.58);
+}
