@@ -2,7 +2,7 @@
    Split from legacy js/app.js; loaded as a classic script to preserve inline handler compatibility. */
 const albums2 = { 22:['22-1.webp','22-2.webp','22-3.webp','22-4.webp','22-5.webp'], 21:['21-1.webp','21-2.webp','21-3.webp','21-4.webp'], 20:['20-1.webp','20-2.webp'], 19:['19-1.webp'] };
 let currentAge=22, currentImages=albums2[currentAge], idx=0, cur=document.getElementById('img1'), nxt=document.getElementById('img2'), slideTimer, fadeTimer=null;
-const SLIDE_INTERVAL=9000;
+const SLIDE_INTERVAL=18000;
 function renderDots() { const dc=document.getElementById('dynamic-dots');dc.innerHTML='';if(currentImages.length>1){dc.style.display='flex';for(let i=0;i<currentImages.length;i++){const d=document.createElement('div');d.className='dot';d.onclick=()=>goTo(i);dc.appendChild(d);}}else dc.style.display='none'; }
 function updateDots(ai) { document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===ai)); }
 function sw() {

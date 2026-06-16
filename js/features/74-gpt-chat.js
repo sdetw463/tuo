@@ -468,6 +468,18 @@ function buildAssistantActionButton(action, label, sessionId, messageIndex) {
     `;
 }
 
+function attachAssistantActionsToLiveMessage(thinkingObj, session, messageIndex) {
+    if (!thinkingObj || !thinkingObj.el || !session || messageIndex < 0) return;
+    const shell = thinkingObj.el.querySelector('.gpt-ai-message-shell') || thinkingObj.el;
+    if (!shell || shell.querySelector('.gpt-msg-actions')) return;
+    shell.insertAdjacentHTML('beforeend', `
+        <div class="gpt-msg-actions">
+            ${buildAssistantActionButton('copy', '复制', session.id, messageIndex)}
+            ${buildAssistantActionButton('branch', '分叉', session.id, messageIndex)}
+        </div>
+    `);
+}
+
 function appendGPTMessageToDOM(msg, shouldScroll = true, session = null, messageIndex = -1) {
     const chatArea = document.getElementById('gpt-chat-area');
 
@@ -807,13 +819,15 @@ function createThinkingMessage(text, files) {
 
     chatArea.insertAdjacentHTML('beforeend', `
         <div class="gpt-msg-container ai gpt-thinking-message" id="${id}">
-            <div class="gpt-avatar gpt-avatar-ai gpt-thinking-dot-avatar" aria-hidden="true">
+            <div class="gpt-thinking-dot-avatar" aria-hidden="true">
                 <div class="gpt-thinking-dots">
                     <span></span><span></span><span></span>
                 </div>
             </div>
-            <div class="gpt-content gpt-thinking-content" aria-live="polite">
-                <span class="gpt-thinking-step-text" hidden></span>
+            <div class="gpt-ai-message-shell">
+                <div class="gpt-content gpt-thinking-content" aria-live="polite">
+                    <span class="gpt-thinking-step-text" hidden></span>
+                </div>
             </div>
         </div>
     `);
@@ -821,7 +835,7 @@ function createThinkingMessage(text, files) {
     chatArea.scrollTop = chatArea.scrollHeight;
 
     const el = document.getElementById(id);
-    const avatarEl = el ? el.querySelector('.gpt-avatar-ai') : null;
+    const avatarEl = el ? el.querySelector('.gpt-thinking-dot-avatar, .gpt-avatar-ai') : null;
     const detailEl = el ? el.querySelector('.gpt-thinking-step-text') : null;
 
     return {
@@ -850,6 +864,7 @@ function prepareAssistantOutput(thinkingObj) {
     }
     if (thinkingObj && thinkingObj.avatarEl) {
         thinkingObj.avatarEl.classList.remove('gpt-thinking-dot-avatar');
+        thinkingObj.avatarEl.classList.add('gpt-avatar', 'gpt-avatar-ai');
         thinkingObj.avatarEl.innerHTML = `<img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">`;
     }
     const contentBox = thinkingObj && thinkingObj.contentBox;
@@ -867,7 +882,7 @@ async function typewriterMarkdown(targetEl, fullText) {
     let current = '';
     for (let i = 0; i < chars.length; i++) {
         current += chars[i];
-        if (i % 3 === 0 || i === chars.length - 1) {
+        if (i % 8 === 0 || i === chars.length - 1) {
             targetEl.innerHTML = renderMarkdownSafe(current);
             const chatArea = document.getElementById('gpt-chat-area');
             const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
@@ -891,7 +906,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
 
     function render(force = false) {
         const now = Date.now();
-        if (!force && now - lastRender < 60) return;
+        if (!force && now - lastRender < 95) return;
 
         if (!streamState.outputEl) {
             streamState.outputEl = prepareAssistantOutput(thinkingObj);
@@ -1147,6 +1162,8 @@ async function sendGPTMessage() {
         if (finalReply) {
             session.needsHistorySeed = false;
             session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources });
+            const assistantMessageIndex = session.messages.length - 1;
+            attachAssistantActionsToLiveMessage(thinkingObj, session, assistantMessageIndex);
             session.updatedAt = Date.now();
             saveSessions();
             renderHistoryList();

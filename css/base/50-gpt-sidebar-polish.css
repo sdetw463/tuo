@@ -286,3 +286,1062 @@
                 padding: calc(18px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)) !important;
             }
         }
+
+/* ===== GPT liquid glass refresh v2: finer frost, clearer glass, lighter rendering ===== */
+#gpt-fullscreen {
+    --tuo-text: rgba(255, 255, 255, 0.94);
+    --tuo-muted: rgba(255, 255, 255, 0.58);
+    --gpt-glass-surface: rgba(255, 255, 255, 0.028);
+    --gpt-glass-surface-soft: rgba(255, 255, 255, 0.016);
+    --gpt-glass-surface-hover: rgba(255, 255, 255, 0.060);
+    --gpt-glass-surface-active: rgba(255, 255, 255, 0.088);
+    --gpt-glass-border: rgba(255, 255, 255, 0.48);
+    --gpt-glass-border-soft: rgba(255, 255, 255, 0.25);
+    --gpt-glass-highlight: rgba(255, 255, 255, 0.70);
+    --gpt-glass-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 14px 30px rgba(0, 0, 0, 0.13);
+    --gpt-glass-shadow-soft: 0 0 0 1px rgba(255, 255, 255, 0.09) inset, 0 10px 22px rgba(0, 0, 0, 0.10);
+    --gpt-frost-blur: blur(2px) saturate(114%) contrast(1.03);
+    background: rgba(7, 9, 9, 0.28) !important;
+    color: var(--tuo-text) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+    isolation: isolate;
+    overflow: hidden;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen::before,
+#gpt-fullscreen::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+#gpt-fullscreen::before {
+    z-index: 0;
+    background:
+        radial-gradient(circle at 13% 10%, rgba(255, 216, 228, 0.26), transparent 29%),
+        radial-gradient(circle at 80% 3%, rgba(210, 232, 255, 0.18), transparent 32%),
+        radial-gradient(circle at 50% 94%, rgba(255, 238, 205, 0.10), transparent 34%),
+        linear-gradient(135deg, rgba(12, 15, 14, 0.56), rgba(38, 30, 38, 0.32) 48%, rgba(11, 14, 13, 0.56));
+}
+
+#gpt-fullscreen::after {
+    z-index: 0;
+    opacity: 0.22;
+    background-image:
+        radial-gradient(circle at 25% 30%, rgba(255, 255, 255, 0.30) 0 0.6px, transparent 0.8px),
+        radial-gradient(circle at 78% 64%, rgba(255, 255, 255, 0.20) 0 0.7px, transparent 0.95px),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.10) 0 1px, transparent 1px 7px);
+    background-size: 5px 5px, 9px 9px, 160px 160px;
+    background-position: 0 0, 2px 3px, center;
+}
+
+#gpt-fullscreen .gpt-sidebar,
+#gpt-fullscreen .gpt-main,
+#gpt-fullscreen .gpt-header,
+#gpt-fullscreen .gpt-chat-area,
+#gpt-fullscreen .gpt-input-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+#gpt-fullscreen .gpt-main {
+    --gpt-composer-width: 860px;
+    --gpt-ai-avatar-size: 38px;
+    --gpt-ai-avatar-gap: 18px;
+    background: transparent !important;
+    color: var(--tuo-text) !important;
+    contain: layout style;
+}
+
+#gpt-fullscreen .gpt-chat-area {
+    background: transparent !important;
+    padding: 34px 24px 24px !important;
+    color: var(--tuo-text) !important;
+    scroll-behavior: auto !important;
+}
+
+#gpt-fullscreen .gpt-header {
+    position: absolute !important;
+    top: 18px !important;
+    left: 18px !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 20 !important;
+}
+
+#gpt-fullscreen #gpt-top-title,
+#gpt-fullscreen .gpt-header-actions {
+    display: none !important;
+}
+
+#gpt-fullscreen #gpt-reopen-btn {
+    display: none !important;
+}
+
+#gpt-fullscreen.sidebar-collapsed #gpt-reopen-btn {
+    display: inline-flex !important;
+}
+
+#gpt-fullscreen .gpt-toggle-sidebar-btn {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--gpt-glass-border) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.070), rgba(255, 255, 255, 0.018)) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: var(--gpt-glass-shadow-soft) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+    transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.16s ease !important;
+}
+
+#gpt-fullscreen .gpt-toggle-sidebar-btn:hover {
+    transform: translateY(-1px) !important;
+    background: rgba(255, 255, 255, 0.075) !important;
+    border-color: rgba(255, 255, 255, 0.62) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-sidebar {
+    z-index: 3;
+    width: 294px !important;
+    padding: 20px 15px 18px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.050), rgba(255, 255, 255, 0.015)) !important;
+    border: 1px solid var(--gpt-glass-border) !important;
+    border-left: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10) inset, 14px 0 34px rgba(0, 0, 0, 0.14) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+    background-clip: padding-box;
+}
+
+#gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+    width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    margin-left: 0 !important;
+    transform: translateX(-18px) !important;
+    pointer-events: none !important;
+}
+
+#gpt-fullscreen .gpt-brand {
+    min-height: 48px;
+    padding: 0 12px 14px !important;
+    color: #ffffff !important;
+    font-size: 24px !important;
+    font-weight: 760 !important;
+    letter-spacing: -0.035em !important;
+    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+#gpt-fullscreen .gpt-brand::after {
+    content: "AI";
+    margin-left: 8px;
+    padding: 3px 8px 4px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.09) inset;
+    text-shadow: none;
+}
+
+#gpt-fullscreen .gpt-sidebar-nav {
+    gap: 8px !important;
+    margin-bottom: 18px !important;
+}
+
+#gpt-fullscreen .gpt-nav-item,
+#gpt-fullscreen .gpt-back-home,
+#gpt-fullscreen .gpt-history-item {
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.80) !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
+}
+
+#gpt-fullscreen .gpt-nav-item,
+#gpt-fullscreen .gpt-back-home {
+    min-height: 46px !important;
+    border-radius: 16px !important;
+    padding: 0 14px !important;
+    font-weight: 640 !important;
+}
+
+#gpt-fullscreen .gpt-nav-item:hover,
+#gpt-fullscreen .gpt-back-home:hover,
+#gpt-fullscreen .gpt-history-item:hover {
+    transform: translateY(-1px) !important;
+    background: rgba(255, 255, 255, 0.050) !important;
+    border-color: rgba(255, 255, 255, 0.34) !important;
+    box-shadow: var(--gpt-glass-shadow-soft) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input {
+    height: 42px !important;
+    border-radius: 15px !important;
+    border: 1px solid var(--gpt-glass-border-soft) !important;
+    background: rgba(255, 255, 255, 0.018) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input::placeholder {
+    color: rgba(255, 255, 255, 0.46) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input:focus {
+    background: rgba(255, 255, 255, 0.035) !important;
+    border-color: rgba(255, 255, 255, 0.56) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.11) inset !important;
+}
+
+#gpt-fullscreen .gpt-history-title {
+    color: rgba(255, 255, 255, 0.54) !important;
+    font-size: 11px !important;
+    letter-spacing: 0.10em !important;
+    text-transform: uppercase;
+}
+
+#gpt-fullscreen .gpt-history-item {
+    min-height: 42px !important;
+    border-radius: 15px !important;
+    color: rgba(255, 255, 255, 0.70) !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.024)) !important;
+    border-color: rgba(255, 255, 255, 0.52) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 10px 22px rgba(0, 0, 0, 0.11) !important;
+}
+
+#gpt-fullscreen .gpt-history-node.branch-child::before {
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+#gpt-fullscreen .gpt-history-more {
+    color: rgba(255, 255, 255, 0.54) !important;
+}
+
+#gpt-fullscreen .gpt-history-more:hover,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    background: rgba(255, 255, 255, 0.060) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-session-menu,
+#gpt-fullscreen .gpt-attachment-menu,
+#gpt-fullscreen .gpt-image-options-menu {
+    background: rgba(18, 20, 20, 0.40) !important;
+    border: 1px solid var(--gpt-glass-border) !important;
+    box-shadow: var(--gpt-glass-shadow) !important;
+    backdrop-filter: blur(6px) saturate(122%) !important;
+    -webkit-backdrop-filter: blur(6px) saturate(122%) !important;
+}
+
+#gpt-fullscreen .gpt-session-menu button,
+#gpt-fullscreen .gpt-menu-item,
+#gpt-fullscreen .gpt-image-option {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item:hover,
+#gpt-fullscreen .gpt-image-option:hover,
+#gpt-fullscreen .gpt-menu-item.active,
+#gpt-fullscreen .gpt-image-option.active {
+    background: rgba(255, 255, 255, 0.070) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-image-options-title,
+#gpt-fullscreen .gpt-image-option-muted {
+    color: rgba(255, 255, 255, 0.56) !important;
+}
+
+#gpt-fullscreen .gpt-menu-divider,
+#gpt-fullscreen .gpt-sidebar-bottom {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#gpt-fullscreen .gpt-chat-area::-webkit-scrollbar-thumb,
+#gpt-fullscreen .gpt-history::-webkit-scrollbar-thumb,
+#gpt-fullscreen .gpt-file-preview::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22) !important;
+}
+
+#gpt-fullscreen.gpt-empty .gpt-chat-area {
+    justify-content: center;
+    padding-bottom: 188px !important;
+}
+
+#gpt-fullscreen .gpt-empty-hero {
+    width: min(100%, 880px) !important;
+    padding: 0 24px !important;
+}
+
+#gpt-fullscreen .gpt-empty-title {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: clamp(28px, 3.6vw, 44px) !important;
+    font-weight: 520 !important;
+    letter-spacing: -0.045em !important;
+    text-shadow: 0 18px 46px rgba(0, 0, 0, 0.30);
+}
+
+#gpt-fullscreen .gpt-empty-title::after {
+    content: "";
+    display: block;
+    width: 78px;
+    height: 1px;
+    margin: 18px auto 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.64), transparent);
+}
+
+#gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+    top: calc(50% + 58px) !important;
+    padding: 0 22px !important;
+}
+
+#gpt-fullscreen .gpt-input-wrapper {
+    z-index: 2;
+    padding: 18px 22px 22px !important;
+    background: linear-gradient(180deg, transparent 0%, rgba(9, 12, 11, 0.16) 50%, rgba(9, 12, 11, 0.30) 100%) !important;
+}
+
+#gpt-fullscreen .gpt-input-box {
+    max-width: 860px !important;
+    padding: 13px 15px !important;
+    border-radius: 30px !important;
+    border: 1px solid rgba(255, 255, 255, 0.56) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.070), rgba(255, 255, 255, 0.018)) !important;
+    box-shadow: var(--gpt-glass-shadow) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+    background-clip: padding-box;
+    transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+#gpt-fullscreen .gpt-input-box:focus-within {
+    border-color: rgba(255, 255, 255, 0.76) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.092), rgba(255, 255, 255, 0.026)) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 16px 34px rgba(0, 0, 0, 0.14), 0 0 0 3px rgba(255, 255, 255, 0.070) !important;
+}
+
+#gpt-fullscreen .gpt-input-controls {
+    gap: 13px !important;
+}
+
+#gpt-fullscreen .gpt-textarea {
+    color: rgba(255, 255, 255, 0.94) !important;
+    caret-color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 450;
+}
+
+#gpt-fullscreen .gpt-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.52) !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn {
+    color: rgba(255, 255, 255, 0.76) !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.065) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn {
+    width: 36px !important;
+    height: 36px !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: rgba(18, 18, 18, 0.92) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+    transition: transform 0.14s ease, background-color 0.14s ease, color 0.14s ease !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:hover {
+    background: #ffffff !important;
+    color: #c94f82 !important;
+    transform: translateY(-1px) scale(1.03) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:disabled {
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: rgba(255, 255, 255, 0.50) !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-disclaimer {
+    color: rgba(255, 255, 255, 0.45) !important;
+    letter-spacing: 0.01em;
+}
+
+#gpt-fullscreen .gpt-mode-chip,
+#gpt-fullscreen .gpt-image-select-btn,
+#gpt-fullscreen .gpt-status-pill {
+    border: 1px solid var(--gpt-glass-border-soft) !important;
+    background: rgba(255, 255, 255, 0.022) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip button,
+#gpt-fullscreen .gpt-ratio-icon,
+#gpt-fullscreen .gpt-select-chevron,
+#gpt-fullscreen .gpt-image-select-btn #gpt-ratio-chip-text,
+#gpt-fullscreen .gpt-mode-chip #gpt-mode-chip-text {
+    color: currentColor !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip:hover,
+#gpt-fullscreen .gpt-image-select-btn:hover {
+    background: rgba(255, 255, 255, 0.060) !important;
+    border-color: rgba(255, 255, 255, 0.50) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-msg-container {
+    max-width: 960px !important;
+    contain: layout style;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai {
+    width: min(100%, 860px) !important;
+    max-width: 860px !important;
+    padding: 18px 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user {
+    max-width: 960px !important;
+    padding: 14px 24px !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    max-width: min(76%, 680px) !important;
+    padding: 13px 18px !important;
+    border-radius: 22px !important;
+    border-bottom-right-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.48) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.025)) !important;
+    color: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: var(--gpt-glass-shadow-soft) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-avatar {
+    top: 24px !important;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.30) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-ai {
+    border: 1px solid rgba(255, 255, 255, 0.50) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    color: #ffffff !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-user {
+    border-color: rgba(255, 255, 255, 0.42) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-ai-message-shell {
+    width: 100% !important;
+    padding: 20px 22px 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.42) !important;
+    border-radius: 26px !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.014)) !important;
+    box-shadow: var(--gpt-glass-shadow-soft) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+    background-clip: padding-box;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    min-height: 70px;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .markdown-body {
+    color: rgba(255, 255, 255, 0.91) !important;
+}
+
+#gpt-fullscreen .markdown-body p,
+#gpt-fullscreen .markdown-body li {
+    color: rgba(255, 255, 255, 0.91) !important;
+}
+
+#gpt-fullscreen .markdown-body h1,
+#gpt-fullscreen .markdown-body h2,
+#gpt-fullscreen .markdown-body h3,
+#gpt-fullscreen .markdown-body h4,
+#gpt-fullscreen .markdown-body strong,
+#gpt-fullscreen .markdown-body a {
+    color: #ffdce9 !important;
+}
+
+#gpt-fullscreen .markdown-body table {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+#gpt-fullscreen .markdown-body th,
+#gpt-fullscreen .markdown-body td {
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#gpt-fullscreen .markdown-body th {
+    background: rgba(255, 255, 255, 0.075) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .markdown-body code:not(pre code),
+#gpt-fullscreen .math-block {
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    background: rgba(255, 255, 255, 0.055) !important;
+    color: #ffffff !important;
+}
+
+#gpt-fullscreen .markdown-body blockquote {
+    border-left-color: rgba(255, 220, 233, 0.72) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    color: rgba(255, 255, 255, 0.76) !important;
+}
+
+#gpt-fullscreen .gpt-msg-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 30px;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.38) !important;
+    background: rgba(255, 255, 255, 0.025) !important;
+    color: rgba(255, 255, 255, 0.74) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07) inset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.14s ease !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn:hover {
+    background: rgba(255, 255, 255, 0.080) !important;
+    border-color: rgba(255, 255, 255, 0.56) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-tip {
+    background: rgba(20, 22, 22, 0.72) !important;
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(4px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(120%) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-tip::after {
+    border-top-color: rgba(20, 22, 22, 0.72) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content,
+#gpt-fullscreen .gpt-thinking-content {
+    color: rgba(255, 255, 255, 0.68) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-dots span {
+    background: rgba(255, 255, 255, 0.88) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-step-text {
+    color: rgba(255, 255, 255, 0.58) !important;
+}
+
+#gpt-fullscreen .gpt-file-preview {
+    border-bottom-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-preview-card img,
+#gpt-fullscreen .gpt-user-image {
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-preview-card .file-icon-box,
+#gpt-fullscreen .gpt-user-file-card {
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+    background: rgba(255, 255, 255, 0.040) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-main {
+        --gpt-ai-avatar-size: 32px;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #gpt-fullscreen .gpt-header {
+        top: calc(12px + env(safe-area-inset-top)) !important;
+        left: 12px !important;
+    }
+
+    #gpt-fullscreen #gpt-reopen-btn {
+        display: inline-flex !important;
+    }
+
+    #gpt-fullscreen .gpt-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: min(84vw, 322px) !important;
+        height: 100dvh !important;
+        padding: calc(18px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.38) !important;
+        opacity: 1 !important;
+        transform: translateX(0) !important;
+        pointer-events: auto !important;
+    }
+
+    #gpt-fullscreen.sidebar-collapsed .gpt-sidebar {
+        width: min(84vw, 322px) !important;
+        padding: calc(18px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.38) !important;
+        opacity: 1 !important;
+        transform: translateX(-108%) !important;
+        pointer-events: none !important;
+    }
+
+    #gpt-fullscreen .gpt-chat-area {
+        padding: calc(58px + env(safe-area-inset-top)) 0 10px !important;
+        align-items: stretch !important;
+    }
+
+    #gpt-fullscreen.gpt-empty .gpt-chat-area {
+        padding-bottom: 154px !important;
+    }
+
+    #gpt-fullscreen .gpt-empty-title {
+        font-size: 26px !important;
+        line-height: 1.25 !important;
+    }
+
+    #gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+        top: calc(50% + 42px) !important;
+        padding: 0 10px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container,
+    #gpt-fullscreen .gpt-msg-container.user,
+    #gpt-fullscreen .gpt-msg-container.ai {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 11px 12px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container.ai {
+        display: flex !important;
+        gap: 10px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container.ai .gpt-avatar {
+        position: static !important;
+        flex: 0 0 auto !important;
+    }
+
+    #gpt-fullscreen .gpt-ai-message-shell {
+        max-width: calc(100vw - 66px) !important;
+        padding: 15px 16px 12px !important;
+        border-radius: 22px !important;
+    }
+
+    #gpt-fullscreen .gpt-content,
+    #gpt-fullscreen .gpt-msg-container.user .gpt-content,
+    #gpt-fullscreen .gpt-msg-container.ai .gpt-content {
+        max-width: calc(100vw - 72px) !important;
+        font-size: 14px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container.user .gpt-content {
+        max-width: min(82vw, 680px) !important;
+        padding: 11px 14px !important;
+    }
+
+    #gpt-fullscreen .gpt-input-wrapper {
+        padding: 8px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+    }
+
+    #gpt-fullscreen .gpt-input-box {
+        max-width: none !important;
+        border-radius: 24px !important;
+        padding: 11px 12px !important;
+    }
+
+    #gpt-fullscreen .gpt-input-controls {
+        gap: 8px !important;
+    }
+
+    #gpt-fullscreen .gpt-textarea {
+        min-width: 96px !important;
+        font-size: 14px !important;
+    }
+
+    #gpt-fullscreen.gpt-image-mode .gpt-mode-row {
+        gap: 6px !important;
+    }
+
+    #gpt-fullscreen .gpt-attachment-menu {
+        min-width: min(72vw, 220px) !important;
+    }
+
+    #gpt-fullscreen .gpt-image-options-menu {
+        width: min(78vw, 232px) !important;
+    }
+}
+
+/* ===== GPT liquid glass refresh v3: gaussian background and thinking-state cleanup ===== */
+#gpt-fullscreen {
+    --gpt-frost-blur: blur(10px) saturate(122%) brightness(1.04);
+    --gpt-bg-gaussian: blur(22px) saturate(118%) brightness(0.82);
+    background: rgba(5, 7, 8, 0.055) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 背景改成真正的高斯模糊：保留主页/照片背景的轮廓，但不再用颗粒磨砂层。 */
+#gpt-fullscreen::before {
+    z-index: 0 !important;
+    background: rgba(10, 11, 12, 0.28) !important;
+    backdrop-filter: var(--gpt-bg-gaussian) !important;
+    -webkit-backdrop-filter: var(--gpt-bg-gaussian) !important;
+    transform: translateZ(0);
+    will-change: backdrop-filter;
+}
+
+#gpt-fullscreen::after {
+    z-index: 0 !important;
+    opacity: 0.58 !important;
+    background:
+        radial-gradient(circle at 15% 8%, rgba(255, 210, 226, 0.16), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(215, 232, 255, 0.13), transparent 30%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012) 42%, rgba(0, 0, 0, 0.12)) !important;
+    background-size: auto !important;
+    background-position: center !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 思考阶段只显示左侧 loading 点，不显示空答案玻璃边框。开始真正输出后会自动移除 gpt-thinking-message，边框再出现。 */
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
+    width: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-msg-actions {
+    display: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message {
+    min-height: 54px !important;
+}
+
+/* 让 AI 正式答案、用户气泡、输入框继续保持透明液态玻璃，而不是灰色实心块。 */
+#gpt-fullscreen .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-input-box,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.088), rgba(255, 255, 255, 0.026)) !important;
+    border-color: rgba(255, 255, 255, 0.54) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+/* 侧栏底部遮挡区改成同质透明玻璃/渐隐遮罩，不再出现突兀的实心方块。 */
+#gpt-fullscreen .gpt-sidebar-bottom {
+    position: relative !important;
+    padding-top: 22px !important;
+    border-top: 0 !important;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.000) 0%,
+        rgba(255, 255, 255, 0.030) 34%,
+        rgba(255, 255, 255, 0.050) 100%
+    ) !important;
+    box-shadow: 0 -18px 36px rgba(0, 0, 0, 0.10) !important;
+    backdrop-filter: blur(12px) saturate(118%) brightness(1.02) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(118%) brightness(1.02) !important;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgba(0, 0, 0, 0.78) 18px, #000 38px, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, rgba(0, 0, 0, 0.78) 18px, #000 38px, #000 100%);
+}
+
+#gpt-fullscreen .gpt-back-home {
+    border: 1px solid rgba(255, 255, 255, 0.42) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.070), rgba(255, 255, 255, 0.022)) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.09) inset, 0 12px 24px rgba(0, 0, 0, 0.10) !important;
+    backdrop-filter: blur(10px) saturate(120%) brightness(1.04) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(120%) brightness(1.04) !important;
+}
+
+#gpt-fullscreen .gpt-back-home:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.038)) !important;
+    border-color: rgba(255, 255, 255, 0.62) !important;
+}
+
+/* 选中的历史项也压低实心感，和返回按钮保持同一种玻璃透明度。 */
+#gpt-fullscreen .gpt-history-item.active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.082), rgba(255, 255, 255, 0.020)) !important;
+    border-color: rgba(255, 255, 255, 0.46) !important;
+    backdrop-filter: blur(8px) saturate(118%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(118%) !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen {
+        --gpt-bg-gaussian: blur(18px) saturate(116%) brightness(0.84);
+        --gpt-frost-blur: blur(8px) saturate(120%) brightness(1.03);
+    }
+
+    #gpt-fullscreen .gpt-sidebar-bottom {
+        padding-top: 20px !important;
+    }
+}
+
+/* ===== GPT liquid glass refresh v4: clear background with black cinema filter ===== */
+#gpt-fullscreen {
+    --gpt-bg-gaussian: none;
+    background: rgba(0, 0, 0, 0.34) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 背景层不再做任何高斯模糊，只加黑色滤镜，接近主页在线聊天窗口的暗色遮罩。 */
+#gpt-fullscreen::before {
+    z-index: 0 !important;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.46)),
+        radial-gradient(circle at 18% 8%, rgba(255, 210, 226, 0.055), transparent 30%),
+        radial-gradient(circle at 84% 12%, rgba(210, 232, 255, 0.045), transparent 32%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    transform: none !important;
+    will-change: auto !important;
+}
+
+#gpt-fullscreen::after {
+    z-index: 0 !important;
+    opacity: 1 !important;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.030), rgba(255, 255, 255, 0.006) 42%, rgba(0, 0, 0, 0.16)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.20)) !important;
+    background-size: auto !important;
+    background-position: center !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+}
+
+/* 底部输入区只用黑色渐隐遮罩，不再对整页背景产生模糊。 */
+#gpt-fullscreen .gpt-input-wrapper {
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.18) 48%, rgba(0, 0, 0, 0.36) 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 侧栏本体也降低背景模糊依赖，改成黑色滤镜上的透明玻璃层，滚动更顺滑。 */
+#gpt-fullscreen .gpt-sidebar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.060), rgba(255, 255, 255, 0.018)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-bottom {
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.000) 0%,
+        rgba(0, 0, 0, 0.18) 34%,
+        rgba(0, 0, 0, 0.26) 100%
+    ) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* ===== GPT liquid glass refresh v5: gaussian message cards and slower home slideshow ===== */
+/* Keep the fullscreen background clear + dark-filtered; blur only the readable chat cards. */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message) .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.155), rgba(255, 255, 255, 0.052)),
+        rgba(16, 18, 20, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.58) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.105) inset,
+        0 18px 42px rgba(0, 0, 0, 0.22) !important;
+    backdrop-filter: blur(18px) saturate(128%) brightness(1.06) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(128%) brightness(1.06) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.175), rgba(255, 255, 255, 0.060)),
+        rgba(20, 22, 24, 0.20) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message) .gpt-ai-message-shell::before,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content::before {
+    opacity: 0.72 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message) .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content,
+#gpt-fullscreen .gpt-message-content {
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Thinking/loading state remains clean: no empty answer card before text starts. */
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+
+/* GPT glass v6 thinking dots only */
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar { background: transparent !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots { background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* GPT glass v7 thinking dots structural cleanup and stronger message blur */
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar {
+    width: var(--gpt-ai-avatar-size) !important;
+    height: var(--gpt-ai-avatar-size) !important;
+    min-width: var(--gpt-ai-avatar-size) !important;
+    min-height: var(--gpt-ai-avatar-size) !important;
+    flex: 0 0 var(--gpt-ai-avatar-size) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: visible !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar::before,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar::after,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots::before,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots span {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* Increase only the dialog text cards' Gaussian blur by 50%: 18px -> 27px. */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message) .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    backdrop-filter: blur(27px) saturate(128%) brightness(1.06) !important;
+    -webkit-backdrop-filter: blur(27px) saturate(128%) brightness(1.06) !important;
+}
+
+/* GPT glass v8 apply selected-history frost to AI answer cards */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.082), rgba(255, 255, 255, 0.020)) !important;
+    border-color: rgba(255, 255, 255, 0.46) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.075) inset,
+        0 14px 32px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: blur(8px) saturate(118%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(118%) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell::before {
+    opacity: 0 !important;
+}
