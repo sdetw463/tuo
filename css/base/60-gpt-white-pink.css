@@ -1,0 +1,1013 @@
+/* ===== Smart TuoTuo AI chat: white + soft pink glass theme =====
+   Goal: opaque white page background, soft pink accents, clean elegant glass cards.
+   Loaded after the previous GPT glass styles so it only overrides the AI chat UI. */
+
+#gpt-fullscreen {
+    --tuo-text: #2f2530 !important;
+    --tuo-muted: #8f7684 !important;
+    --tuo-pink: #f58ab6 !important;
+    --tuo-pink-strong: #d94f88 !important;
+    --gpt-white-page: #ffffff;
+    --gpt-white-panel: #fffdfd;
+    --gpt-white-card: #ffffff;
+    --gpt-white-card-soft: #fff8fb;
+    --gpt-pink-soft: #fff0f6;
+    --gpt-pink-mid: #ffd8e8;
+    --gpt-pink-line: rgba(223, 111, 154, 0.18);
+    --gpt-pink-line-strong: rgba(217, 79, 136, 0.30);
+    --gpt-text: #322632;
+    --gpt-text-soft: #6f5968;
+    --gpt-text-faint: #9c8492;
+    --gpt-shadow-soft: 0 18px 46px rgba(188, 88, 128, 0.10);
+    --gpt-shadow-card: 0 14px 34px rgba(178, 84, 122, 0.10), 0 1px 0 rgba(255,255,255,0.95) inset;
+    --gpt-shadow-hover: 0 18px 42px rgba(178, 84, 122, 0.15), 0 1px 0 rgba(255,255,255,0.95) inset;
+    --gpt-glass-border: rgba(255, 255, 255, 0.92);
+    --gpt-frost-blur: blur(16px) saturate(118%) contrast(1.02);
+    background: #ffffff !important;
+    color: var(--gpt-text) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+    overflow: hidden !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Clean white canvas: remove the previous large pink mist and dotted decorative overlay. */
+#gpt-fullscreen::before {
+    z-index: 0 !important;
+    opacity: 1 !important;
+    background: #ffffff !important;
+}
+
+#gpt-fullscreen::after {
+    display: none !important;
+    content: none !important;
+}
+
+#gpt-fullscreen .gpt-sidebar,
+#gpt-fullscreen .gpt-main,
+#gpt-fullscreen .gpt-header,
+#gpt-fullscreen .gpt-chat-area,
+#gpt-fullscreen .gpt-input-wrapper {
+    color: var(--gpt-text) !important;
+}
+
+#gpt-fullscreen .gpt-main {
+    --gpt-composer-width: 880px;
+    --gpt-ai-avatar-size: 38px;
+    --gpt-ai-avatar-gap: 18px;
+    background: #ffffff !important;
+}
+
+/* Sidebar */
+#gpt-fullscreen .gpt-sidebar {
+    width: 292px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 250, 252, 0.97)) !important;
+    border-right: 1px solid rgba(228, 152, 184, 0.22) !important;
+    box-shadow: 10px 0 28px rgba(185, 91, 130, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.84) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-brand {
+    color: var(--gpt-text) !important;
+    font-weight: 780 !important;
+    letter-spacing: -0.035em !important;
+}
+
+/* Remove the small pink decorative bar after the TuoTuo logo. */
+#gpt-fullscreen .gpt-brand::after {
+    display: none !important;
+    content: none !important;
+}
+
+#gpt-fullscreen .gpt-nav-item,
+#gpt-fullscreen .gpt-back-home,
+#gpt-fullscreen .gpt-history-item {
+    color: var(--gpt-text-soft) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-nav-item svg,
+#gpt-fullscreen .gpt-back-home svg {
+    color: #d94f88 !important;
+}
+
+#gpt-fullscreen .gpt-nav-item:hover,
+#gpt-fullscreen .gpt-back-home:hover,
+#gpt-fullscreen .gpt-history-item:hover {
+    color: var(--gpt-text) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-color: rgba(226, 133, 171, 0.18) !important;
+    box-shadow: var(--gpt-shadow-card) !important;
+    transform: translateY(-1px) !important;
+}
+
+#gpt-fullscreen .gpt-history-title {
+    color: var(--gpt-text-faint) !important;
+    font-size: 12px !important;
+    letter-spacing: 0.04em !important;
+}
+
+#gpt-fullscreen .gpt-history-title-text {
+    color: inherit !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    color: var(--tuo-pink-strong) !important;
+    background: linear-gradient(135deg, #fff0f6, #ffffff) !important;
+    border-color: rgba(217, 79, 136, 0.18) !important;
+    box-shadow: 0 10px 24px rgba(217, 79, 136, 0.10), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+
+#gpt-fullscreen .gpt-history-more {
+    color: var(--gpt-text-faint) !important;
+}
+
+#gpt-fullscreen .gpt-history-more:hover {
+    color: var(--tuo-pink-strong) !important;
+    background: #fff0f6 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-bottom {
+    border-top: 1px solid rgba(226, 133, 171, 0.18) !important;
+    background: transparent !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input {
+    color: var(--gpt-text) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(226, 133, 171, 0.22) !important;
+    box-shadow: 0 7px 18px rgba(178, 84, 122, 0.06), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input::placeholder {
+    color: var(--gpt-text-faint) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-search input:focus {
+    border-color: rgba(217, 79, 136, 0.38) !important;
+    box-shadow: 0 0 0 4px rgba(245, 138, 182, 0.12), 0 8px 18px rgba(178, 84, 122, 0.08) !important;
+}
+
+/* Header / sidebar reopen */
+#gpt-fullscreen .gpt-header {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen #gpt-reopen-btn,
+#gpt-fullscreen .gpt-toggle-sidebar-btn {
+    color: #d94f88 !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid rgba(226, 133, 171, 0.22) !important;
+    box-shadow: var(--gpt-shadow-card) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen #gpt-reopen-btn:hover,
+#gpt-fullscreen .gpt-toggle-sidebar-btn:hover {
+    color: #bf3f78 !important;
+    background: #ffffff !important;
+    border-color: rgba(217, 79, 136, 0.30) !important;
+    box-shadow: var(--gpt-shadow-hover) !important;
+}
+
+/* Empty state */
+#gpt-fullscreen.gpt-empty .gpt-chat-area {
+    justify-content: center !important;
+    padding-bottom: 188px !important;
+}
+
+#gpt-fullscreen .gpt-empty-hero {
+    width: min(100%, 880px) !important;
+    padding: 0 24px !important;
+}
+
+#gpt-fullscreen .gpt-empty-title {
+    color: var(--gpt-text) !important;
+    font-size: clamp(30px, 3.7vw, 46px) !important;
+    font-weight: 560 !important;
+    letter-spacing: -0.055em !important;
+    text-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-empty-title::after {
+    width: 90px !important;
+    height: 3px !important;
+    margin: 18px auto 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(90deg, transparent, #f58ab6, transparent) !important;
+}
+
+#gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+    top: calc(50% + 58px) !important;
+    padding: 0 22px !important;
+    background: transparent !important;
+}
+
+/* Chat area */
+#gpt-fullscreen .gpt-chat-area {
+    background: #ffffff !important;
+    color: var(--gpt-text) !important;
+}
+
+#gpt-fullscreen .gpt-chat-area::-webkit-scrollbar-thumb,
+#gpt-fullscreen .gpt-history::-webkit-scrollbar-thumb,
+#gpt-fullscreen .gpt-file-preview::-webkit-scrollbar-thumb {
+    background: rgba(217, 79, 136, 0.22) !important;
+    border: 4px solid transparent !important;
+    background-clip: content-box !important;
+}
+
+#gpt-fullscreen .gpt-chat-area::-webkit-scrollbar-track,
+#gpt-fullscreen .gpt-history::-webkit-scrollbar-track,
+#gpt-fullscreen .gpt-file-preview::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+/* Composer */
+#gpt-fullscreen .gpt-input-wrapper {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 48%, #ffffff 100%) !important;
+}
+
+#gpt-fullscreen .gpt-input-box {
+    max-width: 880px !important;
+    border-radius: 30px !important;
+    border: 1px solid rgba(226, 133, 171, 0.30) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: var(--gpt-shadow-card) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-input-box:focus-within {
+    border-color: rgba(217, 79, 136, 0.42) !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(245, 138, 182, 0.14), var(--gpt-shadow-hover) !important;
+}
+
+#gpt-fullscreen .gpt-textarea {
+    color: var(--gpt-text) !important;
+    caret-color: var(--tuo-pink-strong) !important;
+    font-size: 15.5px !important;
+    font-weight: 450 !important;
+}
+
+#gpt-fullscreen .gpt-textarea::placeholder {
+    color: #b393a4 !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn {
+    color: #d94f88 !important;
+    background: transparent !important;
+}
+
+#gpt-fullscreen .gpt-attach-btn:hover {
+    color: #bf3f78 !important;
+    background: #fff0f6 !important;
+}
+
+#gpt-fullscreen .gpt-send-btn {
+    background: linear-gradient(135deg, #f58ab6, #d94f88) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 22px rgba(217, 79, 136, 0.24), inset 0 1px 0 rgba(255,255,255,0.48) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:hover {
+    background: linear-gradient(135deg, #ff9cc6, #cf427c) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) scale(1.03) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:disabled {
+    background: #f1d7e2 !important;
+    color: rgba(122, 91, 106, 0.58) !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-disclaimer {
+    color: #a98b9b !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip,
+#gpt-fullscreen .gpt-image-select-btn,
+#gpt-fullscreen .gpt-status-pill {
+    color: #b84477 !important;
+    background: #fff0f6 !important;
+    border: 1px solid rgba(217, 79, 136, 0.18) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.86) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip:hover,
+#gpt-fullscreen .gpt-image-select-btn:hover {
+    color: #a93469 !important;
+    background: #ffe6f0 !important;
+    border-color: rgba(217, 79, 136, 0.25) !important;
+}
+
+#gpt-fullscreen .gpt-mode-chip button,
+#gpt-fullscreen .gpt-ratio-icon,
+#gpt-fullscreen .gpt-select-chevron,
+#gpt-fullscreen .gpt-image-select-btn #gpt-ratio-chip-text,
+#gpt-fullscreen .gpt-mode-chip #gpt-mode-chip-text {
+    color: currentColor !important;
+}
+
+/* Menus */
+#gpt-fullscreen .gpt-attachment-menu,
+#gpt-fullscreen .gpt-image-options-menu,
+#gpt-fullscreen .gpt-session-menu {
+    color: var(--gpt-text) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(226, 133, 171, 0.22) !important;
+    box-shadow: 0 18px 44px rgba(178, 84, 122, 0.14), inset 0 1px 0 rgba(255,255,255,0.94) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-menu-item,
+#gpt-fullscreen .gpt-image-option,
+#gpt-fullscreen .gpt-session-menu button {
+    color: var(--gpt-text-soft) !important;
+    background: transparent !important;
+}
+
+/* The chat-mode return option should only appear after switching into image mode. */
+#gpt-fullscreen:not(.gpt-image-mode) #gpt-menu-chat-mode {
+    display: none !important;
+}
+
+#gpt-fullscreen.gpt-image-mode #gpt-menu-chat-mode {
+    display: flex !important;
+}
+
+#gpt-fullscreen .gpt-menu-item svg,
+#gpt-fullscreen .gpt-image-option svg {
+    color: #d94f88 !important;
+}
+
+#gpt-fullscreen .gpt-menu-item:hover,
+#gpt-fullscreen .gpt-menu-item.active,
+#gpt-fullscreen .gpt-image-option:hover,
+#gpt-fullscreen .gpt-image-option.active,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    color: var(--tuo-pink-strong) !important;
+    background: #fff0f6 !important;
+}
+
+#gpt-fullscreen .gpt-menu-divider {
+    border-color: rgba(226, 133, 171, 0.16) !important;
+    background: rgba(226, 133, 171, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-image-options-title,
+#gpt-fullscreen .gpt-image-option-muted {
+    color: var(--gpt-text-faint) !important;
+}
+
+#gpt-fullscreen .gpt-session-menu button.danger,
+#gpt-fullscreen .gpt-session-menu button.danger:hover {
+    color: #d94f88 !important;
+}
+
+/* File preview */
+#gpt-fullscreen .gpt-file-preview {
+    border-bottom-color: rgba(226, 133, 171, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-preview-card {
+    background: #fff7fb !important;
+    border: 1px solid rgba(226, 133, 171, 0.18) !important;
+    box-shadow: 0 8px 20px rgba(178, 84, 122, 0.08) !important;
+}
+
+#gpt-fullscreen .gpt-preview-card img,
+#gpt-fullscreen .gpt-user-image {
+    border: 1px solid rgba(226, 133, 171, 0.20) !important;
+    box-shadow: 0 10px 26px rgba(178, 84, 122, 0.12) !important;
+}
+
+#gpt-fullscreen .gpt-preview-remove {
+    background: #fff0f6 !important;
+    color: #d94f88 !important;
+    border: 1px solid rgba(217, 79, 136, 0.14) !important;
+}
+
+#gpt-fullscreen .gpt-preview-card .file-icon-box,
+#gpt-fullscreen .gpt-user-file-card {
+    color: var(--gpt-text-soft) !important;
+    background: #fff7fb !important;
+    border: 1px solid rgba(226, 133, 171, 0.18) !important;
+}
+
+/* Messages */
+#gpt-fullscreen .gpt-msg-container {
+    color: var(--gpt-text) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai {
+    width: min(100%, 880px) !important;
+    max-width: 880px !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    color: #553344 !important;
+    background: linear-gradient(135deg, #fff0f6, #fff8fb) !important;
+    border: 1px solid rgba(217, 79, 136, 0.18) !important;
+    box-shadow: 0 10px 26px rgba(217, 79, 136, 0.10), inset 0 1px 0 rgba(255,255,255,0.86) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#gpt-fullscreen .gpt-ai-message-shell {
+    color: var(--gpt-text) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 1px solid rgba(226, 133, 171, 0.18) !important;
+    box-shadow: var(--gpt-shadow-card) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-avatar,
+#gpt-fullscreen .gpt-avatar-ai,
+#gpt-fullscreen .gpt-thinking-dot-avatar {
+    color: #d94f88 !important;
+    background: linear-gradient(135deg, #ffffff, #fff0f6) !important;
+    border: 1px solid rgba(217, 79, 136, 0.20) !important;
+    box-shadow: 0 10px 24px rgba(217, 79, 136, 0.13), inset 0 1px 0 rgba(255,255,255,0.92) !important;
+    backdrop-filter: var(--gpt-frost-blur) !important;
+    -webkit-backdrop-filter: var(--gpt-frost-blur) !important;
+}
+
+#gpt-fullscreen .gpt-avatar-ai img {
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .markdown-body {
+    color: var(--gpt-text) !important;
+}
+
+#gpt-fullscreen .markdown-body,
+#gpt-fullscreen .markdown-body p,
+#gpt-fullscreen .markdown-body li,
+#gpt-fullscreen .markdown-body td,
+#gpt-fullscreen .markdown-body span {
+    color: var(--gpt-text) !important;
+}
+
+#gpt-fullscreen .markdown-body h1,
+#gpt-fullscreen .markdown-body h2,
+#gpt-fullscreen .markdown-body h3,
+#gpt-fullscreen .markdown-body h4,
+#gpt-fullscreen .markdown-body strong {
+    color: #312331 !important;
+}
+
+#gpt-fullscreen .markdown-body a {
+    color: #c9457d !important;
+    text-decoration-color: rgba(201, 69, 125, 0.28) !important;
+}
+
+#gpt-fullscreen .markdown-body hr {
+    border-color: rgba(226, 133, 171, 0.18) !important;
+}
+
+#gpt-fullscreen .markdown-body blockquote {
+    color: #6d5664 !important;
+    background: #fff7fb !important;
+    border-left-color: #f58ab6 !important;
+}
+
+#gpt-fullscreen .markdown-body table {
+    background: #ffffff !important;
+    border: 1px solid rgba(226, 133, 171, 0.16) !important;
+    box-shadow: 0 10px 24px rgba(178, 84, 122, 0.08) !important;
+}
+
+#gpt-fullscreen .markdown-body th,
+#gpt-fullscreen .markdown-body td {
+    color: var(--gpt-text) !important;
+    border-color: rgba(226, 133, 171, 0.16) !important;
+}
+
+#gpt-fullscreen .markdown-body th {
+    background: #fff0f6 !important;
+    color: #6e3450 !important;
+}
+
+#gpt-fullscreen .markdown-body code:not(pre code),
+#gpt-fullscreen .math-block {
+    color: #9f355f !important;
+    background: #fff0f6 !important;
+    border: 1px solid rgba(217, 79, 136, 0.16) !important;
+}
+
+#gpt-fullscreen .markdown-body pre {
+    background: #2f2530 !important;
+    border: 1px solid rgba(217, 79, 136, 0.18) !important;
+    box-shadow: 0 14px 30px rgba(54, 29, 43, 0.16) !important;
+}
+
+#gpt-fullscreen .markdown-body pre code,
+#gpt-fullscreen .markdown-body pre code * {
+    color: #fff7fb !important;
+}
+
+/* Assistant actions */
+#gpt-fullscreen .gpt-msg-actions {
+    opacity: 1 !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn {
+    color: #b56b8a !important;
+    background: #fff8fb !important;
+    border: 1px solid rgba(226, 133, 171, 0.18) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.88) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-btn:hover {
+    color: #d94f88 !important;
+    background: #fff0f6 !important;
+    border-color: rgba(217, 79, 136, 0.26) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-tip {
+    color: #ffffff !important;
+    background: rgba(72, 43, 58, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.46) !important;
+    box-shadow: 0 10px 22px rgba(72, 43, 58, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-msg-action-tip::after {
+    border-top-color: rgba(72, 43, 58, 0.92) !important;
+}
+
+/* Thinking / error */
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-thinking-content {
+    color: var(--gpt-text-soft) !important;
+}
+
+#gpt-fullscreen .gpt-thinking-dots span {
+    background: #d94f88 !important;
+}
+
+#gpt-fullscreen .gpt-thinking-step-text {
+    color: var(--gpt-text-faint) !important;
+}
+
+#gpt-fullscreen .gpt-error-actions {
+    color: #8f4d68 !important;
+    background: #fff0f6 !important;
+    border: 1px solid rgba(217, 79, 136, 0.16) !important;
+}
+
+#gpt-fullscreen .drag-over::after,
+#gpt-fullscreen .gpt-main.drag-over::after {
+    color: #d94f88 !important;
+    background: rgba(255, 240, 246, 0.92) !important;
+    border: 1px dashed rgba(217, 79, 136, 0.38) !important;
+}
+
+/* Mobile: keep layout from 99-mobile-stabilize, only polish visual density. */
+@media (max-width: 768px) {
+    #gpt-fullscreen {
+        background: #ffffff !important;
+    }
+
+    #gpt-fullscreen .gpt-main,
+    #gpt-fullscreen .gpt-chat-area {
+        background: #ffffff !important;
+    }
+
+    #gpt-fullscreen .gpt-sidebar {
+        background: rgba(255, 255, 255, 0.97) !important;
+        border-right: 1px solid rgba(226, 133, 171, 0.24) !important;
+        box-shadow: 18px 0 42px rgba(178, 84, 122, 0.14) !important;
+    }
+
+    #gpt-fullscreen .gpt-chat-area {
+        padding-top: calc(54px + env(safe-area-inset-top)) !important;
+    }
+
+    #gpt-fullscreen.gpt-empty .gpt-chat-area {
+        padding-bottom: 178px !important;
+    }
+
+    #gpt-fullscreen .gpt-empty-title {
+        font-size: clamp(27px, 8vw, 38px) !important;
+        line-height: 1.14 !important;
+    }
+
+    #gpt-fullscreen .gpt-input-wrapper {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 42%, #ffffff 100%) !important;
+    }
+
+    #gpt-fullscreen .gpt-input-box {
+        border-radius: 26px !important;
+        padding: 11px 12px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container.user {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    #gpt-fullscreen .gpt-msg-container.user .gpt-content {
+        max-width: min(86%, 680px) !important;
+    }
+
+    #gpt-fullscreen .gpt-ai-message-shell {
+        border-radius: 22px !important;
+        padding: 16px 16px 12px !important;
+    }
+}
+
+/* ===== professional white cleanup v2: no pink mist, no pink gradients, plain AI replies ===== */
+#gpt-fullscreen,
+#gpt-fullscreen .gpt-main,
+#gpt-fullscreen .gpt-chat-area {
+    background: #ffffff !important;
+}
+
+#gpt-fullscreen::before,
+#gpt-fullscreen::after {
+    display: none !important;
+    content: none !important;
+    opacity: 0 !important;
+    background: none !important;
+}
+
+#gpt-fullscreen .gpt-sidebar {
+    background: #fff6fa !important;
+    border-right: 1px solid #f3d6e2 !important;
+    box-shadow: 8px 0 24px rgba(75, 47, 61, 0.04) !important;
+    backdrop-filter: blur(12px) saturate(108%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(108%) !important;
+}
+
+#gpt-fullscreen .gpt-sidebar-bottom,
+#gpt-fullscreen .gpt-menu-divider {
+    background: transparent !important;
+}
+
+#gpt-fullscreen .gpt-brand::after,
+#gpt-fullscreen .gpt-empty-title::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active,
+#gpt-fullscreen .gpt-msg-container.user .gpt-content,
+#gpt-fullscreen .gpt-avatar,
+#gpt-fullscreen .gpt-avatar-ai,
+#gpt-fullscreen .gpt-thinking-dot-avatar,
+#gpt-fullscreen .gpt-send-btn,
+#gpt-fullscreen .gpt-send-btn:hover,
+#gpt-fullscreen .gpt-input-wrapper,
+#gpt-fullscreen.gpt-empty .gpt-input-wrapper,
+#gpt-fullscreen .gpt-input-box,
+#gpt-fullscreen .gpt-input-box:focus-within,
+#gpt-fullscreen .gpt-toggle-sidebar-btn,
+#gpt-fullscreen #gpt-reopen-btn {
+    background-image: none !important;
+}
+
+#gpt-fullscreen .gpt-input-wrapper,
+#gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+    background: #ffffff !important;
+}
+
+#gpt-fullscreen .gpt-input-box {
+    background: #ffffff !important;
+    border-color: #efc6d8 !important;
+    box-shadow: 0 10px 30px rgba(61, 45, 55, 0.08) !important;
+}
+
+#gpt-fullscreen .gpt-input-box:focus-within {
+    background: #ffffff !important;
+    border-color: #df7aa5 !important;
+    box-shadow: 0 0 0 3px rgba(223, 122, 165, 0.12), 0 12px 32px rgba(61, 45, 55, 0.09) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn,
+#gpt-fullscreen .gpt-send-btn:hover {
+    background: #df5f93 !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(106, 61, 82, 0.16) !important;
+}
+
+#gpt-fullscreen .gpt-send-btn:disabled {
+    background: #ead2dd !important;
+    color: rgba(91, 68, 80, 0.50) !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-history-item.active {
+    background: #ffffff !important;
+    border-color: #efc6d8 !important;
+    color: #c6477c !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-nav-item:hover,
+#gpt-fullscreen .gpt-back-home:hover,
+#gpt-fullscreen .gpt-history-item:hover,
+#gpt-fullscreen .gpt-menu-item:hover,
+#gpt-fullscreen .gpt-menu-item.active,
+#gpt-fullscreen .gpt-image-option:hover,
+#gpt-fullscreen .gpt-image-option.active,
+#gpt-fullscreen .gpt-session-menu button:hover {
+    background: #ffffff !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai {
+    width: min(100%, 880px) !important;
+    max-width: 880px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+}
+
+#gpt-fullscreen .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .markdown-body {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.user .gpt-content {
+    background: #fff3f8 !important;
+    border-color: #efc6d8 !important;
+    box-shadow: 0 8px 20px rgba(61, 45, 55, 0.06) !important;
+}
+
+#gpt-fullscreen .gpt-avatar,
+#gpt-fullscreen .gpt-avatar-ai,
+#gpt-fullscreen .gpt-thinking-dot-avatar {
+    background: #ffffff !important;
+    border-color: #f0d4df !important;
+    box-shadow: 0 6px 16px rgba(61, 45, 55, 0.08) !important;
+}
+
+#gpt-fullscreen .markdown-body blockquote,
+#gpt-fullscreen .markdown-body table,
+#gpt-fullscreen .markdown-body code:not(pre code),
+#gpt-fullscreen .math-block,
+#gpt-fullscreen .gpt-error-actions {
+    background-image: none !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen,
+    #gpt-fullscreen .gpt-main,
+    #gpt-fullscreen .gpt-chat-area,
+    #gpt-fullscreen .gpt-input-wrapper,
+    #gpt-fullscreen.gpt-empty .gpt-input-wrapper {
+        background: #ffffff !important;
+    }
+
+    #gpt-fullscreen .gpt-sidebar {
+        background: #fff6fa !important;
+        box-shadow: 14px 0 34px rgba(75, 47, 61, 0.08) !important;
+    }
+
+    #gpt-fullscreen .gpt-ai-message-shell {
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+}
+
+/* ===== AI reply minimal text-only cleanup v3 =====
+   Match ChatGPT-like assistant output: no card, no border, no shadow, no avatar, no round action bubbles. */
+#gpt-fullscreen .gpt-msg-container.ai,
+#gpt-fullscreen .gpt-msg-container.ai:hover,
+#gpt-fullscreen .gpt-msg-container.ai:focus,
+#gpt-fullscreen .gpt-msg-container.ai:focus-within {
+    width: min(100%, 880px) !important;
+    max-width: 880px !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    margin: 0 auto !important;
+    padding: 18px 24px !important;
+    contain: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai::before,
+#gpt-fullscreen .gpt-msg-container.ai::after,
+#gpt-fullscreen .gpt-ai-message-shell::before,
+#gpt-fullscreen .gpt-ai-message-shell::after,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content::before,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-ai-message-shell:hover,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-ai-message-shell:focus,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-ai-message-shell:focus-within,
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content,
+#gpt-fullscreen .gpt-msg-container.ai .markdown-body,
+#gpt-fullscreen .gpt-msg-container.ai .markdown-body:hover,
+#gpt-fullscreen .gpt-msg-container.ai .markdown-body:focus,
+#gpt-fullscreen .gpt-thinking-content {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-content {
+    font-size: 16px !important;
+    line-height: 1.78 !important;
+    color: #2f2530 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .markdown-body p:first-child {
+    margin-top: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .markdown-body p:last-child {
+    margin-bottom: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) > .gpt-avatar,
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) .gpt-avatar-ai,
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) .gpt-msg-actions {
+    display: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai .gpt-msg-action-btn,
+#gpt-fullscreen .gpt-msg-container.ai .gpt-msg-action-tip {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    #gpt-fullscreen .gpt-msg-container.ai {
+        padding: 16px 16px !important;
+    }
+}
+
+/* ===== AI reply minimal text-only cleanup v4 =====
+   Override older high-specificity :not(.user) assistant-card rules from 50-gpt-sidebar-polish.css. */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user),
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):focus,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):focus-within,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user).ai,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user).ai:hover {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):focus-within .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user).ai .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user).ai:hover .gpt-ai-message-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    display: block !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell::before,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell::after,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .gpt-ai-message-shell::before,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .gpt-ai-message-shell::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-content,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .markdown-body,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .gpt-content,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .markdown-body {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-msg-actions,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover .gpt-msg-actions {
+    display: none !important;
+}
+
+/* ===== Restore assistant avatar while keeping text-only AI reply body v5 ===== */
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) > .gpt-avatar,
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) > .gpt-avatar.gpt-avatar-ai,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) > .gpt-avatar,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) > .gpt-avatar.gpt-avatar-ai,
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message):hover > .gpt-avatar,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user):hover > .gpt-avatar {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    flex: 0 0 38px !important;
+    border-radius: 50% !important;
+    border: 1px solid #f4bfd4 !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(196, 93, 139, 0.14) !important;
+    overflow: hidden !important;
+}
+
+#gpt-fullscreen .gpt-msg-container.ai:not(.gpt-thinking-message) > .gpt-avatar img,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) > .gpt-avatar img {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
+
