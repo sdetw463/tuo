@@ -304,7 +304,7 @@
     background: rgba(7, 9, 9, 0.28) !important;
     color: var(--tuo-text) !important;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
-    isolation: isolate;
+    /* isolation: isolate 已移除：它会创建独立合成组，导致内部元素的 backdrop-filter 无法穿透到背景图片 */
     overflow: hidden;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -353,7 +353,7 @@
     --gpt-ai-avatar-gap: 18px;
     background: transparent !important;
     color: var(--tuo-text) !important;
-    contain: layout style;
+    contain: style; /* 去掉 layout，否则会创建新层叠上下文截断子元素的 backdrop-filter */
 }
 
 #gpt-fullscreen .gpt-chat-area {
@@ -1041,7 +1041,7 @@
 #gpt-fullscreen {
     --gpt-frost-blur: blur(10px) saturate(122%) brightness(1.04);
     --gpt-bg-gaussian: blur(22px) saturate(118%) brightness(0.82);
-    background: rgba(5, 7, 8, 0.055) !important;
+    background: rgba(5, 7, 8, 0.02) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
@@ -1049,7 +1049,7 @@
 /* 背景改成真正的高斯模糊：保留主页/照片背景的轮廓，但不再用颗粒磨砂层。 */
 #gpt-fullscreen::before {
     z-index: 0 !important;
-    background: rgba(10, 11, 12, 0.28) !important;
+    background: rgba(10, 11, 12, 0.04) !important;
     backdrop-filter: var(--gpt-bg-gaussian) !important;
     -webkit-backdrop-filter: var(--gpt-bg-gaussian) !important;
     transform: translateZ(0);
@@ -1172,7 +1172,7 @@
 #gpt-fullscreen::before {
     z-index: 0 !important;
     background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.46)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.10)),
         radial-gradient(circle at 18% 8%, rgba(255, 210, 226, 0.055), transparent 30%),
         radial-gradient(circle at 84% 12%, rgba(210, 232, 255, 0.045), transparent 32%) !important;
     backdrop-filter: none !important;
@@ -1345,3 +1345,56 @@
 #gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell::before {
     opacity: 0 !important;
 }
+
+/* GPT glass v9: AI 答案气泡——纯白背景，所有文字统一深色 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 气泡内所有文字元素统一为深色（排除代码块和tooltip） */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell *:not(pre):not(code):not(pre *):not(.gpt-msg-action-tip):not(.gpt-msg-action-tip *) {
+    color: rgba(30, 25, 30, 0.90) !important;
+    text-shadow: none !important;
+}
+
+/* tooltip 保持深色背景白色字 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell .gpt-msg-action-tip {
+    color: #ffffff !important;
+}
+
+/* 链接单独处理，保持可识别的深色 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell a {
+    color: #b5386a !important;
+}
+
+/* 代码块：纯黑背景，亮色文字 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell pre,
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell pre code {
+    color: #e8e8e8 !important;
+    background: #000000 !important;
+}
+
+/* 行内代码 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell code:not(pre code) {
+    color: #b5386a !important;
+    background: rgba(181, 56, 106, 0.08) !important;
+}
+
+/* 代码块复制按钮：纯黑背景上改为亮色，确保可见 */
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell .code-copy-btn {
+    background: rgba(255, 255, 255, 0.90) !important;
+    color: #1a1a1a !important;
+    border-color: rgba(255, 255, 255, 0.30) !important;
+}
+
+#gpt-fullscreen .gpt-msg-container:not(.gpt-thinking-message):not(.user) .gpt-ai-message-shell .code-copy-btn:hover {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+
+
