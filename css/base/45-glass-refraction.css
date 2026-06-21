@@ -9,7 +9,10 @@
 .age-btn,
 .dot,
 .music-player-pro,
-.star-trigger-btn {
+.star-trigger-btn,
+#chat-window.chat-window,
+.chat-header-close,
+.chat-send-btn {
     isolation: isolate;
     overflow: hidden !important;
     background: rgba(255, 255, 255, 0.018) !important;
@@ -27,7 +30,10 @@
 .age-btn > :not(.glass-ca-wrap),
 .dot > :not(.glass-ca-wrap),
 .music-player-pro > :not(.glass-ca-wrap),
-.star-trigger-btn > :not(.glass-ca-wrap) {
+.star-trigger-btn > :not(.glass-ca-wrap),
+#chat-window.chat-window > :not(.glass-ca-wrap),
+.chat-header-close > :not(.glass-ca-wrap),
+.chat-send-btn > :not(.glass-ca-wrap) {
     position: relative;
     z-index: 2;
 }
@@ -35,7 +41,10 @@
 .age-btn,
 .dot,
 .music-player-pro,
-.star-trigger-btn {
+.star-trigger-btn,
+#chat-window.chat-window,
+.chat-header-close,
+.chat-send-btn {
     color: rgba(255, 255, 255, 0.96) !important;
 }
 
@@ -47,7 +56,9 @@
 
 .age-btn::before,
 .btn-ctrl::before,
-.star-trigger-btn::before {
+.star-trigger-btn::before,
+.chat-header-close::before,
+.chat-send-btn::before {
     opacity: 0 !important;
 }
 
@@ -56,6 +67,77 @@
 .star-trigger-btn svg {
     position: relative;
     z-index: 2;
+}
+
+#chat-window.chat-window {
+    background: rgba(255, 255, 255, 0.018) !important;
+}
+
+#chat-window.chat-window.show {
+    animation: chat-glass-appear 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+    transform-origin: center bottom;
+}
+
+@keyframes chat-glass-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#chat-window.chat-window .chat-header,
+#chat-window.chat-window .chat-bottom-wrapper {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+#chat-window.chat-window .chat-input {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+#chat-window.chat-window .chat-header-close,
+#chat-window.chat-window .chat-send-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+#chat-window.chat-window .chat-input,
+#chat-window.chat-window .chat-messages {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+}
+
+#chat-window.chat-window .chat-input::-webkit-scrollbar,
+#chat-window.chat-window .chat-messages::-webkit-scrollbar {
+    width: 7px;
+}
+
+#chat-window.chat-window .chat-input::-webkit-scrollbar-track,
+#chat-window.chat-window .chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#chat-window.chat-window .chat-input::-webkit-scrollbar-thumb,
+#chat-window.chat-window .chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+}
+
+#chat-window.chat-window .chat-input::-webkit-scrollbar-thumb:hover,
+#chat-window.chat-window .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.42);
+    background-clip: padding-box;
 }
 
 .glass-ca-wrap {

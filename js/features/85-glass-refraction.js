@@ -29,12 +29,13 @@
     const TAG = '[glass-refraction]';
 
     // ==================== CONFIG ====================
-    const EDGE_WIDTH      = 18;    // px — visible refraction zone width
+    const EDGE_WIDTH      = 28;    // px — visible refraction zone width
     const OUTSET          = 0;     // px — inward refraction no longer needs an outside sampling margin
-    const SCALE_R         = 10;    // Red channel displacement scale (least)
-    const SCALE_G         = 19;    // Green channel displacement scale (medium)
-    const SCALE_B         = 28;    // Blue channel displacement scale (most)
-    const WRAPPER_OPACITY = 0.92;  // overall strength of effect
+    const LENS_SCALE      = 50;    // Main same-channel lens displacement
+    const CHROMA_SPREAD   = 3;     // Small RGB separation around the lens displacement
+    const WRAPPER_OPACITY = 0.96;  // overall strength of effect
+    const TARGET_REFRESH_MS = 500;
+    const LAYOUT_REFRESH_MS = 250;
 
     const GLASS_TARGETS = [
         '#ai-entry-card',
@@ -43,12 +44,19 @@
         '.age-btn',
         '.dot',
         '.music-player-pro',
-        '.star-trigger-btn'
+        '.star-trigger-btn',
+        '#chat-window',
+        '.chat-header-close',
+        '.chat-send-btn'
     ];
     const mapCache = {};
     const elementIds = new WeakMap();
     const elementStates = new WeakMap();
     let nextElementId = 1;
+    let cachedTargets = [];
+    let targetsDirty = true;
+    let lastTargetRefresh = 0;
+    let lastViewportKey = '';
 
     // ==================== SDF & NORMAL MAP GENERATION ====================
 
@@ -124,13 +132,13 @@
                 if (dist > -edgeWidth && dist <= 0) {
                     const t = Math.max(0, Math.min(1, (dist + edgeWidth) / edgeWidth));
                     const smooth = t * t * t * (t * (t * 6 - 15) + 10);
-                    const profile = Math.pow(smooth, 0.88);
+                    const profile = 0.18 * smooth + 0.82 * Math.pow(smooth, 0.54);
 
                     // Inward refraction samples pixels from inside the card.
                     // This avoids transparent/out-of-bounds sampling at rounded edges.
                     rVal = 128 - 127 * nx * profile;
                     gVal = 128 - 127 * ny * profile;
-                    aVal = Math.round(255 * Math.pow(smooth, 0.76)); // Opaque at edge, fades to 0 inwards
+                    aVal = Math.round(255 * Math.pow(smooth, 0.58)); // Opaque at edge, fades to 0 inwards
                 }
 
                 data[idx]     = Math.round(rVal);
@@ -163,6 +171,11 @@
     }
 
     function glassElements() {
+        const now = performance.now();
+        if (!targetsDirty && now - lastTargetRefresh < TARGET_REFRESH_MS) {
+            return cachedTargets;
+        }
+
         const seen = new Set();
         const elements = [];
         GLASS_TARGETS.forEach((selector) => {
@@ -173,14 +186,18 @@
                 }
             });
         });
-        return elements;
+        cachedTargets = elements;
+        targetsDirty = false;
+        lastTargetRefresh = now;
+        return cachedTargets;
     }
 
     function injectSVGFilter(elementKey, dataUrl, w, h, strength) {
         const filterId = 'refract-filter-' + elementKey;
-        const scaleR = Math.max(2, Math.round(SCALE_R * strength));
-        const scaleG = Math.max(3, Math.round(SCALE_G * strength));
-        const scaleB = Math.max(4, Math.round(SCALE_B * strength));
+        const scaleLens = Math.max(4, Math.round(LENS_SCALE * strength));
+        const scaleR = Math.max(2, Math.round((LENS_SCALE - CHROMA_SPREAD) * strength));
+        const scaleG = scaleLens;
+        const scaleB = Math.max(4, Math.round((LENS_SCALE + CHROMA_SPREAD) * strength));
         let svg = document.getElementById('refract-svg-' + elementKey);
         if (!svg) {
             svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -193,8 +210,12 @@
             <filter id="${filterId}" x="0" y="0" width="${w}" height="${h}" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
               <feImage href="${dataUrl}" x="0" y="0" width="${w}" height="${h}" result="mapRaw" />
               <feGaussianBlur in="mapRaw" stdDeviation="0.45" result="map" />
+
+              <!-- Primary lens: a same-channel displacement that creates the thick-glass magnification. -->
+              <feDisplacementMap in="SourceGraphic" in2="map" scale="${scaleLens}" xChannelSelector="R" yChannelSelector="G" result="lensBase" />
+              <feComposite in="lensBase" in2="map" operator="in" result="lensMasked" />
               
-              <!-- Chromatic separation: displace R, G, B channels by different scales -->
+              <!-- Secondary chromatic separation: subtle color fringe around the main lens distortion. -->
               <feDisplacementMap in="SourceGraphic" in2="map" scale="${scaleR}" xChannelSelector="R" yChannelSelector="G" result="dispR" />
               <feDisplacementMap in="SourceGraphic" in2="map" scale="${scaleG}" xChannelSelector="R" yChannelSelector="G" result="dispG" />
               <feDisplacementMap in="SourceGraphic" in2="map" scale="${scaleB}" xChannelSelector="R" yChannelSelector="G" result="dispB" />
@@ -208,8 +229,16 @@
               <feBlend mode="screen" in="redOnly" in2="greenOnly" result="rg" />
               <feBlend mode="screen" in="rg" in2="blueOnly" result="rgb" />
               
-              <!-- Smooth edge fade: multiply output with normal map alpha -->
-              <feComposite in="rgb" in2="map" operator="in" />
+              <!-- Smooth edge fade: multiply output with normal map alpha, then keep color fringe subtle. -->
+              <feComposite in="rgb" in2="map" operator="in" result="chromaMasked" />
+              <feComponentTransfer in="chromaMasked" result="chromaSoft">
+                <feFuncA type="linear" slope="0.22" />
+              </feComponentTransfer>
+
+              <feMerge>
+                <feMergeNode in="lensMasked" />
+                <feMergeNode in="chromaSoft" />
+              </feMerge>
             </filter>
           </defs>`;
     }
@@ -220,10 +249,31 @@
         if (el.style[prop] !== value) el.style[prop] = value;
     }
 
-    function ensureGlassLayer(el) {
+    function updateFilterForSize(el, state, w, h) {
+        const computed = window.getComputedStyle(el);
+        const radius = parseInt(computed.borderRadius) || Math.min(w, h) / 2;
+        const minDim = Math.min(w, h);
+        const edgeWidth = Math.max(4, Math.min(EDGE_WIDTH, Math.floor(minDim * 0.62)));
+        const strength = Math.max(0.26, Math.min(1, minDim / 42));
+        const sizeKey = `${w}x${h}x${radius}x${edgeWidth}x${strength.toFixed(2)}`;
+        if (state.sizeKey !== sizeKey) {
+            const elementKey = getElementKey(el);
+            const normalMapUrl = getNormalMap(w, h, radius, edgeWidth, OUTSET);
+            injectSVGFilter(elementKey, normalMapUrl, w, h, strength);
+            setStyle(state.wrap, 'filter', 'url(#refract-filter-' + elementKey + ') saturate(1.08) contrast(1.10) brightness(1.03)');
+            state.sizeKey = sizeKey;
+        }
+    }
+
+    function getLayoutSize(el) {
         const rect = el.getBoundingClientRect();
-        const w = Math.round(rect.width);
-        const h = Math.round(rect.height);
+        const w = Math.round(el.offsetWidth || rect.width);
+        const h = Math.round(el.offsetHeight || rect.height);
+        return { w, h, rect };
+    }
+
+    function ensureGlassLayer(el) {
+        const { w, h } = getLayoutSize(el);
         if (w < 8 || h < 8) return null;
 
         const oldClipper = el.querySelector('.glass-ca-clipper');
@@ -236,11 +286,6 @@
             el.style.position = 'relative';
         }
 
-        const radius = parseInt(computed.borderRadius) || Math.min(w, h) / 2;
-        const minDim = Math.min(w, h);
-        const edgeWidth = Math.max(4, Math.min(EDGE_WIDTH, Math.floor(minDim / 2)));
-        const strength = Math.max(0.26, Math.min(1, minDim / 42));
-        const sizeKey = `${w}x${h}x${radius}x${edgeWidth}x${strength.toFixed(2)}`;
         const elementKey = getElementKey(el);
         let state = elementStates.get(el);
 
@@ -253,7 +298,7 @@
             wrap.style.cssText =
                 'position:absolute;inset:0;z-index:0;pointer-events:none;' +
                 'border-radius:inherit;overflow:hidden;opacity:' + WRAPPER_OPACITY + ';' +
-                'filter:url(#refract-filter-' + elementKey + ') saturate(1.16) contrast(1.08) brightness(1.03);';
+                'filter:none;';
 
             const scaler = document.createElement('div');
             scaler.className = 'glass-refract-scaler';
@@ -274,20 +319,56 @@
 
             wrap.appendChild(scaler);
             el.insertBefore(wrap, el.firstChild);
-            state = { wrap, scaler, bgEls, sizeKey: '' };
+            state = {
+                wrap,
+                scaler,
+                bgEls,
+                sizeKey: '',
+                lastLayoutAt: 0,
+                lastRectKey: '',
+                lastViewportKey: '',
+                sourceKeys: ['', '']
+            };
             elementStates.set(el, state);
         }
 
-        if (state.sizeKey !== sizeKey) {
-            const normalMapUrl = getNormalMap(w, h, radius, edgeWidth, OUTSET);
-            injectSVGFilter(elementKey, normalMapUrl, w, h, strength);
-            state.sizeKey = sizeKey;
-        }
+        updateFilterForSize(el, state, w, h);
 
         return state;
     }
 
+    function updateLayout(el, state, now, viewportKey, vpW, vpH) {
+        if (
+            state.lastViewportKey === viewportKey &&
+            now - state.lastLayoutAt < LAYOUT_REFRESH_MS
+        ) {
+            return;
+        }
+
+        const { w, h, rect } = getLayoutSize(el);
+        const rectKey = `${Math.round(rect.left)}:${Math.round(rect.top)}:${w}:${h}`;
+        if (state.lastRectKey !== rectKey || state.lastViewportKey !== viewportKey) {
+            updateFilterForSize(el, state, w, h);
+            const origin = (vpW / 2) + 'px ' + (vpH / 2) + 'px';
+            state.bgEls.forEach((bgEl) => {
+                setStyle(bgEl, 'left', (-rect.left) + 'px');
+                setStyle(bgEl, 'top', (-rect.top) + 'px');
+                setStyle(bgEl, 'width', vpW + 'px');
+                setStyle(bgEl, 'height', vpH + 'px');
+                setStyle(bgEl, 'transformOrigin', origin);
+            });
+            state.lastRectKey = rectKey;
+            state.lastViewportKey = viewportKey;
+        }
+        state.lastLayoutAt = now;
+    }
+
     function syncGlassLayers() {
+        if (document.hidden) {
+            requestAnimationFrame(syncGlassLayers);
+            return;
+        }
+
         const sources = [document.getElementById('img1'), document.getElementById('img2')];
         const sourceStyles = sources.map((source) => {
             if (!source) return null;
@@ -295,19 +376,29 @@
             return {
                 backgroundImage: style.backgroundImage,
                 opacity: style.opacity,
-                transform: style.transform === 'none' ? '' : style.transform
+                transform: style.transform === 'none' ? '' : style.transform,
+                key: style.backgroundImage + '|' + style.opacity + '|' + (style.transform === 'none' ? '' : style.transform)
             };
         });
         const vpW = window.innerWidth;
         const vpH = window.innerHeight;
-        const origin = (vpW / 2) + 'px ' + (vpH / 2) + 'px';
+        const viewportKey = vpW + 'x' + vpH;
+        if (lastViewportKey !== viewportKey) {
+            targetsDirty = true;
+            lastViewportKey = viewportKey;
+        }
+        const now = performance.now();
 
         glassElements().forEach(function (el) {
             if (el.offsetWidth > 0) {
-                const state = ensureGlassLayer(el);
+                let state = elementStates.get(el);
+                if (!state || !state.wrap || !el.contains(state.wrap)) {
+                    state = ensureGlassLayer(el);
+                }
                 if (!state) return;
 
-                const rect = el.getBoundingClientRect();
+                updateLayout(el, state, now, viewportKey, vpW, vpH);
+
                 state.bgEls.forEach((bgEl, i) => {
                     const sourceStyle = sourceStyles[i];
                     if (!sourceStyle || !sourceStyle.backgroundImage || sourceStyle.backgroundImage === 'none') {
@@ -315,14 +406,12 @@
                         return;
                     }
 
-                    setStyle(bgEl, 'left', (-rect.left) + 'px');
-                    setStyle(bgEl, 'top', (-rect.top) + 'px');
-                    setStyle(bgEl, 'width', vpW + 'px');
-                    setStyle(bgEl, 'height', vpH + 'px');
-                    setStyle(bgEl, 'transformOrigin', origin);
-                    setStyle(bgEl, 'backgroundImage', sourceStyle.backgroundImage);
-                    setStyle(bgEl, 'opacity', sourceStyle.opacity);
-                    setStyle(bgEl, 'transform', sourceStyle.transform);
+                    if (state.sourceKeys[i] !== sourceStyle.key) {
+                        setStyle(bgEl, 'backgroundImage', sourceStyle.backgroundImage);
+                        setStyle(bgEl, 'opacity', sourceStyle.opacity);
+                        setStyle(bgEl, 'transform', sourceStyle.transform);
+                        state.sourceKeys[i] = sourceStyle.key;
+                    }
                 });
             }
         });
@@ -333,6 +422,14 @@
 
     function init() {
         console.log(TAG, 'init (CORS-free live refraction sync)');
+        const observer = new MutationObserver(() => {
+            targetsDirty = true;
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        window.addEventListener('resize', () => {
+            targetsDirty = true;
+            lastViewportKey = '';
+        }, { passive: true });
         requestAnimationFrame(syncGlassLayers);
     }
 
