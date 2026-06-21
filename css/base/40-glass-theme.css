@@ -462,9 +462,9 @@
             transform: translateY(0) scaleX(0.99) scaleY(0.98);
         }
 
-        @media (max-width: 768px) {
-            #ai-entry-card.ai-entry-card,
-            #main-card.main-card {
-                background: var(--glass-surface) !important;
-            }
-        }
+@media (max-width: 768px) {
+    #ai-entry-card.ai-entry-card,
+    #main-card.main-card {
+        background: var(--glass-surface) !important;
+    }
+}
