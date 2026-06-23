@@ -1,0 +1,22 @@
+/* Pause expensive homepage rendering while the full-screen AI chat is open. */
+body.home-rendering-paused #img1,
+body.home-rendering-paused #img2,
+body.home-rendering-paused .star-wish,
+body.home-rendering-paused .heart-trail,
+body.home-rendering-paused .song-title-text {
+    animation-play-state: paused !important;
+}
+
+body.home-rendering-paused .image-layer {
+    transition: none !important;
+    will-change: auto !important;
+}
+
+body.home-rendering-paused .floating-bubble {
+    display: none !important;
+    animation: none !important;
+}
+
+body.home-rendering-paused .glass-refract-bg {
+    will-change: auto !important;
+}

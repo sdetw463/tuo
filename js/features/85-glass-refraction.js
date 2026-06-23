@@ -57,6 +57,8 @@
     let targetsDirty = true;
     let lastTargetRefresh = 0;
     let lastViewportKey = '';
+    let syncRafId = 0;
+    let syncRunning = false;
 
     // ==================== SDF & NORMAL MAP GENERATION ====================
 
@@ -249,6 +251,29 @@
         if (el.style[prop] !== value) el.style[prop] = value;
     }
 
+    function isHomeRenderingPaused() {
+        return document.body.classList.contains('home-rendering-paused');
+    }
+
+    function scheduleSync() {
+        if (!syncRunning) return;
+        syncRafId = requestAnimationFrame(syncGlassLayers);
+    }
+
+    function startSync() {
+        if (syncRunning || document.hidden || isHomeRenderingPaused()) return;
+        syncRunning = true;
+        scheduleSync();
+    }
+
+    function stopSync() {
+        syncRunning = false;
+        if (syncRafId) {
+            cancelAnimationFrame(syncRafId);
+            syncRafId = 0;
+        }
+    }
+
     function updateFilterForSize(el, state, w, h) {
         const computed = window.getComputedStyle(el);
         const radius = parseInt(computed.borderRadius) || Math.min(w, h) / 2;
@@ -364,8 +389,9 @@
     }
 
     function syncGlassLayers() {
-        if (document.hidden) {
-            requestAnimationFrame(syncGlassLayers);
+        if (!syncRunning) return;
+        if (document.hidden || isHomeRenderingPaused()) {
+            stopSync();
             return;
         }
 
@@ -415,7 +441,7 @@
                 });
             }
         });
-        requestAnimationFrame(syncGlassLayers);
+        scheduleSync();
     }
 
     // ==================== INIT ====================
@@ -430,7 +456,17 @@
             targetsDirty = true;
             lastViewportKey = '';
         }, { passive: true });
-        requestAnimationFrame(syncGlassLayers);
+        document.addEventListener('tuotuo:home-rendering-paused', stopSync);
+        document.addEventListener('tuotuo:home-rendering-resumed', () => {
+            targetsDirty = true;
+            lastViewportKey = '';
+            startSync();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopSync();
+            else startSync();
+        });
+        startSync();
     }
 
     if (document.readyState === 'loading') {

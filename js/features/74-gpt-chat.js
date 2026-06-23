@@ -10,9 +10,17 @@ function getCurrentSession() {
 
 async function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
-    win.classList.toggle('show');
+    const willShow = !win.classList.contains('show');
+    win.classList.toggle('show', willShow);
 
-    if (win.classList.contains('show')) {
+    if (typeof window.setHomeRenderingPaused === 'function') {
+        window.setHomeRenderingPaused(willShow);
+    } else {
+        document.body.classList.toggle('home-rendering-paused', willShow);
+        document.dispatchEvent(new CustomEvent(willShow ? 'tuotuo:home-rendering-paused' : 'tuotuo:home-rendering-resumed'));
+    }
+
+    if (willShow) {
         if (window.innerWidth <= 768) {
             win.classList.add('sidebar-collapsed');
         }
