@@ -45,66 +45,13 @@
 #chat-window.chat-window,
 .chat-header-close,
 .chat-send-btn {
-    color: rgba(70, 70, 70, 0.88) !important;
-    text-shadow: none !important;
-}
-
-#ai-entry-card.ai-entry-card,
-#ai-entry-card.ai-entry-card *,
-#diary-card.diary-card,
-#diary-card.diary-card *,
-#main-card.main-card,
-#main-card.main-card *,
-.age-btn,
-.dot,
-.music-player-pro,
-.music-player-pro *,
-.star-trigger-btn,
-.star-trigger-btn *,
-#chat-window.chat-window,
-#chat-window.chat-window *,
-.chat-header-close,
-.chat-header-close *,
-.chat-send-btn,
-.chat-send-btn * {
-    color: rgba(70, 70, 70, 0.88) !important;
-    text-shadow: none !important;
-}
-
-#ai-entry-card.ai-entry-card > div:first-child,
-#ai-entry-card.ai-entry-card > div:last-child,
-#main-card.main-card h1,
-#main-card.main-card .quote,
-#main-card.main-card #love-days,
-#main-card.main-card #love-days + span,
-#main-card.main-card .album-nav-btn,
-#main-card.main-card .xiamen-entry-btn,
-#diary-card.diary-card .diary-cal-year,
-#diary-card.diary-card .diary-cal-month-name,
-#diary-card.diary-card .diary-cal-wd,
-#diary-card.diary-card .diary-cal-day,
-#diary-card.diary-card .diary-cal-nav,
-#chat-window.chat-window .chat-header-info h3,
-#chat-window.chat-window .chat-header-info span,
-#chat-window.chat-window .message-name,
-#chat-window.chat-window .message-bubble {
-    color: rgba(70, 70, 70, 0.88) !important;
-    text-shadow: none !important;
-}
-
-.music-player-pro svg,
-.star-trigger-btn svg,
-.chat-header-close svg,
-.chat-send-btn svg {
-    color: rgba(70, 70, 70, 0.88) !important;
-    fill: currentColor !important;
-    stroke: currentColor !important;
+    color: rgba(255, 255, 255, 0.96) !important;
 }
 
 .age-btn.active,
 .dot.active {
     background: rgba(255, 255, 255, 0.78) !important;
-    color: rgba(48, 48, 48, 0.94) !important;
+    color: #111 !important;
 }
 
 .age-btn::before,
@@ -156,11 +103,6 @@
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
-    color: rgba(70, 70, 70, 0.88) !important;
-}
-
-#chat-window.chat-window .chat-input::placeholder {
-    color: rgba(70, 70, 70, 0.46) !important;
 }
 
 #chat-window.chat-window .chat-header-close,
