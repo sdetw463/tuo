@@ -8,6 +8,21 @@ function getCurrentSession() {
     return getSessionById(currentSessionId);
 }
 
+function buildGPTContextMessages(session, excludeLastCount = 0) {
+    if (!session || !Array.isArray(session.messages)) return [];
+
+    const end = Math.max(0, session.messages.length - excludeLastCount);
+    return session.messages
+        .slice(0, end)
+        .filter(msg => msg && (msg.role === 'user' || msg.role === 'assistant'))
+        .slice(-18)
+        .map(msg => ({
+            role: msg.role,
+            content: String(msg.content || msg.userText || '').trim().slice(0, 24000)
+        }))
+        .filter(msg => msg.content);
+}
+
 async function toggleFullScreenGPT() {
     const win = document.getElementById('gpt-fullscreen');
     const willShow = !win.classList.contains('show');
@@ -1118,10 +1133,7 @@ async function sendGPTMessage() {
                     message: cleanMessageToBackend,
                     sessionId: currentSessionId,
                     userName: getStableUserName(),
-                    historyMessages: session.needsHistorySeed ? session.messages.slice(0, -1).map(msg => ({
-                        role: msg.role,
-                        content: msg.content || msg.userText || ''
-                    })) : [],
+                    historyMessages: buildGPTContextMessages(session, 1),
                     images: imagesToSend,
                     documents: documentsToSend,
                     stream: true,
@@ -1210,4 +1222,3 @@ async function sendGPTMessage() {
         }
     });
 })();
-
