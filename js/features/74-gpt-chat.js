@@ -40,6 +40,10 @@ async function toggleFullScreenGPT() {
             win.classList.add('sidebar-collapsed');
         }
 
+        if (typeof ensureGPTSessionsLoaded === 'function') {
+            await ensureGPTSessionsLoaded();
+        }
+
         renderHistoryList();
 
         if (chatSessions.length === 0) {
@@ -182,7 +186,11 @@ document.addEventListener('click', (e) => {
     }
 });
 
-function startNewGPTChat() {
+async function startNewGPTChat() {
+    if (typeof ensureGPTSessionsLoaded === 'function' && !gptSessionsLoaded) {
+        await ensureGPTSessionsLoaded();
+    }
+
     const session = createSessionRecord();
     currentSessionId = session.id;
     chatSessions.unshift(session);
@@ -201,20 +209,54 @@ function loadSession(id) {
 }
 
 let saveSessionsTimer = null;
+function buildSessionsSavePayload() {
+    return JSON.stringify({
+        sessions: chatSessions,
+        userName: getStableUserName(), // ✨ 告诉服务器这是谁的记录
+        clientLoadedAllSessions: !!gptSessionsLoaded
+    });
+}
+
 function saveSessions() {
+    if (typeof ensureGPTSessionsLoaded === 'function' && !gptSessionsLoaded) {
+        ensureGPTSessionsLoaded().then(saveSessions);
+        return;
+    }
+
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
         repairSessionTree();
         fetch(`${TUOTUO_API_BASE}/api/sessions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                sessions: chatSessions,
-                userName: getStableUserName() // ✨ 告诉服务器这是谁的记录
+            body: buildSessionsSavePayload()
+        })
+            .then(async res => {
+                const text = await res.text();
+                let data = null;
+                try { data = text ? JSON.parse(text) : null; } catch {}
+                if (!res.ok || (data && data.success === false)) {
+                    throw new Error((data && (data.error || data.msg)) || text || `HTTP ${res.status}`);
+                }
             })
-        }).catch(err => console.error("同步到云端数据库失败:", err));
+            .catch(err => console.error("同步到云端数据库失败:", err));
     }, 1000); // 稍微防抖，避免高频发请求
 }
+
+window.addEventListener('pagehide', () => {
+    if (!gptSessionsLoaded || chatSessions.length === 0) return;
+    clearTimeout(saveSessionsTimer);
+    const payload = buildSessionsSavePayload();
+    const url = `${TUOTUO_API_BASE}/api/sessions`;
+    const blob = new Blob([payload], { type: 'application/json' });
+    if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true
+    }).catch(() => {});
+});
 
 function fileToDataURL(file) {
     return new Promise((resolve, reject) => {
@@ -1021,6 +1063,10 @@ async function sendGPTMessage() {
 
     const text = inputEl.value.trim();
     if (!text && gptPendingFiles.length === 0) return;
+
+    if (typeof ensureGPTSessionsLoaded === 'function') {
+        await ensureGPTSessionsLoaded();
+    }
 
     if (!currentSessionId || !getCurrentSession()) {
         const newSession = createSessionRecord();

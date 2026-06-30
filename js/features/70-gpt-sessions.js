@@ -5,6 +5,8 @@ let currentSessionId = null;
 let currentGPTMode = 'chat';
 let currentReasoningMode = 'normal';
 let currentImageRatio = 'auto';
+let gptSessionsLoaded = false;
+let gptSessionsLoadPromise = null;
 
 function generateSessionId() {
     return `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -178,23 +180,31 @@ function getOrderedSessions() {
     return ordered;
 }
 
+function ensureGPTSessionsLoaded() {
+    return gptSessionsLoadPromise || Promise.resolve();
+}
+
 const myUserName = getStableUserName(); // 获取当前用户身份
-fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
+gptSessionsLoadPromise = fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)}`)
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data)) {
-            const localUnsaved = chatSessions.filter(s => s.messages.length === 0);
-            chatSessions = data.map(s => normalizeSessionRecord({
+            const localSessions = chatSessions
+                .map(s => normalizeSessionRecord(s))
+                .filter(s => s && s.id);
+            const loadedSessions = data.map(s => normalizeSessionRecord({
                 pinned: false,
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 ...s
             }));
-            localUnsaved.forEach(ls => {
-                if (!chatSessions.find(s => s.id === ls.id)) {
-                    chatSessions.unshift(ls);
+            const loadedIds = new Set(loadedSessions.map(s => s.id));
+            localSessions.forEach(ls => {
+                if (!loadedIds.has(ls.id)) {
+                    loadedSessions.unshift(ls);
                 }
             });
+            chatSessions = loadedSessions;
             repairSessionTree();
             if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
                 renderHistoryList();
@@ -203,5 +213,8 @@ fetch(`${TUOTUO_API_BASE}/api/sessions?userName=${encodeURIComponent(myUserName)
                 }
             }
         }
-    }).catch(err => console.error("从数据库读取 AI 历史失败:", err));
-
+    })
+    .catch(err => console.error("从数据库读取 AI 历史失败:", err))
+    .finally(() => {
+        gptSessionsLoaded = true;
+    });
