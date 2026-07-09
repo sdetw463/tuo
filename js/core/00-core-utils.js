@@ -208,17 +208,27 @@ function openFull(src) {
     document.getElementById('image-viewer').style.display = 'flex';
 }
 
-const TUOTUO_API_TOKEN_KEY = 'tuotuo_personal_api_token';
+const TUOTUO_API_TOKEN_KEY = 'tuotuo_account_api_token';
 let tuoApiAccessValidated = false;
 let tuoApiAccessPromise = null;
 
 function getTuoApiToken() {
-    return sessionStorage.getItem(TUOTUO_API_TOKEN_KEY) || '';
+    const savedToken = localStorage.getItem(TUOTUO_API_TOKEN_KEY) || '';
+    if (savedToken) return savedToken;
+
+    // Upgrade the short-lived tab-only token from the previous release once.
+    const previousToken = sessionStorage.getItem('tuotuo_personal_api_token') || '';
+    if (previousToken) {
+        localStorage.setItem(TUOTUO_API_TOKEN_KEY, previousToken);
+        sessionStorage.removeItem('tuotuo_personal_api_token');
+    }
+    return previousToken;
 }
 
 function clearTuoApiAccess() {
     tuoApiAccessValidated = false;
-    sessionStorage.removeItem(TUOTUO_API_TOKEN_KEY);
+    localStorage.removeItem(TUOTUO_API_TOKEN_KEY);
+    sessionStorage.removeItem('tuotuo_personal_api_token');
 }
 
 async function fetchTuoApiAccessSession(token) {
@@ -266,7 +276,7 @@ async function ensureTuoApiAccess() {
         if (!loginResponse.ok || !loginData.accessToken) {
             throw new Error(loginData.error || '账号验证失败。');
         }
-        sessionStorage.setItem(TUOTUO_API_TOKEN_KEY, loginData.accessToken);
+        localStorage.setItem(TUOTUO_API_TOKEN_KEY, loginData.accessToken);
         tuoApiAccessValidated = true;
     })();
 
