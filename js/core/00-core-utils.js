@@ -242,16 +242,29 @@ async function ensureTuoApiAccess() {
             clearTuoApiAccess();
         }
 
-        const password = window.prompt('请输入 TuoTuo 个人 AI 访问密码');
-        if (!password) throw new Error('未提供个人 AI 访问密码。');
-        const loginResponse = await fetch(`${TUOTUO_API_BASE}/api/auth/login`, {
+        const username = String(window.prompt('请输入用户名（3-24 位；可用小写字母、数字、中文、下划线或连字符）') || '').trim().toLowerCase();
+        if (!username) throw new Error('未提供用户名。');
+        const password = window.prompt('请输入你的个人密码（首次使用会创建账号，至少 8 个字符）');
+        if (!password) throw new Error('未提供个人密码。');
+
+        let loginResponse = await fetch(`${TUOTUO_API_BASE}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            body: JSON.stringify({ username, password })
         });
-        const loginData = await loginResponse.json().catch(() => ({}));
+        let loginData = await loginResponse.json().catch(() => ({}));
+        if (loginResponse.status === 404) {
+            const shouldRegister = window.confirm(`用户名“${username}”尚未注册。要用此用户名创建新账号吗？`);
+            if (!shouldRegister) throw new Error('未创建账号。');
+            loginResponse = await fetch(`${TUOTUO_API_BASE}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            loginData = await loginResponse.json().catch(() => ({}));
+        }
         if (!loginResponse.ok || !loginData.accessToken) {
-            throw new Error(loginData.error || '个人 AI 访问验证失败。');
+            throw new Error(loginData.error || '账号验证失败。');
         }
         sessionStorage.setItem(TUOTUO_API_TOKEN_KEY, loginData.accessToken);
         tuoApiAccessValidated = true;
