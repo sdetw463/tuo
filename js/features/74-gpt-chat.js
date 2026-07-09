@@ -1380,9 +1380,12 @@ async function sendGPTMessage() {
             const rawErrorMsg = err.message || '请求失败，请稍后再试';
             const safeMsg = escapeHtml(rawErrorMsg);
             const isFilter = /content management policy|content_filter|filtered|内容过滤|400/i.test(rawErrorMsg);
+            const isAccountError = /账号|用户名|密码|访问验证|登录|注册/i.test(rawErrorMsg);
             const suggestion = isFilter
                 ? '这通常是 Azure 内容过滤误伤。请点击左侧【新聊天】后重试，或换成“请客观描述图片中的场景、人物姿态、物品和文字”。'
-                : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
+                : isAccountError
+                    ? '请确认用户名和个人密码；若仍然失败，请在 Azure App Service 的日志流中搜索页面显示的错误编号。'
+                    : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
             if (chatArea) {
                 chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">${escapeHtml(suggestion)}</div></div></div>`);
                 chatArea.scrollTop = chatArea.scrollHeight;
