@@ -336,6 +336,21 @@ function normalizeExtractedDocumentText(text, name, maxChars = 180000) {
     return `【文件名：${name}】\n${body}`.slice(0, maxChars);
 }
 
+function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(reader.error || new Error('文件读取失败'));
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeSandboxDownloadLinks(text) {
+    return String(text || '')
+        .replace(/\[([^\]]+)\]\(sandbox:[^)]+\)/gi, '$1')
+        .replace(/sandbox:\/?\/?[^\s)]+/gi, '');
+}
+
 async function extractPdfText(file) {
     if (!window.pdfjsLib) throw new Error('PDF 解析库尚未加载，请稍后重试');
     if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -434,9 +449,16 @@ async function handleGPTFileSelect(e) {
                 const processed = await processImageAsync(file, currentGPTMode);
                 gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, name });
             } else {
-                showGPTTransientStatus(`正在读取文件：${name}`);
-                const extractedText = await extractDocumentTextFromFile(file, ext, name);
-                gptPendingFiles.push({ type: 'document', data: extractedText, name });
+                showGPTTransientStatus(`正在上传文件：${name}`);
+                const fileData = await readFileAsDataUrl(file);
+                gptPendingFiles.push({
+                    type: 'document',
+                    data: fileData,
+                    fileData,
+                    mimeType: file.type || 'application/octet-stream',
+                    size: file.size || 0,
+                    name
+                });
             }
         } catch (err) {
             console.error('文件解析失败', err);
@@ -458,6 +480,9 @@ function normalizeGeneratedFiles(files) {
             const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
             const fileId = String(file.fileId || file.file_id || '').trim();
             const containerId = String(file.containerId || file.container_id || '').trim();
+            if (/sandbox:/i.test(url) || /\/api\/ai-agent-file\/cfile_[^/]+(?:\?|$)/i.test(url)) {
+                url = '';
+            }
             if (!url && fileId && containerId) {
                 const encodedFilename = encodeURIComponent(filename || 'agent-output');
                 url = `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(containerId)}/${encodeURIComponent(fileId)}?filename=${encodedFilename}`;
@@ -489,7 +514,7 @@ function renderGeneratedFilesHtml(files) {
 }
 
 function renderAssistantMessageHtml(text, sources = [], files = []) {
-    return renderMarkdownSafe(text || '', sources || []) + renderGeneratedFilesHtml(files || []);
+    return renderMarkdownSafe(removeSandboxDownloadLinks(text || ''), sources || []) + renderGeneratedFilesHtml(files || []);
 }
 
 function renderGPTFilePreview() {
@@ -1154,8 +1179,13 @@ async function sendGPTMessage() {
             } else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
         } else if (f.type === 'document') {
-            documentsToSend.push({ name: f.name, content: f.data });
-            docsText += `\n\n【用户上传了附件：${f.name}】\n内容如下：\n${f.data}`;
+            documentsToSend.push({
+                name: f.name,
+                fileData: f.fileData || f.data,
+                mimeType: f.mimeType || 'application/octet-stream',
+                size: f.size || 0
+            });
+            docsText += `\n\n【用户上传了附件：${f.name}】`;
             mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`;
         }
     });
