@@ -454,13 +454,20 @@ function normalizeGeneratedFiles(files) {
     return (Array.isArray(files) ? files : [])
         .map(file => {
             if (!file) return null;
-            const url = String(file.url || file.downloadUrl || '').trim();
+            let url = String(file.url || file.downloadUrl || '').trim();
             const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
             const fileId = String(file.fileId || file.file_id || '').trim();
+            const containerId = String(file.containerId || file.container_id || '').trim();
+            if (!url && fileId) {
+                const encodedFilename = encodeURIComponent(filename || 'agent-output');
+                url = containerId
+                    ? `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(containerId)}/${encodeURIComponent(fileId)}?filename=${encodedFilename}`
+                    : `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(fileId)}?filename=${encodedFilename}`;
+            }
             const key = url || fileId || filename;
             if (!key || seen.has(key)) return null;
             seen.add(key);
-            return { url, filename, fileId, containerId: file.containerId || file.container_id || '', type: file.type || 'file' };
+            return { url, filename, fileId, containerId, type: file.type || 'file' };
         })
         .filter(file => file && (file.url || file.fileId));
 }
