@@ -351,6 +351,10 @@ function removeSandboxDownloadLinks(text) {
         .replace(/sandbox:\/?\/?[^\s)]+/gi, '');
 }
 
+function shouldSendAsRawInputFile(file, ext) {
+    return ext === 'pdf' || file.type === 'application/pdf';
+}
+
 async function extractPdfText(file) {
     if (!window.pdfjsLib) throw new Error('PDF 解析库尚未加载，请稍后重试');
     if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -449,16 +453,29 @@ async function handleGPTFileSelect(e) {
                 const processed = await processImageAsync(file, currentGPTMode);
                 gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, name });
             } else {
-                showGPTTransientStatus(`正在上传文件：${name}`);
-                const fileData = await readFileAsDataUrl(file);
-                gptPendingFiles.push({
-                    type: 'document',
-                    data: fileData,
-                    fileData,
-                    mimeType: file.type || 'application/octet-stream',
-                    size: file.size || 0,
-                    name
-                });
+                if (shouldSendAsRawInputFile(file, ext)) {
+                    showGPTTransientStatus(`正在上传原始文件：${name}`);
+                    const fileData = await readFileAsDataUrl(file);
+                    gptPendingFiles.push({
+                        type: 'document',
+                        data: fileData,
+                        fileData,
+                        mimeType: file.type || 'application/pdf',
+                        size: file.size || 0,
+                        name
+                    });
+                } else {
+                    showGPTTransientStatus(`正在解析文件：${name}`);
+                    const extractedText = await extractDocumentTextFromFile(file, ext, name);
+                    gptPendingFiles.push({
+                        type: 'document',
+                        data: extractedText,
+                        content: extractedText,
+                        mimeType: file.type || 'text/plain',
+                        size: file.size || 0,
+                        name
+                    });
+                }
             }
         } catch (err) {
             console.error('文件解析失败', err);
@@ -1179,12 +1196,14 @@ async function sendGPTMessage() {
             } else imagesToSend.push(f.data);
             mediaHtml += `<img src="${escapeAttr(f.data)}" class="gpt-user-image" onclick="openFull(this.src)">`;
         } else if (f.type === 'document') {
-            documentsToSend.push({
+            const documentPayload = {
                 name: f.name,
-                fileData: f.fileData || f.data,
                 mimeType: f.mimeType || 'application/octet-stream',
                 size: f.size || 0
-            });
+            };
+            if (f.fileData) documentPayload.fileData = f.fileData;
+            if (f.content) documentPayload.content = f.content;
+            documentsToSend.push(documentPayload);
             docsText += `\n\n【用户上传了附件：${f.name}】`;
             mediaHtml += `<div class="gpt-user-file-card">📄 ${escapeHtml(f.name)}</div>`;
         }
@@ -1307,6 +1326,7 @@ async function sendGPTMessage() {
         gptIsSending = false;
         autoResizeGPT(inputEl);
         if (finalReply) {
+            finalReply = removeSandboxDownloadLinks(finalReply);
             session.needsHistorySeed = false;
             session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources, generatedFiles: finalGeneratedFiles });
             const assistantMessageIndex = session.messages.length - 1;
