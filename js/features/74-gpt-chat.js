@@ -352,7 +352,11 @@ function removeSandboxDownloadLinks(text) {
 }
 
 function shouldSendAsRawInputFile(file, ext) {
-    return ext === 'pdf' || file.type === 'application/pdf';
+    const codeInterpreterExts = new Set([
+        'c','cpp','csv','css','docx','gif','html','java','jpeg','jpg','js','json','md',
+        'pdf','php','png','pptx','py','rb','tar','tex','ts','txt','xlsx','xml','zip'
+    ]);
+    return codeInterpreterExts.has(ext) || file.type === 'application/pdf';
 }
 
 async function extractPdfText(file) {
@@ -499,6 +503,9 @@ function normalizeGeneratedFiles(files) {
             const containerId = String(file.containerId || file.container_id || '').trim();
             if (/sandbox:/i.test(url) || /\/api\/ai-agent-file\/cfile_[^/]+(?:\?|$)/i.test(url)) {
                 url = '';
+            }
+            if (url.startsWith('/api/')) {
+                url = `${TUOTUO_API_BASE}${url}`;
             }
             if (!url && fileId && containerId) {
                 const encodedFilename = encodeURIComponent(filename || 'agent-output');
