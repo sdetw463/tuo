@@ -7,6 +7,7 @@ let currentReasoningMode = 'normal';
 let currentImageRatio = 'auto';
 let gptSessionsLoaded = false;
 let gptSessionsLoadPromise = null;
+const GPT_LOCAL_SESSIONS_KEY = 'tuotuo_local_ai_sessions_v1';
 
 function generateSessionId() {
     return `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -183,35 +184,26 @@ function getOrderedSessions() {
 function ensureGPTSessionsLoaded() {
     if (gptSessionsLoaded) return Promise.resolve();
     if (gptSessionsLoadPromise) return gptSessionsLoadPromise;
-    gptSessionsLoadPromise = tuoApiFetch('/api/sessions')
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json();
-        })
-        .then(data => {
-            if (data && Array.isArray(data)) {
-                const localSessions = chatSessions
-                    .map(s => normalizeSessionRecord(s))
-                    .filter(s => s && s.id);
-                const loadedSessions = data.map(s => normalizeSessionRecord({
-                    pinned: false,
-                    createdAt: Date.now(),
-                    updatedAt: Date.now(),
-                    ...s
-                }));
-                const loadedIds = new Set(loadedSessions.map(s => s.id));
-                localSessions.forEach(ls => {
-                    if (!loadedIds.has(ls.id)) loadedSessions.unshift(ls);
-                });
-                chatSessions = loadedSessions;
-                repairSessionTree();
-                if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
-                    renderHistoryList();
-                    if (!currentSessionId && chatSessions.length > 0) loadSession(getOrderedSessions()[0].id);
-                }
-            }
-        })
-        .catch(err => console.error('从数据库读取 AI 历史失败:', err))
+    gptSessionsLoadPromise = Promise.resolve().then(() => {
+        const raw = localStorage.getItem(GPT_LOCAL_SESSIONS_KEY);
+        const savedSessions = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(savedSessions)) return;
+        const localSessions = chatSessions
+            .map(s => normalizeSessionRecord(s))
+            .filter(s => s && s.id);
+        const loadedSessions = savedSessions.map(s => normalizeSessionRecord(s));
+        const loadedIds = new Set(loadedSessions.map(s => s.id));
+        localSessions.forEach(session => {
+            if (!loadedIds.has(session.id)) loadedSessions.unshift(session);
+        });
+        chatSessions = loadedSessions;
+        repairSessionTree();
+        if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
+            renderHistoryList();
+            if (!currentSessionId && chatSessions.length > 0) loadSession(getOrderedSessions()[0].id);
+        }
+    })
+        .catch(err => console.error('读取本地 AI 历史失败:', err))
         .finally(() => {
             gptSessionsLoaded = true;
         });
