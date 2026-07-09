@@ -16,11 +16,44 @@ function buildGPTContextMessages(session, excludeLastCount = 0) {
         .slice(0, end)
         .filter(msg => msg && (msg.role === 'user' || msg.role === 'assistant'))
         .slice(-18)
-        .map(msg => ({
-            role: msg.role,
-            content: String(msg.content || msg.userText || '').trim().slice(0, 24000)
-        }))
+        .map(msg => {
+            const generatedFiles = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
+            const fileContext = generatedFiles.length
+                ? '\n\n【这条回复生成的文件】\n' + generatedFiles
+                    .map(file => `- ${file.filename || '未命名文件'}${file.url ? `：${file.url}` : ''}`)
+                    .join('\n')
+                : '';
+            return {
+                role: msg.role,
+                content: `${String(msg.content || msg.userText || '').trim()}${fileContext}`.slice(0, 24000)
+            };
+        })
         .filter(msg => msg.content);
+}
+
+function collectGPTSessionFiles(session, maxFiles = 12) {
+    if (!session || !Array.isArray(session.messages)) return [];
+    const found = [];
+    const seen = new Set();
+
+    session.messages.forEach((msg, messageIndex) => {
+        const files = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
+        files.forEach(file => {
+            const key = file.url || `${file.containerId || ''}:${file.fileId || ''}:${file.filename || ''}`;
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            found.push({
+                filename: file.filename || 'agent-output',
+                url: file.url || '',
+                fileId: file.fileId || '',
+                containerId: file.containerId || '',
+                type: file.type || 'file',
+                messageIndex
+            });
+        });
+    });
+
+    return found.slice(-maxFiles);
 }
 
 async function toggleFullScreenGPT() {
@@ -1285,6 +1318,7 @@ async function sendGPTMessage() {
                     sessionId: currentSessionId,
                     userName: getStableUserName(),
                     historyMessages: buildGPTContextMessages(session, 1),
+                    sessionFiles: collectGPTSessionFiles(session),
                     images: imagesToSend,
                     documents: documentsToSend,
                     stream: true,
