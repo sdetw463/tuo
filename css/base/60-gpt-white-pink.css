@@ -1047,6 +1047,14 @@
     border-color: #df7aa5 !important;
 }
 
+#gpt-fullscreen .gpt-generated-file-card.is-disabled {
+    cursor: not-allowed !important;
+    opacity: 0.62 !important;
+    color: #8f7684 !important;
+    border-color: #ead8e1 !important;
+    background: #faf5f8 !important;
+}
+
 #gpt-fullscreen .gpt-generated-file-card span {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
