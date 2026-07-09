@@ -1011,3 +1011,44 @@
     border-radius: 50% !important;
 }
 
+/* ===== Agent generated file download cards ===== */
+#gpt-fullscreen .gpt-generated-files {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 14px !important;
+}
+
+#gpt-fullscreen .gpt-generated-files-title {
+    color: #8f7684 !important;
+    font-size: 12px !important;
+    font-weight: 650 !important;
+}
+
+#gpt-fullscreen .gpt-generated-file-card {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    padding: 9px 12px !important;
+    border: 1px solid #efc6d8 !important;
+    border-radius: 12px !important;
+    background: #fff7fb !important;
+    color: #c6477c !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 650 !important;
+    box-shadow: 0 8px 20px rgba(61, 45, 55, 0.06) !important;
+}
+
+#gpt-fullscreen .gpt-generated-file-card:hover {
+    background: #fff0f6 !important;
+    border-color: #df7aa5 !important;
+}
+
+#gpt-fullscreen .gpt-generated-file-card span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}

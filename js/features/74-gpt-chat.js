@@ -448,6 +448,43 @@ async function handleGPTFileSelect(e) {
     if (e.target) e.target.value = '';
 }
 
+
+function normalizeGeneratedFiles(files) {
+    const seen = new Set();
+    return (Array.isArray(files) ? files : [])
+        .map(file => {
+            if (!file) return null;
+            const url = String(file.url || file.downloadUrl || '').trim();
+            const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
+            const fileId = String(file.fileId || file.file_id || '').trim();
+            const key = url || fileId || filename;
+            if (!key || seen.has(key)) return null;
+            seen.add(key);
+            return { url, filename, fileId, containerId: file.containerId || file.container_id || '', type: file.type || 'file' };
+        })
+        .filter(file => file && (file.url || file.fileId));
+}
+
+function mergeGeneratedFiles(existing, incoming) {
+    return normalizeGeneratedFiles([...(existing || []), ...(incoming || [])]);
+}
+
+function renderGeneratedFilesHtml(files) {
+    const normalized = normalizeGeneratedFiles(files);
+    if (!normalized.length) return '';
+    const items = normalized.map(file => {
+        const label = escapeHtml(file.filename || '下载文件');
+        const href = escapeAttr(file.url || '#');
+        const disabled = file.url ? '' : ' aria-disabled="true" onclick="event.preventDefault()"';
+        return `<a class="gpt-generated-file-card" href="${href}" target="_blank" rel="noopener noreferrer" download${disabled}>📎 <span>${label}</span></a>`;
+    }).join('');
+    return `<div class="gpt-generated-files"><div class="gpt-generated-files-title">生成的文件</div>${items}</div>`;
+}
+
+function renderAssistantMessageHtml(text, sources = [], files = []) {
+    return renderMarkdownSafe(text || '', sources || []) + renderGeneratedFilesHtml(files || []);
+}
+
 function renderGPTFilePreview() {
     const previewWrap = document.getElementById('gpt-image-preview');
     previewWrap.innerHTML = '';
@@ -575,7 +612,7 @@ function appendGPTMessageToDOM(msg, shouldScroll = true, session = null, message
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
                 <div class="gpt-ai-message-shell">
-                    <div class="gpt-content markdown-body">${renderMarkdownSafe(msg.content || '', msg.sources || [])}</div>
+                    <div class="gpt-content markdown-body">${renderAssistantMessageHtml(msg.content || '', msg.sources || [], msg.generatedFiles || msg.files || [])}</div>
                     ${actionsHtml}
                 </div>
             </div>
@@ -979,7 +1016,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
 
         const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
 
-        streamState.outputEl.innerHTML = renderMarkdownSafe(streamState.fullText, streamState.sources || []);
+        streamState.outputEl.innerHTML = renderAssistantMessageHtml(streamState.fullText, streamState.sources || [], streamState.generatedFiles || []);
 
         if (!isScrolledUp || force) {
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1023,6 +1060,9 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                     } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
                         streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
                         render(true);
+                    } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
+                        streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
+                        render(true);
                     }
                 } catch {
                     streamState.fullText += payload;
@@ -1038,7 +1078,8 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
     render(true);
     return {
         text: streamState.fullText,
-        sources: normalizeAssistantSources(streamState.sources || [])
+        sources: normalizeAssistantSources(streamState.sources || []),
+        files: normalizeGeneratedFiles(streamState.generatedFiles || [])
     };
 }
 
@@ -1130,8 +1171,9 @@ async function sendGPTMessage() {
 
     let finalReply = '';
     let finalSources = [];
+    let finalGeneratedFiles = [];
     let outputEl = null;
-    const streamState = { outputEl: null, fullText: '', sources: [] };
+    const streamState = { outputEl: null, fullText: '', sources: [], generatedFiles: [] };
 
     try {
         if (modeAtSend === 'image') {
@@ -1193,12 +1235,14 @@ async function sendGPTMessage() {
                 const data = await response.json();
                 finalReply = data.reply || '';
                 finalSources = normalizeAssistantSources(data.sources || []);
+                finalGeneratedFiles = normalizeGeneratedFiles(data.files || data.generatedFiles || data.attachments || []);
                 await typewriterMarkdown(outputEl, finalReply);
-                outputEl.innerHTML = renderMarkdownSafe(finalReply, finalSources);
+                outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
             } else {
                 const streamResult = await consumeGPTStream(response, thinkingObj, streamState);
                 finalReply = streamResult.text || '';
                 finalSources = normalizeAssistantSources(streamResult.sources || []);
+                finalGeneratedFiles = normalizeGeneratedFiles(streamResult.files || []);
             }
         }
     } catch (err) {
@@ -1227,7 +1271,7 @@ async function sendGPTMessage() {
         autoResizeGPT(inputEl);
         if (finalReply) {
             session.needsHistorySeed = false;
-            session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources });
+            session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources, generatedFiles: finalGeneratedFiles });
             const assistantMessageIndex = session.messages.length - 1;
             attachAssistantActionsToLiveMessage(thinkingObj, session, assistantMessageIndex);
             session.updatedAt = Date.now();
