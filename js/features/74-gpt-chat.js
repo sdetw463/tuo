@@ -39,14 +39,13 @@ function collectGPTSessionFiles(session, maxFiles = 12) {
     session.messages.forEach((msg, messageIndex) => {
         const files = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
         files.forEach(file => {
-            const key = file.url || `${file.containerId || ''}:${file.fileId || ''}:${file.filename || ''}`;
+            const key = file.url || `${file.downloadId || ''}:${file.filename || ''}`;
             if (!key || seen.has(key)) return;
             seen.add(key);
             found.push({
                 filename: file.filename || 'agent-output',
                 url: file.url || '',
-                fileId: file.fileId || '',
-                containerId: file.containerId || '',
+                downloadId: file.downloadId || '',
                 type: file.type || 'file',
                 messageIndex
             });
@@ -245,7 +244,6 @@ let saveSessionsTimer = null;
 function buildSessionsSavePayload() {
     return JSON.stringify({
         sessions: chatSessions,
-        userName: getStableUserName(), // ✨ 告诉服务器这是谁的记录
         clientLoadedAllSessions: !!gptSessionsLoaded
     });
 }
@@ -259,7 +257,7 @@ function saveSessions() {
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
         repairSessionTree();
-        fetch(`${TUOTUO_API_BASE}/api/sessions`, {
+        tuoApiFetch('/api/sessions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: buildSessionsSavePayload()
@@ -280,10 +278,8 @@ window.addEventListener('pagehide', () => {
     if (!gptSessionsLoaded || chatSessions.length === 0) return;
     clearTimeout(saveSessionsTimer);
     const payload = buildSessionsSavePayload();
-    const url = `${TUOTUO_API_BASE}/api/sessions`;
-    const blob = new Blob([payload], { type: 'application/json' });
-    if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
-    fetch(url, {
+    // Beacon cannot attach the private Authorization header, so use the authenticated fetch path.
+    tuoApiFetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload,
@@ -460,15 +456,17 @@ async function handleGPTFileSelect(e) {
     const files = Array.from(e.target?.files || e.dataTransfer?.files || []);
     if (!files.length) return;
 
-    const remainingSlots = 5 - gptPendingFiles.length;
+    const maxAttachments = currentGPTMode === 'image' ? 5 : 3;
+    const remainingSlots = maxAttachments - gptPendingFiles.length;
     if (remainingSlots <= 0) {
-        alert('最多只能同时上传 5 个附件哦～');
+        alert(`最多只能同时上传 ${maxAttachments} 个附件哦～`);
         if (e.target) e.target.value = '';
         return;
     }
 
     const selectedFiles = files.slice(0, remainingSlots);
     if (files.length > remainingSlots) showGPTTransientStatus(`已自动保留前 ${remainingSlots} 个附件`);
+    let pendingBytes = gptPendingFiles.reduce((sum, pending) => sum + Number(pending.size || 0), 0);
 
     for (const file of selectedFiles) {
         const name = file.name || '未命名文件';
@@ -479,8 +477,12 @@ async function handleGPTFileSelect(e) {
             continue;
         }
 
-        if (file.size > 25 * 1024 * 1024) {
-            alert(`文件 ${name} 太大啦，请尽量控制在 25MB 以内。`);
+        if (file.size > 10 * 1024 * 1024) {
+            alert(`文件 ${name} 太大啦，请尽量控制在 10MB 以内。`);
+            continue;
+        }
+        if (currentGPTMode !== 'image' && pendingBytes + file.size > 20 * 1024 * 1024) {
+            alert('本轮聊天附件合计不能超过 20MB。');
             continue;
         }
 
@@ -488,7 +490,7 @@ async function handleGPTFileSelect(e) {
             if (file.type.startsWith('image/')) {
                 showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
-                gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, name });
+                gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, size: file.size || 0, name });
             } else {
                 if (shouldSendAsRawInputFile(file, ext)) {
                     showGPTTransientStatus(`正在上传原始文件：${name}`);
@@ -514,6 +516,7 @@ async function handleGPTFileSelect(e) {
                     });
                 }
             }
+            pendingBytes += file.size;
         } catch (err) {
             console.error('文件解析失败', err);
             alert(`文件 ${name} 读取失败：${err.message || '未知错误'}`);
@@ -532,24 +535,21 @@ function normalizeGeneratedFiles(files) {
             if (!file) return null;
             let url = String(file.url || file.downloadUrl || '').trim();
             const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
-            const fileId = String(file.fileId || file.file_id || '').trim();
-            const containerId = String(file.containerId || file.container_id || '').trim();
-            if (/sandbox:/i.test(url) || /\/api\/ai-agent-file\/cfile_[^/]+(?:\?|$)/i.test(url)) {
+            const downloadId = String(file.downloadId || '').trim();
+            if (/sandbox:/i.test(url)) {
                 url = '';
             }
             if (url.startsWith('/api/')) {
                 url = `${TUOTUO_API_BASE}${url}`;
             }
-            if (!url && fileId && containerId) {
-                const encodedFilename = encodeURIComponent(filename || 'agent-output');
-                url = `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(containerId)}/${encodeURIComponent(fileId)}?filename=${encodedFilename}`;
-            }
-            const key = url || fileId || filename;
+            const safeDownloadUrl = /^https?:\/\/[^/]+\/api\/ai-agent-file\/[^/?#]+(?:\?[^#]*)?$/i.test(url);
+            if (!safeDownloadUrl) url = '';
+            const key = url || downloadId || filename;
             if (!key || seen.has(key)) return null;
             seen.add(key);
-            return { url, filename, fileId, containerId, type: file.type || 'file' };
+            return { url, filename, downloadId, type: file.type || 'file' };
         })
-        .filter(file => file && (file.url || file.fileId));
+        .filter(file => file && file.url);
 }
 
 function mergeGeneratedFiles(existing, incoming) {
@@ -562,12 +562,37 @@ function renderGeneratedFilesHtml(files) {
     const items = normalized.map(file => {
         const label = escapeHtml(file.filename || '下载文件');
         const href = escapeAttr(file.url || '#');
+        const safeFilename = escapeAttr(file.filename || 'agent-output');
         const disabledClass = file.url ? '' : ' is-disabled';
-        const disabledAttrs = file.url ? '' : ' aria-disabled="true" onclick="event.preventDefault()"';
-        const title = file.url ? '下载文件' : '缺少文件容器信息，请重新生成一次文件';
-        return `<a class="gpt-generated-file-card${disabledClass}" href="${href}" target="_blank" rel="noopener noreferrer" download title="${escapeAttr(title)}"${disabledAttrs}>📎 <span>${label}</span></a>`;
+        const disabledAttrs = file.url
+            ? ` data-download-url="${href}" data-download-name="${safeFilename}" onclick="downloadGeneratedFile(event, this.dataset.downloadUrl, this.dataset.downloadName)"`
+            : ' aria-disabled="true" onclick="event.preventDefault()"';
+        const title = file.url ? '下载文件' : '文件安全访问已过期，请重新生成一次文件';
+        return `<a class="gpt-generated-file-card${disabledClass}" href="${href}" download title="${escapeAttr(title)}"${disabledAttrs}>📎 <span>${label}</span></a>`;
     }).join('');
     return `<div class="gpt-generated-files"><div class="gpt-generated-files-title">生成的文件</div>${items}</div>`;
+}
+
+async function downloadGeneratedFile(event, url, filename) {
+    event.preventDefault();
+    try {
+        const base = String(TUOTUO_API_BASE || '').replace(/\/+$/, '');
+        const path = String(url || '').startsWith(base) ? String(url).slice(base.length) : String(url || '');
+        if (!path.startsWith('/api/ai-agent-file/')) throw new Error('无效的文件下载地址。');
+        const response = await tuoApiFetch(path);
+        if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '下载文件失败'));
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = filename || 'agent-output';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch (error) {
+        alert(`文件下载失败：${error.message || '未知错误'}`);
+    }
 }
 
 function renderAssistantMessageHtml(text, sources = [], files = []) {
@@ -1135,6 +1160,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
 
                 try {
                     const obj = JSON.parse(payload);
+                    if (obj.error) throw new Error(String(obj.error));
                     const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
                     if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
                     if (obj.delta) {
@@ -1278,7 +1304,7 @@ async function sendGPTMessage() {
             }, 600000);
             let response;
             try {
-                response = await fetch(`${TUOTUO_API_BASE}/api/ai-image`, {
+                response = await tuoApiFetch('/api/ai-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     signal: gptAbortController.signal,
@@ -1309,14 +1335,13 @@ async function sendGPTMessage() {
             const metaText = data.size ? `${data.size} / ${data.ratio || imageRatioAtSend}` : (data.ratio || imageRatioAtSend || 'auto');
             finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
-            const response = await fetch(`${TUOTUO_API_BASE}/api/ai-chat`, {
+            const response = await tuoApiFetch('/api/ai-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 signal: gptAbortController.signal,
                 body: JSON.stringify({
                     message: cleanMessageToBackend,
                     sessionId: currentSessionId,
-                    userName: getStableUserName(),
                     historyMessages: buildGPTContextMessages(session, 1),
                     sessionFiles: collectGPTSessionFiles(session),
                     images: imagesToSend,

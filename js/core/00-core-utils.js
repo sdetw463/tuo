@@ -208,10 +208,77 @@ function openFull(src) {
     document.getElementById('image-viewer').style.display = 'flex';
 }
 
+const TUOTUO_API_TOKEN_KEY = 'tuotuo_personal_api_token';
+let tuoApiAccessValidated = false;
+let tuoApiAccessPromise = null;
+
+function getTuoApiToken() {
+    return sessionStorage.getItem(TUOTUO_API_TOKEN_KEY) || '';
+}
+
+function clearTuoApiAccess() {
+    tuoApiAccessValidated = false;
+    sessionStorage.removeItem(TUOTUO_API_TOKEN_KEY);
+}
+
+async function fetchTuoApiAccessSession(token) {
+    return fetch(`${TUOTUO_API_BASE}/api/auth/session`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+}
+
+async function ensureTuoApiAccess() {
+    if (tuoApiAccessValidated) return;
+    if (tuoApiAccessPromise) return tuoApiAccessPromise;
+
+    tuoApiAccessPromise = (async () => {
+        const existingToken = getTuoApiToken();
+        if (existingToken) {
+            const sessionResponse = await fetchTuoApiAccessSession(existingToken);
+            if (sessionResponse.ok) {
+                tuoApiAccessValidated = true;
+                return;
+            }
+            clearTuoApiAccess();
+        }
+
+        const password = window.prompt('请输入 TuoTuo 个人 AI 访问密码');
+        if (!password) throw new Error('未提供个人 AI 访问密码。');
+        const loginResponse = await fetch(`${TUOTUO_API_BASE}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        const loginData = await loginResponse.json().catch(() => ({}));
+        if (!loginResponse.ok || !loginData.accessToken) {
+            throw new Error(loginData.error || '个人 AI 访问验证失败。');
+        }
+        sessionStorage.setItem(TUOTUO_API_TOKEN_KEY, loginData.accessToken);
+        tuoApiAccessValidated = true;
+    })();
+
+    try {
+        await tuoApiAccessPromise;
+    } finally {
+        tuoApiAccessPromise = null;
+    }
+}
+
+async function tuoApiFetch(path, options = {}, retried = false) {
+    await ensureTuoApiAccess();
+    const token = getTuoApiToken();
+    const headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+    const response = await fetch(`${TUOTUO_API_BASE}${path}`, { ...options, headers });
+    if (response.status === 401 && !retried) {
+        clearTuoApiAccess();
+        return tuoApiFetch(path, options, true);
+    }
+    return response;
+}
+
 (function(){
     const s = new Date('2026-04-11');
     const d = Math.max(0, Math.floor((new Date() - s) / 86400000));
     const el = document.getElementById('love-days');
     if (el) el.textContent = d;
 })();
-
