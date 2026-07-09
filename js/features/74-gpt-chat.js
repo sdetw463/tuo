@@ -241,11 +241,9 @@ function loadSession(id) {
 }
 
 let saveSessionsTimer = null;
-function buildSessionsSavePayload() {
-    return JSON.stringify({
-        sessions: chatSessions,
-        clientLoadedAllSessions: !!gptSessionsLoaded
-    });
+function persistSessionsToBrowser() {
+    repairSessionTree();
+    localStorage.setItem(GPT_LOCAL_SESSIONS_KEY, JSON.stringify(chatSessions));
 }
 
 function saveSessions() {
@@ -256,35 +254,18 @@ function saveSessions() {
 
     clearTimeout(saveSessionsTimer);
     saveSessionsTimer = setTimeout(() => {
-        repairSessionTree();
-        tuoApiFetch('/api/sessions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: buildSessionsSavePayload()
-        })
-            .then(async res => {
-                const text = await res.text();
-                let data = null;
-                try { data = text ? JSON.parse(text) : null; } catch {}
-                if (!res.ok || (data && data.success === false)) {
-                    throw new Error((data && (data.error || data.msg)) || text || `HTTP ${res.status}`);
-                }
-            })
-            .catch(err => console.error("同步到云端数据库失败:", err));
+        try {
+            persistSessionsToBrowser();
+        } catch (err) {
+            console.error('保存本地 AI 历史失败:', err);
+        }
     }, 1000); // 稍微防抖，避免高频发请求
 }
 
 window.addEventListener('pagehide', () => {
     if (!gptSessionsLoaded || chatSessions.length === 0) return;
     clearTimeout(saveSessionsTimer);
-    const payload = buildSessionsSavePayload();
-    // Beacon cannot attach the private Authorization header, so use the authenticated fetch path.
-    tuoApiFetch('/api/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true
-    }).catch(() => {});
+    try { persistSessionsToBrowser(); } catch {}
 });
 
 function fileToDataURL(file) {
