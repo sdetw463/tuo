@@ -458,11 +458,9 @@ function normalizeGeneratedFiles(files) {
             const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
             const fileId = String(file.fileId || file.file_id || '').trim();
             const containerId = String(file.containerId || file.container_id || '').trim();
-            if (!url && fileId) {
+            if (!url && fileId && containerId) {
                 const encodedFilename = encodeURIComponent(filename || 'agent-output');
-                url = containerId
-                    ? `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(containerId)}/${encodeURIComponent(fileId)}?filename=${encodedFilename}`
-                    : `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(fileId)}?filename=${encodedFilename}`;
+                url = `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(containerId)}/${encodeURIComponent(fileId)}?filename=${encodedFilename}`;
             }
             const key = url || fileId || filename;
             if (!key || seen.has(key)) return null;
@@ -482,8 +480,10 @@ function renderGeneratedFilesHtml(files) {
     const items = normalized.map(file => {
         const label = escapeHtml(file.filename || '下载文件');
         const href = escapeAttr(file.url || '#');
-        const disabled = file.url ? '' : ' aria-disabled="true" onclick="event.preventDefault()"';
-        return `<a class="gpt-generated-file-card" href="${href}" target="_blank" rel="noopener noreferrer" download${disabled}>📎 <span>${label}</span></a>`;
+        const disabledClass = file.url ? '' : ' is-disabled';
+        const disabledAttrs = file.url ? '' : ' aria-disabled="true" onclick="event.preventDefault()"';
+        const title = file.url ? '下载文件' : '缺少文件容器信息，请重新生成一次文件';
+        return `<a class="gpt-generated-file-card${disabledClass}" href="${href}" target="_blank" rel="noopener noreferrer" download title="${escapeAttr(title)}"${disabledAttrs}>📎 <span>${label}</span></a>`;
     }).join('');
     return `<div class="gpt-generated-files"><div class="gpt-generated-files-title">生成的文件</div>${items}</div>`;
 }
