@@ -1023,7 +1023,7 @@ function createThinkingMessage(text, files) {
             </div>
             <div class="gpt-ai-message-shell">
                 <div class="gpt-content gpt-thinking-content" aria-live="polite">
-                    <span class="gpt-thinking-step-text" hidden></span>
+                    <span class="gpt-thinking-step-text show">正在连接 Foundry Agent</span>
                 </div>
             </div>
         </div>
@@ -1139,30 +1139,32 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
 
                 if (!payload || payload === '[DONE]') continue;
 
+                let obj;
                 try {
-                    const obj = JSON.parse(payload);
-                    if (obj.error) throw new Error(String(obj.error));
-                    const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
-                    if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
-                    if (obj.delta) {
-                        streamState.fullText += obj.delta;
-                        render();
-                    } else if (obj.reply) {
-                        streamState.fullText += obj.reply;
-                        render();
-                    } else if (obj.content) {
-                        streamState.fullText += obj.content;
-                        render();
-                    } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
-                        streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
-                        render(true);
-                    } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
-                        streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
-                        render(true);
-                    }
+                    obj = JSON.parse(payload);
                 } catch {
                     streamState.fullText += payload;
                     render();
+                    continue;
+                }
+                if (obj.error) throw new Error(String(obj.error));
+                const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
+                if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
+                if (obj.delta) {
+                    streamState.fullText += obj.delta;
+                    render();
+                } else if (obj.reply) {
+                    streamState.fullText += obj.reply;
+                    render();
+                } else if (obj.content) {
+                    streamState.fullText += obj.content;
+                    render();
+                } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
+                    streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
+                    render(true);
+                } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
+                    streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
+                    render(true);
                 }
             }
         } else {

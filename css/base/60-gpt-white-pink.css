@@ -1055,8 +1055,107 @@
     background: #faf5f8 !important;
 }
 
+
 #gpt-fullscreen .gpt-generated-file-card span {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+}
+
+/* ===== Stable live Agent progress =====
+   Keep the three-dot indicator spatially fixed and show concise SSE progress beside it. */
+#gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message,
+#gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:hover,
+#gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:focus,
+#gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:focus-within {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-height: 58px !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar,
+#gpt-fullscreen .gpt-thinking-message:hover .gpt-thinking-dot-avatar {
+    position: static !important;
+    inset: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 72px !important;
+    height: 40px !important;
+    min-width: 72px !important;
+    flex: 0 0 72px !important;
+    transform: none !important;
+    transition: none !important;
+    pointer-events: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: 72px !important;
+    height: 40px !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots span,
+#gpt-fullscreen .gpt-thinking-message:hover .gpt-thinking-dots span {
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 8px !important;
+    transform: none !important;
+    transition: none !important;
+    animation: tuoThinkingDotOpacity 1.15s infinite ease-in-out !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots span:nth-child(2) {
+    animation-delay: 0.15s !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-dots span:nth-child(3) {
+    animation-delay: 0.3s !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
+    display: flex !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
+    display: flex !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+}
+
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-step-text,
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-step-text.show:not([hidden]) {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    margin: 0 !important;
+    color: #8f7684 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    white-space: normal !important;
+}
+
+@keyframes tuoThinkingDotOpacity {
+    0%, 100% { opacity: 0.34; }
+    50% { opacity: 0.95; }
 }
