@@ -974,27 +974,22 @@ function startThinkingRing(avatarEl) {
     };
 }
 
-function getInitialThinkingStatus(files) {
-    if (currentGPTMode === 'image') return '正在启动绘图模型…';
-    if (Array.isArray(files) && files.length > 0) return '正在上传并读取附件…';
-    return '正在等待实时思考摘要…';
-}
-
 function createThinkingMessage(text, files) {
     const chatArea = document.getElementById('gpt-chat-area');
     const id = 'gpt_thinking_' + Date.now();
-    const initialStatus = getInitialThinkingStatus(files);
 
     chatArea.insertAdjacentHTML('beforeend', `
         <div class="gpt-msg-container ai gpt-thinking-message" id="${id}">
-            <div class="gpt-thinking-dot-avatar" aria-hidden="true">
-                <div class="gpt-thinking-dots">
-                    <span></span><span></span><span></span>
+            <div class="gpt-thinking-inline">
+                <div class="gpt-thinking-dot-avatar" aria-hidden="true">
+                    <div class="gpt-thinking-dots">
+                        <span></span><span></span><span></span>
+                    </div>
                 </div>
-            </div>
-            <div class="gpt-ai-message-shell">
-                <div class="gpt-content gpt-thinking-content" aria-live="polite">
-                    <span class="gpt-thinking-step-text show">${escapeHtml(initialStatus)}</span>
+                <div class="gpt-ai-message-shell">
+                    <div class="gpt-content gpt-thinking-content" aria-live="polite">
+                        <span class="gpt-thinking-step-text show">正在连接 Foundry Agent</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1012,20 +1007,14 @@ function createThinkingMessage(text, files) {
         avatarEl,
         contentBox: el ? el.querySelector('.gpt-content') : null,
         detailEl,
-        hasReasoningSummary: false,
         stop() {}
     };
 }
 
-function updateThinkingStep(thinkingObj, text, options = {}) {
+function updateThinkingStep(thinkingObj, text) {
     const step = thinkingObj && thinkingObj.detailEl;
     const value = String(text || '').replace(/\s+/g, ' ').trim();
     if (!step || !value) return;
-
-    const isReasoningSummary = options.kind === 'reasoning_summary';
-    if (thinkingObj.hasReasoningSummary && !isReasoningSummary) return;
-    if (isReasoningSummary) thinkingObj.hasReasoningSummary = true;
-
     step.textContent = value;
     step.title = value;
     step.hidden = false;
@@ -1035,6 +1024,11 @@ function updateThinkingStep(thinkingObj, text, options = {}) {
 function prepareAssistantOutput(thinkingObj) {
     if (thinkingObj && typeof thinkingObj.stop === 'function') thinkingObj.stop();
     if (thinkingObj && thinkingObj.el) {
+        const inline = thinkingObj.el.querySelector('.gpt-thinking-inline');
+        if (inline) {
+            while (inline.firstChild) thinkingObj.el.insertBefore(inline.firstChild, inline);
+            inline.remove();
+        }
         thinkingObj.el.classList.remove('gpt-thinking-message');
     }
     if (thinkingObj && thinkingObj.avatarEl) {
@@ -1126,11 +1120,8 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                     continue;
                 }
                 if (obj.error) throw new Error(String(obj.error));
-                const liveStatus = obj.thinkingSummary || obj.reasoningSummary || obj.status || obj.thinking || obj.progress || obj.stage || '';
-                const statusKind = (obj.kind === 'reasoning_summary' || obj.statusKind === 'reasoning_summary' || obj.thinkingSummary || obj.reasoningSummary)
-                    ? 'reasoning_summary'
-                    : 'progress';
-                if (liveStatus) updateThinkingStep(thinkingObj, liveStatus, { kind: statusKind });
+                const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
+                if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
                 if (obj.delta) {
                     streamState.fullText += obj.delta;
                     render();

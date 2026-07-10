@@ -1063,16 +1063,12 @@
 }
 
 /* ===== Stable live Agent progress =====
-   A fixed two-column layout prevents hover reflow. The dots animate vertically as a wave,
-   while the second column displays live SSE progress/reasoning summaries. */
+   Keep the animated dots and the stream-driven fixed status in one inline row. */
 #gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message,
 #gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:hover,
 #gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:focus,
 #gpt-fullscreen .gpt-msg-container.ai.gpt-thinking-message:focus-within {
-    display: grid !important;
-    grid-template-columns: 42px minmax(0, 1fr) !important;
-    column-gap: 9px !important;
-    align-items: center !important;
+    display: block !important;
     min-height: 56px !important;
     transform: none !important;
     transition: none !important;
@@ -1080,17 +1076,33 @@
     contain: layout style !important;
 }
 
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-inline {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 9px !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    vertical-align: middle !important;
+}
+
 #gpt-fullscreen .gpt-thinking-message .gpt-thinking-dot-avatar,
 #gpt-fullscreen .gpt-thinking-message:hover .gpt-thinking-dot-avatar {
     position: static !important;
     inset: auto !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    width: 42px !important;
+    width: 36px !important;
     height: 40px !important;
-    min-width: 42px !important;
+    min-width: 36px !important;
     min-height: 40px !important;
+    flex: 0 0 36px !important;
     margin: 0 !important;
     padding: 0 !important;
     transform: none !important;
@@ -1137,24 +1149,29 @@
     animation-delay: 0.28s !important;
 }
 
-#gpt-fullscreen .gpt-thinking-message .gpt-ai-message-shell {
-    display: flex !important;
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-inline > .gpt-ai-message-shell {
+    position: static !important;
+    display: inline-flex !important;
     align-items: center !important;
-    justify-self: start !important;
     width: auto !important;
-    max-width: 100% !important;
+    max-width: calc(100vw - 150px) !important;
     min-width: 0 !important;
+    flex: 0 1 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     transform: none !important;
     transition: none !important;
 }
 
-#gpt-fullscreen .gpt-thinking-message .gpt-thinking-content {
-    display: flex !important;
+#gpt-fullscreen .gpt-thinking-message .gpt-thinking-inline .gpt-thinking-content {
+    display: inline-flex !important;
     align-items: center !important;
     width: auto !important;
     max-width: 100% !important;
     min-width: 0 !important;
     min-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
     transform: none !important;
     transition: none !important;
 }
@@ -1175,6 +1192,7 @@
     font-weight: 500 !important;
     line-height: 1.5 !important;
     white-space: nowrap !important;
+    text-align: left !important;
 }
 
 @keyframes tuoThinkingDotWave {
