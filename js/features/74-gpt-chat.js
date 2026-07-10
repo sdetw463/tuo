@@ -20,7 +20,7 @@ function buildGPTContextMessages(session, excludeLastCount = 0) {
             const generatedFiles = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
             const fileContext = generatedFiles.length
                 ? '\n\n【这条回复生成的文件】\n' + generatedFiles
-                    .map(file => `- ${file.filename || '未命名文件'}${file.url ? `：${file.url}` : ''}`)
+                    .map(file => `- ${file.filename || '未命名文件'}`)
                     .join('\n')
                 : '';
             return {
@@ -1322,6 +1322,7 @@ async function sendGPTMessage() {
                 signal: gptAbortController.signal,
                 body: JSON.stringify({
                     message: cleanMessageToBackend,
+                    clientId: getGPTClientId(),
                     sessionId: currentSessionId,
                     historyMessages: buildGPTContextMessages(session, 1),
                     sessionFiles: collectGPTSessionFiles(session),

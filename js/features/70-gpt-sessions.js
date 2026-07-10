@@ -8,6 +8,26 @@ let currentImageRatio = 'auto';
 let gptSessionsLoaded = false;
 let gptSessionsLoadPromise = null;
 const GPT_LOCAL_SESSIONS_KEY = 'tuotuo_local_ai_sessions_v1';
+const GPT_LOCAL_CLIENT_ID_KEY = 'tuotuo_ai_client_id_v1';
+
+function getGPTClientId() {
+    try {
+        const existing = localStorage.getItem(GPT_LOCAL_CLIENT_ID_KEY);
+        if (existing) return existing;
+        let id;
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            id = window.crypto.randomUUID();
+        } else if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+            id = Array.from(window.crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+        } else {
+            id = `legacy_${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`;
+        }
+        localStorage.setItem(GPT_LOCAL_CLIENT_ID_KEY, id);
+        return id;
+    } catch {
+        return `ephemeral_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    }
+}
 
 function generateSessionId() {
     return `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
