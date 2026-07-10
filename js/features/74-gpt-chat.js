@@ -441,7 +441,7 @@ async function handleGPTFileSelect(e) {
     const remainingSlots = maxAttachments - gptPendingFiles.length;
     if (remainingSlots <= 0) {
         alert(`最多只能同时上传 ${maxAttachments} 个附件哦～`);
-        if (e.target) e.target.value = '';
+        if (e.target?.type === 'file') e.target.value = '';
         return;
     }
 
@@ -505,7 +505,9 @@ async function handleGPTFileSelect(e) {
     }
 
     renderGPTFilePreview();
-    if (e.target) e.target.value = '';
+    // When a file is dragged onto the textarea, event.target is the textarea.
+    // Only reset the hidden file picker; never clear the user's in-progress draft.
+    if (e.target?.type === 'file') e.target.value = '';
 }
 
 
@@ -1367,6 +1369,20 @@ async function sendGPTMessage() {
     const main = document.querySelector('.gpt-main');
     const input = document.getElementById('gpt-input-el');
     if (!main || !input) return;
+
+    // A drop on a textarea has a native default action that can replace its
+    // value. Handle file drops at the input itself so the draft is preserved.
+    ['dragenter', 'dragover', 'drop'].forEach(type => {
+        input.addEventListener(type, e => {
+            if (!e.dataTransfer?.files?.length) return;
+            e.preventDefault();
+            if (type === 'drop') {
+                e.stopPropagation();
+                main.classList.remove('drag-over');
+                handleGPTFileSelect(e);
+            }
+        });
+    });
 
     ['dragenter', 'dragover'].forEach(type => {
         main.addEventListener(type, e => {
