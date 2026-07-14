@@ -85,7 +85,8 @@
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 14px 34px rgba(0, 0, 0, 0.12) !important;
         }
 
-        #ai-entry-card.ai-entry-card > div:first-child {
+        #ai-entry-card.ai-entry-card > div:first-child:not(.liquid-glass-mount),
+        #ai-entry-card.ai-entry-card > .liquid-glass-mount + div {
             background: transparent !important;
             box-shadow: none !important;
             color: var(--glass-text) !important;

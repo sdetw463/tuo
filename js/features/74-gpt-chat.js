@@ -37,7 +37,10 @@ function collectGPTSessionFiles(session, maxFiles = 12) {
     const seen = new Set();
 
     session.messages.forEach((msg, messageIndex) => {
-        const files = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
+        const files = mergeGeneratedFiles(
+            normalizeGeneratedFiles(msg.generatedFiles || msg.files || []),
+            normalizeGeneratedFiles(msg.sessionFiles || [])
+        );
         files.forEach(file => {
             const key = file.url || `${file.downloadId || ''}:${file.filename || ''}`;
             if (!key || seen.has(key)) return;
@@ -1139,6 +1142,8 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                 } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
                     streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
                     render(true);
+                } else if (obj.sessionFiles && Array.isArray(obj.sessionFiles)) {
+                    streamState.sessionFiles = mergeGeneratedFiles(streamState.sessionFiles || [], obj.sessionFiles);
                 }
             }
         } else {
@@ -1151,7 +1156,8 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
     return {
         text: streamState.fullText,
         sources: normalizeAssistantSources(streamState.sources || []),
-        files: normalizeGeneratedFiles(streamState.generatedFiles || [])
+        files: normalizeGeneratedFiles(streamState.generatedFiles || []),
+        sessionFiles: normalizeGeneratedFiles(streamState.sessionFiles || [])
     };
 }
 
@@ -1251,8 +1257,9 @@ async function sendGPTMessage() {
     let finalReply = '';
     let finalSources = [];
     let finalGeneratedFiles = [];
+    let finalSessionFiles = [];
     let outputEl = null;
-    const streamState = { outputEl: null, fullText: '', sources: [], generatedFiles: [] };
+    const streamState = { outputEl: null, fullText: '', sources: [], generatedFiles: [], sessionFiles: [] };
 
     try {
         if (modeAtSend === 'image') {
@@ -1316,6 +1323,7 @@ async function sendGPTMessage() {
                 finalReply = data.reply || '';
                 finalSources = normalizeAssistantSources(data.sources || []);
                 finalGeneratedFiles = normalizeGeneratedFiles(data.files || data.generatedFiles || data.attachments || []);
+                finalSessionFiles = normalizeGeneratedFiles(data.sessionFiles || []);
                 await typewriterMarkdown(outputEl, finalReply);
                 outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
             } else {
@@ -1323,6 +1331,7 @@ async function sendGPTMessage() {
                 finalReply = streamResult.text || '';
                 finalSources = normalizeAssistantSources(streamResult.sources || []);
                 finalGeneratedFiles = normalizeGeneratedFiles(streamResult.files || []);
+                finalSessionFiles = normalizeGeneratedFiles(streamResult.sessionFiles || []);
             }
         }
     } catch (err) {
@@ -1355,7 +1364,13 @@ async function sendGPTMessage() {
         if (finalReply) {
             finalReply = removeSandboxDownloadLinks(finalReply);
             session.needsHistorySeed = false;
-            session.messages.push({ role: 'assistant', content: finalReply, sources: finalSources, generatedFiles: finalGeneratedFiles });
+            session.messages.push({
+                role: 'assistant',
+                content: finalReply,
+                sources: finalSources,
+                generatedFiles: finalGeneratedFiles,
+                sessionFiles: finalSessionFiles
+            });
             const assistantMessageIndex = session.messages.length - 1;
             attachAssistantActionsToLiveMessage(thinkingObj, session, assistantMessageIndex);
             session.updatedAt = Date.now();

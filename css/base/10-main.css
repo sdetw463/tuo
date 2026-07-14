@@ -522,7 +522,8 @@
         background: rgba(255,255,255,0.42);
     }
 
-    #ai-entry-card.ai-entry-card > div:first-child {
+    #ai-entry-card.ai-entry-card > div:first-child:not(.liquid-glass-mount),
+    #ai-entry-card.ai-entry-card > .liquid-glass-mount + div {
         font-size: 24px !important;
     }
 

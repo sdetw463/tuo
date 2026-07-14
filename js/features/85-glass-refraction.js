@@ -27,6 +27,22 @@
 (function initGlassRefraction() {
     'use strict';
     const TAG = '[glass-refraction]';
+    const documentRoot = document.documentElement;
+    const userAgent = navigator.userAgent;
+    const isFirefox = /Firefox|FxiOS/i.test(userAgent);
+    const isIOS = /iPad|iPhone|iPod/i.test(userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isSafari = /Safari/i.test(userAgent) &&
+        !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|Opera|Android/i.test(userAgent);
+    const useCompatibilityFallback =
+        documentRoot.classList.contains('liquid-glass-refraction-fallback') ||
+        isFirefox || isIOS || isSafari;
+
+    // liquid-glass-react cannot show displacement refraction on these engines.
+    // Keep this older pixel-mirror implementation as an exclusive compatibility
+    // path instead of drawing it underneath the React layer.
+    if (!useCompatibilityFallback) return;
+    documentRoot.classList.add('liquid-glass-refraction-fallback');
 
     // ==================== CONFIG ====================
     const EDGE_WIDTH      = 28;    // px — visible refraction zone width
@@ -41,13 +57,7 @@
         '#ai-entry-card',
         '#diary-card',
         '#main-card',
-        '.age-btn',
-        '.dot',
-        '.music-player-pro',
-        '.star-trigger-btn',
-        '#chat-window',
-        '.chat-header-close',
-        '.chat-send-btn'
+        '#chat-window'
     ];
     const mapCache = {};
     const elementIds = new WeakMap();
@@ -310,6 +320,7 @@
         if (computed.position === 'static') {
             el.style.position = 'relative';
         }
+        el.classList.add('glass-refraction-fallback-host');
 
         const elementKey = getElementKey(el);
         let state = elementStates.get(el);
