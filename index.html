@@ -23,6 +23,29 @@
 </head>
 <body>
 <div id="app">
+    <section class="anniversary-intro" id="anniversary-intro" aria-label="恋爱第一百天纪念开场">
+        <div class="anniversary-intro__stars" id="anniversary-intro-stars" aria-hidden="true"></div>
+        <div class="anniversary-intro__orb" aria-hidden="true"></div>
+        <div class="anniversary-intro__content">
+            <div class="anniversary-intro__inner">
+                <div class="anniversary-intro__dates">
+                    <span>2026.04.11</span>
+                    <span class="anniversary-intro__date-arrow" aria-hidden="true"></span>
+                    <span>2026.07.20</span>
+                </div>
+                <div class="anniversary-intro__divider" aria-hidden="true"></div>
+                <p class="anniversary-intro__lead">我们已经一起走过</p>
+                <div class="anniversary-intro__counter" aria-live="polite">
+                    <span class="anniversary-intro__number" id="anniversary-day-number">1</span>
+                    <span class="anniversary-intro__days">DAYS</span>
+                </div>
+                <p class="anniversary-intro__wish">第一百天快乐 ~</p>
+                <button class="anniversary-intro__enter" id="anniversary-enter-btn" type="button">进入我们的第 100 天</button>
+                <div class="anniversary-intro__signature">TuoTuo's Dimension</div>
+            </div>
+        </div>
+    </section>
+
     <div id="img1" class="image-layer"></div>
     <div id="img2" class="image-layer"></div>
     <div id="star-field"></div>
@@ -335,6 +358,7 @@
     </div>
 </div>
 
+<script src="js/features/05-anniversary-intro.js?v=20260720-day100-v1"></script>
 <script src="js/core/00-core-utils.js?v=20260710-public-ai"></script>
 <script src="js/config.js?v=20260616-deep2"></script>
 <script src="js/features/10-realtime-ws.js?v=20260616-deep2"></script>
