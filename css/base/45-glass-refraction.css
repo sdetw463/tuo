@@ -44,11 +44,20 @@ html.liquid-glass-refraction-fallback #chat-window.chat-window.glass-refraction-
     background-clip: border-box;
 }
 
+/* Chrome/Edge: allow liquid-glass-react to render its outer optical rim,
+   chromatic fringe and depth shadow instead of clipping everything to the
+   host rectangle. The legacy fallback path is intentionally left unchanged. */
+html.liquid-glass-react-ready #ai-entry-card.ai-entry-card.liquid-glass-react-host,
+html.liquid-glass-react-ready #diary-card.diary-card.liquid-glass-react-host,
+html.liquid-glass-react-ready #main-card.main-card.liquid-glass-react-host {
+    overflow: visible !important;
+}
+
 .liquid-glass-mount {
     position: absolute;
     inset: 0;
     z-index: 0;
-    overflow: hidden;
+    overflow: visible;
     border-radius: inherit;
     pointer-events: none;
     contain: none;
@@ -63,6 +72,7 @@ html.liquid-glass-refraction-fallback #chat-window.chat-window.glass-refraction-
 .liquid-glass-mount .tuotuo-liquid-glass {
     width: 100%;
     height: 100%;
+    overflow: visible !important;
 }
 
 .liquid-glass-mount .tuotuo-liquid-glass > .glass {
@@ -72,6 +82,10 @@ html.liquid-glass-refraction-fallback #chat-window.chat-window.glass-refraction-
     padding: 0 !important;
     box-shadow: none !important;
 }
+
+/* Do not draw an additional static rim here. liquid-glass-react already owns
+   the animated edge/highlight layers; a second fixed outline causes the doubled
+   border visible when the liquid edge moves. */
 
 .tuotuo-liquid-glass-fill {
     display: block;

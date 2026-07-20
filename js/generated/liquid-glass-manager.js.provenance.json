@@ -1,0 +1,11 @@
+{
+  "output": "liquid-glass-manager.js",
+  "created_at": "2026-07-20T02:22:09.551972+00:00",
+  "job_id": "20260720_102208_8e718bcc",
+  "script": null,
+  "script_sha256": null,
+  "command": "./node_modules/.bin/esbuild src/liquid-glass-manager.jsx --bundle --minify --format=iife --target=es2020 --outfile=js/generated/liquid-glass-manager.js",
+  "input_files": [],
+  "analysis_type": null,
+  "parameters": {}
+}
