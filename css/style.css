@@ -1,13 +1,9 @@
 /* Main stylesheet manifest. Keep import order stable; later files intentionally override earlier ones. */
 @import url("./tokens.css");
-@import url("./base/05-anniversary-intro.css?v=20260720-day100-v1");
 @import url("./base/10-main.css?v=20260713-liquid-glass-react");
 @import url("./base/40-glass-theme.css?v=20260713-liquid-glass-react");
-@import url("./base/45-glass-refraction.css?v=20260720-glass-shadowless-v5");
+@import url("./base/45-glass-refraction.css?v=20260713-hybrid-refraction");
 @import url("./base/50-gpt-sidebar-polish.css");
 @import url("./base/99-mobile-stabilize.css");
 @import url("./base/60-gpt-white-pink.css?v=20260710-fixed-progress");
 @import url("./base/92-home-render-pause.css");
-@import url("./base/06-anniversary-home-effects.css?v=20260720-day100-home-v1");
-@import url("./base/07-anniversary-confetti.css?v=20260720-day100-confetti-v1");
-@import url("./base/08-star-wish-flight.css?v=20260720-star-blessing-v1");
