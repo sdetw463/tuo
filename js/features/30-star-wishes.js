@@ -1,6 +1,22 @@
 /* Star wish modal, launch animation and star-field rendering.
    Split from legacy js/app.js; loaded as a classic script to preserve inline handler compatibility. */
 const STAR_WISH_FLIGHT_DURATION = 1050;
+const STAR_WISH_SAFE_X_MIN = 12;
+const STAR_WISH_SAFE_X_SPAN = 76;
+const STAR_WISH_SAFE_Y_MIN = 10;
+const STAR_WISH_SAFE_Y_SPAN = 76;
+const STAR_WISH_BLOCKER_CLEARANCE = 30;
+const STAR_WISH_BLOCKER_SELECTORS = [
+    '#main-card',
+    '#ai-entry-card',
+    '#diary-card',
+    '.music-player-pro',
+    '.age-selector',
+    '.dots-container',
+    '.star-trigger-btn',
+    '.chat-bubble-btn',
+    '#ws-status'
+];
 const pendingStarWishBirths = new Map();
 const starWishReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -28,8 +44,95 @@ function getStarWishAnimationKey(data) {
     return [data.name || '', data.time || '', data.msgType || '', data.msg || ''].join('|');
 }
 
+function getStarWishHash(value) {
+    let hash = 2166136261;
+    const text = String(value || '');
+    for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+}
+
+function mixStarWishHash(value) {
+    let hash = value >>> 0;
+    hash ^= hash >>> 16;
+    hash = Math.imul(hash, 0x7feb352d);
+    hash ^= hash >>> 15;
+    hash = Math.imul(hash, 0x846ca68b);
+    hash ^= hash >>> 16;
+    return hash >>> 0;
+}
+
+function isFirstHundredDayAdminWish(data) {
+    const name = String(data && data.name || '').trim().toLowerCase();
+    const message = String(data && data.msg || '').replace(/\s+/g, '');
+    return name === 'admin'
+        && message.includes('第一个100天啦')
+        && message.includes('布满整个星空');
+}
+
+function getHashedStarWishCandidate(seed, attempt) {
+    const step = attempt + 1;
+    const xHash = mixStarWishHash(seed + Math.imul(step, 0x9e3779b1));
+    const yHash = mixStarWishHash(seed ^ Math.imul(step, 0x85ebca6b));
+    return {
+        left: STAR_WISH_SAFE_X_MIN + (xHash % (STAR_WISH_SAFE_X_SPAN * 100 + 1)) / 100,
+        top: STAR_WISH_SAFE_Y_MIN + (yHash % (STAR_WISH_SAFE_Y_SPAN * 100 + 1)) / 100
+    };
+}
+
+function isStarWishPositionClear(pos, fieldRect) {
+    const pointX = fieldRect.left + fieldRect.width * pos.left / 100;
+    const pointY = fieldRect.top + fieldRect.height * pos.top / 100;
+
+    return STAR_WISH_BLOCKER_SELECTORS.every(selector => {
+        const blocker = document.querySelector(selector);
+        if (!blocker) return true;
+        const rect = blocker.getBoundingClientRect();
+        if (!rect.width || !rect.height) return true;
+        return pointX < rect.left - STAR_WISH_BLOCKER_CLEARANCE
+            || pointX > rect.right + STAR_WISH_BLOCKER_CLEARANCE
+            || pointY < rect.top - STAR_WISH_BLOCKER_CLEARANCE
+            || pointY > rect.bottom + STAR_WISH_BLOCKER_CLEARANCE;
+    });
+}
+
 function getStarWishPosition(data) {
-    return getHashPos((data.name || '') + (data.msg || '') + (data.time || ''));
+    const field = document.getElementById('star-field');
+    const fieldRect = field && field.getBoundingClientRect();
+    const hasUsableField = fieldRect && fieldRect.width > 0 && fieldRect.height > 0;
+
+    // Keep the first 100-day wish at a deliberate, memorable position away
+    // from the lower-left album card. The fallback candidates cover narrow
+    // mobile layouts where another control may occupy the preferred point.
+    const preferred = isFirstHundredDayAdminWish(data)
+        ? [
+            { left: 68, top: 30 },
+            { left: 74, top: 38 },
+            { left: 62, top: 24 }
+        ]
+        : [];
+
+    if (!hasUsableField) return preferred[0] || { left: 50, top: 36 };
+
+    for (const candidate of preferred) {
+        if (isStarWishPositionClear(candidate, fieldRect)) return candidate;
+    }
+
+    const seed = getStarWishHash([
+        data && data.name || '',
+        data && data.msg || '',
+        data && data.time || ''
+    ].join('|'));
+    for (let attempt = 0; attempt < 32; attempt++) {
+        const candidate = getHashedStarWishCandidate(seed, attempt);
+        if (isStarWishPositionClear(candidate, fieldRect)) return candidate;
+    }
+
+    // Extremely crowded small screens still get a point safely inset from
+    // every edge, rather than falling back to the old lower-left range.
+    return { left: 72, top: 52 };
 }
 
 function launchStarWish(data, sourceRect) {
@@ -128,8 +231,6 @@ function sendStarWish() {
     btn.innerText = '放飞祝福';
     toggleWishModal();
 }
-
-function getHashPos(str) { let h=0; for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h); return{left:5+Math.abs(h%90),top:5+Math.abs((h>>8)%60)}; }
 
 function addStar(data) {
     const key = getMessageKey(data);
