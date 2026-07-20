@@ -1,0 +1,143 @@
+/* Star-wish launch and birth effects for newly sent blessings. */
+.star-wish-flight {
+    position: fixed;
+    z-index: 1400;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, #fff 0 24%, #fff7c9 38%, rgba(255, 220, 244, 0.72) 58%, transparent 76%);
+    box-shadow:
+        0 0 8px rgba(255, 255, 255, 0.98),
+        0 0 18px rgba(255, 244, 194, 0.88),
+        0 0 34px rgba(255, 185, 222, 0.62);
+    animation: starWishFlightSparkle 0.34s ease-in-out infinite alternate;
+}
+
+.star-wish-flight::before,
+.star-wish-flight::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.star-wish-flight::before {
+    width: 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.96), transparent);
+    filter: drop-shadow(0 0 4px rgba(255, 235, 189, 0.82));
+}
+
+.star-wish-flight::after {
+    width: 1px;
+    height: 34px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.96), transparent);
+    filter: drop-shadow(0 0 4px rgba(255, 210, 235, 0.82));
+}
+
+.star-wish.star-wish--birth-pending {
+    opacity: 0 !important;
+    animation: none !important;
+    pointer-events: none !important;
+}
+
+.star-wish.star-wish--birthing {
+    z-index: 80;
+}
+
+.star-wish.star-wish--birthing::before,
+.star-wish.star-wish--birthing::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+    animation: starWishBirthCollapse 1.45s cubic-bezier(0.2, 0.75, 0.22, 1) forwards;
+}
+
+.star-wish.star-wish--birthing::before {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,1) 0 10%,
+        rgba(255,248,198,0.94) 22%,
+        rgba(255,205,232,0.62) 46%,
+        rgba(226,205,255,0.22) 66%,
+        transparent 76%
+    );
+    box-shadow:
+        0 0 14px rgba(255,255,255,0.98),
+        0 0 34px rgba(255,236,176,0.82),
+        0 0 58px rgba(255,174,219,0.52);
+}
+
+.star-wish.star-wish--birthing::after {
+    width: 58px;
+    height: 58px;
+    background:
+        linear-gradient(90deg, transparent 48%, rgba(255,255,255,0.94) 50%, transparent 52%),
+        linear-gradient(180deg, transparent 48%, rgba(255,255,255,0.94) 50%, transparent 52%);
+    filter: drop-shadow(0 0 7px rgba(255,235,199,0.82));
+}
+
+@keyframes starWishFlightSparkle {
+    from {
+        box-shadow:
+            0 0 7px rgba(255,255,255,0.92),
+            0 0 15px rgba(255,244,194,0.70),
+            0 0 28px rgba(255,185,222,0.44);
+    }
+    to {
+        box-shadow:
+            0 0 12px rgba(255,255,255,1),
+            0 0 25px rgba(255,244,194,0.96),
+            0 0 42px rgba(255,185,222,0.72);
+    }
+}
+
+@keyframes starWishBirthCollapse {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.3) rotate(0deg);
+    }
+    14% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(2.05) rotate(8deg);
+    }
+    52% {
+        opacity: 0.96;
+        transform: translate(-50%, -50%) scale(1.08) rotate(20deg);
+    }
+    82% {
+        opacity: 0.48;
+        transform: translate(-50%, -50%) scale(0.45) rotate(34deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.12) rotate(42deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .star-wish-flight {
+        display: none !important;
+    }
+
+    .star-wish.star-wish--birth-pending {
+        opacity: 1 !important;
+        animation: star-twinkle 2s infinite alternate !important;
+        pointer-events: auto !important;
+    }
+
+    .star-wish.star-wish--birthing::before,
+    .star-wish.star-wish--birthing::after {
+        display: none;
+    }
+}

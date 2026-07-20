@@ -1,0 +1,192 @@
+/* 100-day anniversary home accents: flowing love counter. */
+
+/* ---------- Anniversary counter ---------- */
+#main-card .love-anniversary-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin-top: 12px !important;
+    padding: 14px 15px 13px !important;
+    border-top: 0 !important;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 22% 18%, rgba(255, 224, 236, 0.12), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.018));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.11),
+        inset 0 -1px 0 rgba(255,255,255,0.025),
+        0 7px 24px rgba(80, 32, 58, 0.10);
+}
+
+#main-card .love-anniversary-card::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: 1;
+    border-radius: 17px;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,0.13), rgba(255,255,255,0.025)),
+        rgba(35, 22, 32, 0.10);
+    box-shadow:
+        0 0 0 1px rgba(255, 236, 243, 0.14),
+        inset 0 1px 0 rgba(255,255,255,0.055),
+        0 10px 28px rgba(51, 28, 43, 0.08);
+}
+
+#main-card .love-anniversary-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+#main-card .love-anniversary-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 7px;
+    color: rgba(255, 232, 241, 0.78);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+}
+
+#main-card .love-anniversary-heart {
+    width: 14px;
+    height: 13px;
+    flex: 0 0 14px;
+    background: linear-gradient(145deg, rgba(255, 242, 248, 0.98), rgba(255, 126, 177, 0.84));
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center / contain no-repeat;
+    filter: drop-shadow(0 0 5px rgba(255, 146, 188, 0.46));
+    animation: loveMiniHeart 3.6s ease-in-out infinite;
+}
+
+#main-card .love-anniversary-count-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    min-height: 47px;
+}
+
+#main-card #love-days {
+    display: inline-block;
+    min-width: 2.35ch;
+    font-family: "Helvetica Neue", "PingFang SC", Arial, sans-serif;
+    font-size: 44px !important;
+    line-height: 0.9 !important;
+    font-weight: 650 !important;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 244, 249, 0.56) !important;
+    background: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0.34) 8%,
+        rgba(255, 220, 235, 0.72) 30%,
+        rgba(255, 255, 255, 0.58) 48%,
+        rgba(229, 195, 230, 0.64) 68%,
+        rgba(255, 255, 255, 0.34) 92%
+    );
+    background-size: 240% 100%;
+    background-position: 100% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 0.8px rgba(255, 247, 251, 0.52);
+    text-shadow:
+        0 0 7px rgba(255, 234, 242, 0.20),
+        0 0 15px rgba(255, 153, 195, 0.10);
+    filter: drop-shadow(0 0 2px rgba(255, 238, 245, 0.20));
+    animation:
+        loveNumberLightFlow 7.2s ease-in-out infinite,
+        loveNumberBreath 4.2s ease-in-out infinite;
+}
+
+#main-card .love-anniversary-unit {
+    padding-bottom: 3px;
+    color: rgba(255, 214, 231, 0.70);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+}
+
+#main-card .love-anniversary-date {
+    margin-top: 8px;
+    color: rgba(255, 235, 243, 0.44);
+    font-size: 9px;
+    letter-spacing: 0.11em;
+}
+
+@keyframes loveNumberLightFlow {
+    0%, 100% { background-position: 100% 50%; }
+    50% { background-position: 0% 50%; }
+}
+
+@keyframes loveNumberBreath {
+    0%, 100% {
+        -webkit-text-stroke-color: rgba(255, 247, 251, 0.42);
+        text-shadow:
+            0 0 6px rgba(255, 236, 244, 0.16),
+            0 0 13px rgba(255, 158, 198, 0.08);
+        filter: drop-shadow(0 0 1px rgba(255, 238, 245, 0.16));
+    }
+    50% {
+        -webkit-text-stroke-color: rgba(255, 252, 254, 0.78);
+        text-shadow:
+            0 0 9px rgba(255, 242, 248, 0.42),
+            0 0 20px rgba(255, 166, 202, 0.24),
+            0 0 34px rgba(218, 177, 226, 0.12);
+        filter: drop-shadow(0 0 4px rgba(255, 227, 239, 0.34));
+    }
+}
+
+@keyframes loveMiniHeart {
+    0%, 100% { transform: scale(0.92); opacity: 0.76; }
+    50% { transform: scale(1.04); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+    #main-card .love-anniversary-card {
+        margin-top: 8px !important;
+        padding: 10px 12px 9px !important;
+        border-radius: 15px;
+    }
+
+    #main-card .love-anniversary-card::after {
+        border-radius: 14px;
+    }
+
+    #main-card .love-anniversary-label {
+        margin-bottom: 5px;
+        font-size: 9px;
+    }
+
+    #main-card .love-anniversary-count-row {
+        min-height: 39px;
+    }
+
+    #main-card #love-days {
+        font-size: 35px !important;
+    }
+
+    #main-card .love-anniversary-unit {
+        font-size: 10px;
+        padding-bottom: 2px;
+    }
+
+    #main-card .love-anniversary-date {
+        margin-top: 5px;
+        font-size: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #main-card #love-days,
+    #main-card .love-anniversary-heart {
+        animation: none !important;
+    }
+
+    #main-card #love-days {
+        background-position: 50% 50%;
+        text-shadow: 0 0 8px rgba(255, 236, 244, 0.20);
+        filter: none;
+    }
+}

@@ -1,0 +1,26 @@
+/* Canvas-confetti anniversary ceremony. Kept above the home UI but below the 100-day intro. */
+.anniversary-confetti-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.45s ease;
+}
+
+body.anniversary-intro-active .anniversary-confetti-canvas,
+body.home-rendering-paused .anniversary-confetti-canvas {
+    opacity: 0;
+}
+
+#main-card .love-anniversary-card.is-confetti-enabled #love-days {
+    cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .anniversary-confetti-canvas {
+        display: none;
+    }
+}
