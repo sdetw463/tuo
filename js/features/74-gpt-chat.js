@@ -1163,7 +1163,13 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
         }
 
         const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
-        if (liveStatus) updateLiveStatus(liveStatus);
+        if (liveStatus) {
+            const elapsed = Number(obj.elapsedSeconds);
+            const elapsedText = Number.isFinite(elapsed) && elapsed >= 5
+                ? `（已用时 ${Math.floor(elapsed / 60)}分${String(Math.floor(elapsed % 60)).padStart(2, '0')}秒）`
+                : '';
+            updateLiveStatus(`${liveStatus}${elapsedText}`);
+        }
         if (obj.delta) {
             appendText(obj.delta);
         } else if (obj.reply) {
