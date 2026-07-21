@@ -204,6 +204,12 @@
         document.addEventListener('click', runPointerBurst, { passive: true });
     }
 
+    // The 100-day intro has been retired, but the ambient heart rain remains
+    // part of the homepage. Start it directly without replaying the full ceremony.
+    if (getLoveDays() >= 100) {
+        window.setTimeout(startHeartRain, 350);
+    }
+
     if (enterBtn) {
         enterBtn.addEventListener('click', () => {
             if (getLoveDays() !== 100) return;
