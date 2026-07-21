@@ -1068,7 +1068,28 @@ async function typewriterMarkdown(targetEl, fullText) {
     targetEl.innerHTML = renderMarkdownSafe(fullText || '');
 }
 
+const GPT_STREAM_IDLE_TIMEOUT_MS = 90_000;
+
+async function readGPTStreamChunk(reader) {
+    let timeoutId;
+    try {
+        return await Promise.race([
+            reader.read(),
+            new Promise((_, reject) => {
+                timeoutId = setTimeout(() => {
+                    const error = new Error('流式连接超过 90 秒没有收到任何数据。已保留当前内容，请重试。');
+                    error.name = 'StreamIdleError';
+                    reject(error);
+                }, GPT_STREAM_IDLE_TIMEOUT_MS);
+            })
+        ]);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
 async function consumeGPTStream(response, thinkingObj, streamState) {
+    if (!response.body) throw new Error('浏览器没有收到可读取的流式响应。');
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
     const contentType = response.headers.get('content-type') || '';
@@ -1087,8 +1108,15 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
         }
 
         const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
+        const statusHtml = streamState.liveStatus
+            ? `<div class="gpt-status-pill" role="status" aria-live="polite">${escapeHtml(streamState.liveStatus)}</div>`
+            : '';
 
-        streamState.outputEl.innerHTML = renderAssistantMessageHtml(streamState.fullText, streamState.sources || [], streamState.generatedFiles || []);
+        streamState.outputEl.innerHTML = renderAssistantMessageHtml(
+            streamState.fullText,
+            streamState.sources || [],
+            streamState.generatedFiles || []
+        ) + statusHtml;
 
         if (!isScrolledUp || force) {
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1097,61 +1125,109 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
         lastRender = now;
     }
 
-    while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
+    function updateLiveStatus(value) {
+        const status = String(value || '').replace(/\s+/g, ' ').trim();
+        if (!status) return;
+        streamState.liveStatus = status;
+        if (streamState.outputEl) render(true);
+        else updateThinkingStep(thinkingObj, status);
+    }
 
-        const chunk = decoder.decode(value, { stream: true });
-        if (isSSE) {
-            buffer += chunk;
-            const lines = buffer.split(/\r?\n/);
-            buffer = lines.pop() || '';
+    function appendText(value) {
+        if (!value) return;
+        streamState.liveStatus = '';
+        streamState.fullText += value;
+        render();
+    }
 
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed) continue;
-                const payload = trimmed.startsWith('data:')
-                    ? trimmed.slice(5).trim()
-                    : trimmed;
+    function processSSEPayload(payload) {
+        if (!payload) return;
+        if (payload === '[DONE]') {
+            streamState.receivedDone = true;
+            streamState.liveStatus = '';
+            return;
+        }
 
-                if (!payload || payload === '[DONE]') continue;
+        let obj;
+        try {
+            obj = JSON.parse(payload);
+        } catch {
+            appendText(payload);
+            return;
+        }
 
-                let obj;
-                try {
-                    obj = JSON.parse(payload);
-                } catch {
-                    streamState.fullText += payload;
-                    render();
-                    continue;
-                }
-                if (obj.error) throw new Error(String(obj.error));
-                const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
-                if (liveStatus) updateThinkingStep(thinkingObj, liveStatus);
-                if (obj.delta) {
-                    streamState.fullText += obj.delta;
-                    render();
-                } else if (obj.reply) {
-                    streamState.fullText += obj.reply;
-                    render();
-                } else if (obj.content) {
-                    streamState.fullText += obj.content;
-                    render();
-                } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
-                    streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
-                    render(true);
-                } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
-                    streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
-                    render(true);
-                } else if (obj.sessionFiles && Array.isArray(obj.sessionFiles)) {
-                    streamState.sessionFiles = mergeGeneratedFiles(streamState.sessionFiles || [], obj.sessionFiles);
-                }
-            }
-        } else {
-            streamState.fullText += chunk;
-            render();
+        if (obj.error) throw new Error(String(obj.error));
+        if (obj.done) {
+            streamState.receivedDone = true;
+            streamState.liveStatus = '';
+        }
+
+        const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
+        if (liveStatus) updateLiveStatus(liveStatus);
+        if (obj.delta) {
+            appendText(obj.delta);
+        } else if (obj.reply) {
+            appendText(obj.reply);
+        } else if (obj.content) {
+            appendText(obj.content);
+        } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
+            streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
+            render(true);
+        } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
+            streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
+            render(true);
+        } else if (obj.sessionFiles && Array.isArray(obj.sessionFiles)) {
+            streamState.sessionFiles = mergeGeneratedFiles(streamState.sessionFiles || [], obj.sessionFiles);
         }
     }
 
+    try {
+        while (true) {
+            const { value, done } = await readGPTStreamChunk(reader);
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            if (isSSE) {
+                buffer += chunk;
+                const lines = buffer.split(/\r?\n/);
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || trimmed.startsWith(':')) continue;
+                    const payload = trimmed.startsWith('data:')
+                        ? trimmed.slice(5).trim()
+                        : trimmed;
+                    processSSEPayload(payload);
+                }
+            } else {
+                appendText(chunk);
+            }
+        }
+
+        const trailing = decoder.decode();
+        if (trailing) {
+            if (isSSE) buffer += trailing;
+            else appendText(trailing);
+        }
+        if (isSSE && buffer.trim()) {
+            const trimmed = buffer.trim();
+            if (!trimmed.startsWith(':')) {
+                processSSEPayload(trimmed.startsWith('data:') ? trimmed.slice(5).trim() : trimmed);
+            }
+        }
+
+        if (isSSE && !streamState.receivedDone) {
+            throw new Error(streamState.fullText
+                ? '流式连接在完成标记到达前中断。已保留当前内容，请重试。'
+                : '流式连接提前中断，未收到有效回答，请重试。');
+        }
+    } catch (error) {
+        try { await reader.cancel(); } catch {}
+        throw error;
+    }
+
+    streamState.liveStatus = '';
     render(true);
     return {
         text: streamState.fullText,
@@ -1259,7 +1335,15 @@ async function sendGPTMessage() {
     let finalGeneratedFiles = [];
     let finalSessionFiles = [];
     let outputEl = null;
-    const streamState = { outputEl: null, fullText: '', sources: [], generatedFiles: [], sessionFiles: [] };
+    const streamState = {
+        outputEl: null,
+        fullText: '',
+        sources: [],
+        generatedFiles: [],
+        sessionFiles: [],
+        liveStatus: '',
+        receivedDone: false
+    };
 
     try {
         if (modeAtSend === 'image') {
@@ -1342,20 +1426,30 @@ async function sendGPTMessage() {
             finalReply = (streamState.fullText || outputEl.innerText || '') + "\n\n*[已停止生成]*";
             outputEl.innerHTML = renderMarkdownSafe(finalReply, finalSources);
         } else {
-            if (thinkingObj.el) thinkingObj.el.remove();
-            const chatArea = document.getElementById('gpt-chat-area');
             const rawErrorMsg = err.message || '请求失败，请稍后再试';
-            const safeMsg = escapeHtml(rawErrorMsg);
-            const isFilter = /content management policy|content_filter|filtered|内容过滤|400/i.test(rawErrorMsg);
-            const isAccountError = /账号|用户名|密码|访问验证|登录|注册/i.test(rawErrorMsg);
-            const suggestion = isFilter
-                ? '这通常是 Azure 内容过滤误伤。请点击左侧【新聊天】后重试，或换成“请客观描述图片中的场景、人物姿态、物品和文字”。'
-                : isAccountError
-                    ? '请确认用户名和个人密码；若仍然失败，请在 Azure App Service 的日志流中搜索页面显示的错误编号。'
-                    : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
-            if (chatArea) {
-                chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">${escapeHtml(suggestion)}</div></div></div>`);
-                chatArea.scrollTop = chatArea.scrollHeight;
+            const partialText = String(streamState.fullText || '').trim();
+            if (partialText) {
+                outputEl = streamState.outputEl || outputEl || prepareAssistantOutput(thinkingObj);
+                finalSources = normalizeAssistantSources(streamState.sources || []);
+                finalGeneratedFiles = normalizeGeneratedFiles(streamState.generatedFiles || []);
+                finalSessionFiles = normalizeGeneratedFiles(streamState.sessionFiles || []);
+                finalReply = `${streamState.fullText}\n\n> ⚠️ 流式生成未正常结束：${rawErrorMsg}`;
+                outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
+            } else {
+                if (thinkingObj.el) thinkingObj.el.remove();
+                const chatArea = document.getElementById('gpt-chat-area');
+                const safeMsg = escapeHtml(rawErrorMsg);
+                const isFilter = /content management policy|content_filter|filtered|内容过滤|400/i.test(rawErrorMsg);
+                const isAccountError = /账号|用户名|密码|访问验证|登录|注册/i.test(rawErrorMsg);
+                const suggestion = isFilter
+                    ? '这通常是 Azure 内容过滤误伤。请点击左侧【新聊天】后重试，或换成“请客观描述图片中的场景、人物姿态、物品和文字”。'
+                    : isAccountError
+                        ? '请确认用户名和个人密码；若仍然失败，请在 Azure App Service 的日志流中搜索页面显示的错误编号。'
+                        : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
+                if (chatArea) {
+                    chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">${escapeHtml(suggestion)}</div></div></div>`);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }
             }
         }
     } finally {
