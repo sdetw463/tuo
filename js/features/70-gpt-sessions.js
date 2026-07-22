@@ -9,6 +9,8 @@ let gptSessionsLoaded = false;
 let gptSessionsLoadPromise = null;
 const GPT_LOCAL_SESSIONS_KEY = 'tuotuo_local_ai_sessions_v1';
 const GPT_LOCAL_CLIENT_ID_KEY = 'tuotuo_ai_client_id_v1';
+const GPT_MAX_STORED_MESSAGES = 300;
+const gptLastSyncedAt = new Map();
 
 function getGPTClientId() {
     try {
@@ -49,6 +51,11 @@ function deepCloneSessionMessages(messages) {
 }
 
 function normalizeSessionRecord(raw = {}) {
+    const messages = (Array.isArray(raw.messages) ? raw.messages : []).slice(-GPT_MAX_STORED_MESSAGES).map((message, index) => ({
+        ...message,
+        id: String(message.id || message.messageId || `legacy_${raw.id || 'session'}_${index}_${String(message.role || '')}_${String(message.content || '').length}`),
+        createdAt: Number(message.createdAt) || (Number(raw.createdAt) || Date.now()) + index
+    }));
     const session = {
         ...raw,
         id: String(raw.id || generateSessionId()),
@@ -56,7 +63,8 @@ function normalizeSessionRecord(raw = {}) {
         pinned: !!raw.pinned,
         createdAt: Number(raw.createdAt) || Date.now(),
         updatedAt: Number(raw.updatedAt) || Date.now(),
-        messages: Array.isArray(raw.messages) ? raw.messages : [],
+        messages,
+        fileRefs: Array.isArray(raw.fileRefs) ? raw.fileRefs : [],
         parentSessionId: raw.parentSessionId ? String(raw.parentSessionId) : null,
         rootSessionId: raw.rootSessionId ? String(raw.rootSessionId) : null,
         branchDepth: Number.isFinite(raw.branchDepth) ? Number(raw.branchDepth) : 0,
@@ -65,6 +73,88 @@ function normalizeSessionRecord(raw = {}) {
         needsHistorySeed: !!raw.needsHistorySeed
     };
     return session;
+}
+
+function mergeSessionMessages(localMessages, remoteMessages) {
+    const merged = new Map();
+    [...(remoteMessages || []), ...(localMessages || [])].forEach(message => {
+        const normalized = normalizeSessionRecord({ id: 'merge', messages: [message] }).messages[0];
+        if (normalized) merged.set(normalized.id, { ...(merged.get(normalized.id) || {}), ...normalized });
+    });
+    return [...merged.values()].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).slice(-GPT_MAX_STORED_MESSAGES);
+}
+
+function mergeRemoteSessions(localSessions, remoteSessions) {
+    const byId = new Map((localSessions || []).map(session => [session.id, normalizeSessionRecord(session)]));
+    (remoteSessions || []).forEach(raw => {
+        const remote = normalizeSessionRecord(raw);
+        const local = byId.get(remote.id);
+        if (!local) {
+            byId.set(remote.id, remote);
+            return;
+        }
+        const remoteIsNewer = (remote.updatedAt || 0) > (local.updatedAt || 0);
+        byId.set(remote.id, normalizeSessionRecord({
+            ...(remoteIsNewer ? local : remote),
+            ...(remoteIsNewer ? remote : local),
+            messages: mergeSessionMessages(local.messages, remote.messages),
+            fileRefs: [...(remote.fileRefs || []), ...(local.fileRefs || [])]
+        }));
+    });
+    return [...byId.values()];
+}
+
+function compactSessionForServer(session) {
+    const normalized = normalizeSessionRecord(session);
+    return {
+        id: normalized.id,
+        title: normalized.title,
+        pinned: normalized.pinned,
+        createdAt: normalized.createdAt,
+        updatedAt: normalized.updatedAt,
+        parentSessionId: normalized.parentSessionId,
+        rootSessionId: normalized.rootSessionId,
+        branchDepth: normalized.branchDepth,
+        messages: normalized.messages.map(message => ({
+            id: message.id,
+            role: message.role,
+            content: String(message.content || message.userText || '').slice(0, 32000),
+            userText: String(message.userText || '').slice(0, 16000),
+            mediaHtml: String(message.mediaHtml || '').replace(/<img\b[^>]*src=["']data:[^"']+["'][^>]*>/gi, '<div class="gpt-user-file-card">🖼️ 已上传图片</div>'),
+            sources: message.sources || [],
+            generatedFiles: message.generatedFiles || message.files || [],
+            sessionFiles: message.sessionFiles || [],
+            createdAt: message.createdAt || 0
+        }))
+    };
+}
+
+async function syncChangedGPTSessions() {
+    if (typeof tuoApiFetch !== 'function') return;
+    for (const session of chatSessions) {
+        const updatedAt = Number(session.updatedAt) || 0;
+        if (gptLastSyncedAt.get(session.id) >= updatedAt) continue;
+        try {
+            const response = await tuoApiFetch('/api/sessions/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: getGPTClientId(), session: compactSessionForServer(session) })
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            gptLastSyncedAt.set(session.id, updatedAt);
+        } catch (error) {
+            console.warn('云端 AI 历史同步暂时失败，将保留本地副本:', error);
+            break;
+        }
+    }
+}
+
+async function deleteGPTSessionsFromServer(sessionIds) {
+    if (typeof tuoApiFetch !== 'function') return;
+    await Promise.allSettled((sessionIds || []).map(sessionId => tuoApiFetch(
+        `/api/sessions/${encodeURIComponent(sessionId)}`,
+        { method: 'DELETE', headers: { 'X-Client-ID': getGPTClientId() } }
+    )));
 }
 
 function repairSessionTree() {
@@ -204,7 +294,7 @@ function getOrderedSessions() {
 function ensureGPTSessionsLoaded() {
     if (gptSessionsLoaded) return Promise.resolve();
     if (gptSessionsLoadPromise) return gptSessionsLoadPromise;
-    gptSessionsLoadPromise = Promise.resolve().then(() => {
+    gptSessionsLoadPromise = Promise.resolve().then(async () => {
         const raw = localStorage.getItem(GPT_LOCAL_SESSIONS_KEY);
         const savedSessions = raw ? JSON.parse(raw) : [];
         if (!Array.isArray(savedSessions)) return;
@@ -217,6 +307,19 @@ function ensureGPTSessionsLoaded() {
             if (!loadedIds.has(session.id)) loadedSessions.unshift(session);
         });
         chatSessions = loadedSessions;
+        try {
+            if (typeof tuoApiFetch === 'function') {
+                const response = await tuoApiFetch('/api/sessions', { headers: { 'X-Client-ID': getGPTClientId() } });
+                if (response.ok) {
+                    const data = await response.json();
+                    chatSessions = mergeRemoteSessions(chatSessions, data.sessions || []);
+                    (data.sessions || []).forEach(session => gptLastSyncedAt.set(session.id, Number(session.updatedAt) || 0));
+                    localStorage.setItem(GPT_LOCAL_SESSIONS_KEY, JSON.stringify(chatSessions));
+                }
+            }
+        } catch (error) {
+            console.warn('读取云端 AI 历史失败，继续使用本地记录:', error);
+        }
         repairSessionTree();
         if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
             renderHistoryList();

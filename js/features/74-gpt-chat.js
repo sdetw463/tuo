@@ -15,7 +15,7 @@ function buildGPTContextMessages(session, excludeLastCount = 0) {
     return session.messages
         .slice(0, end)
         .filter(msg => msg && (msg.role === 'user' || msg.role === 'assistant'))
-        .slice(-18)
+        .slice(-60)
         .map(msg => {
             const generatedFiles = normalizeGeneratedFiles(msg.generatedFiles || msg.files || []);
             const fileContext = generatedFiles.length
@@ -24,16 +24,18 @@ function buildGPTContextMessages(session, excludeLastCount = 0) {
                     .join('\n')
                 : '';
             return {
+                id: msg.id || msg.messageId || '',
                 role: msg.role,
-                content: `${String(msg.content || msg.userText || '').trim()}${fileContext}`.slice(0, 24000)
+                content: `${String(msg.content || msg.userText || '').trim()}${fileContext}`.slice(0, 24000),
+                createdAt: msg.createdAt || 0
             };
         })
         .filter(msg => msg.content);
 }
 
-function collectGPTSessionFiles(session, maxFiles = 12) {
+function collectGPTSessionFiles(session, maxFiles = 80) {
     if (!session || !Array.isArray(session.messages)) return [];
-    const found = [];
+    const found = normalizeGeneratedFiles(session.fileRefs || []);
     const seen = new Set();
 
     session.messages.forEach((msg, messageIndex) => {
@@ -55,7 +57,7 @@ function collectGPTSessionFiles(session, maxFiles = 12) {
         });
     });
 
-    return found.slice(-maxFiles);
+    return normalizeGeneratedFiles(found).slice(-maxFiles);
 }
 
 async function toggleFullScreenGPT() {
@@ -202,6 +204,7 @@ function deleteSession(e, id) {
     if (!confirm(confirmText)) return;
     const blockedIds = new Set([id, ...descendantIds]);
     chatSessions = chatSessions.filter(s => !blockedIds.has(s.id));
+    deleteGPTSessionsFromServer([...blockedIds]);
     saveSessions();
     closeAllSessionMenus();
     if (blockedIds.has(currentSessionId)) {
@@ -246,7 +249,14 @@ function loadSession(id) {
 let saveSessionsTimer = null;
 function persistSessionsToBrowser() {
     repairSessionTree();
-    localStorage.setItem(GPT_LOCAL_SESSIONS_KEY, JSON.stringify(chatSessions));
+    const compact = chatSessions.map(session => ({
+        ...session,
+        messages: (session.messages || []).map(message => ({
+            ...message,
+            mediaHtml: String(message.mediaHtml || '').replace(/<img\b[^>]*src=["']data:[^"']+["'][^>]*>/gi, '<div class="gpt-user-file-card">🖼️ 已上传图片</div>')
+        }))
+    }));
+    localStorage.setItem(GPT_LOCAL_SESSIONS_KEY, JSON.stringify(compact));
 }
 
 function saveSessions() {
@@ -259,6 +269,7 @@ function saveSessions() {
     saveSessionsTimer = setTimeout(() => {
         try {
             persistSessionsToBrowser();
+            syncChangedGPTSessions();
         } catch (err) {
             console.error('保存本地 AI 历史失败:', err);
         }
@@ -522,6 +533,8 @@ function normalizeGeneratedFiles(files) {
             let url = String(file.url || file.downloadUrl || '').trim();
             const filename = String(file.filename || file.name || file.fileName || 'agent-output').trim();
             const downloadId = String(file.downloadId || '').trim();
+            const storageId = String(file.storageId || file.fileId || '').trim();
+            if (!url && downloadId) url = `${TUOTUO_API_BASE}/api/ai-agent-file/${encodeURIComponent(downloadId)}`;
             if (/sandbox:/i.test(url)) {
                 url = '';
             }
@@ -530,10 +543,10 @@ function normalizeGeneratedFiles(files) {
             }
             const safeDownloadUrl = /^https?:\/\/[^/]+\/api\/ai-agent-file\/[^/?#]+(?:\?[^#]*)?$/i.test(url);
             if (!safeDownloadUrl) url = '';
-            const key = url || downloadId || filename;
+            const key = storageId || downloadId || url || filename;
             if (!key || seen.has(key)) return null;
             seen.add(key);
-            return { url, filename, downloadId, type: file.type || 'file' };
+            return { url, filename, downloadId, storageId, type: file.type || 'file', persistent: file.persistent === true };
         })
         .filter(file => file && file.url);
 }
@@ -1281,6 +1294,9 @@ async function sendGPTMessage() {
     if (!session) return;
 
     const modeAtSend = currentGPTMode;
+    const requestId = (window.crypto && typeof window.crypto.randomUUID === 'function')
+        ? window.crypto.randomUUID()
+        : `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const imageRatioAtSend = currentImageRatio;
     const filesSnapshot = [...gptPendingFiles];
 
@@ -1322,7 +1338,7 @@ async function sendGPTMessage() {
 
     const textToSendToBackend = text + docsText;
     const cleanMessageToBackend = text || (documentsToSend.length ? '请分析我上传的附件。' : '');
-    session.messages.push({ role: 'user', content: textToSendToBackend, userText: text, mediaHtml });
+    session.messages.push({ id: `${requestId}:user`, role: 'user', content: textToSendToBackend, userText: text, mediaHtml, createdAt: Date.now() });
     session.updatedAt = Date.now();
     saveSessions();
     renderHistoryList();
@@ -1397,6 +1413,7 @@ async function sendGPTMessage() {
                     message: cleanMessageToBackend,
                     clientId: getGPTClientId(),
                     sessionId: currentSessionId,
+                    requestId,
                     historyMessages: buildGPTContextMessages(session, 1),
                     sessionFiles: collectGPTSessionFiles(session),
                     images: imagesToSend,
@@ -1461,21 +1478,32 @@ async function sendGPTMessage() {
     } finally {
         gptIsSending = false;
         autoResizeGPT(inputEl);
+        const durableRefs = mergeGeneratedFiles(finalSessionFiles, finalGeneratedFiles);
+        if (durableRefs.length) {
+            session.fileRefs = mergeGeneratedFiles(session.fileRefs || [], durableRefs);
+            const userMessage = session.messages.find(message => message.id === `${requestId}:user`);
+            if (userMessage) userMessage.attachments = mergeGeneratedFiles(userMessage.attachments || [], finalSessionFiles);
+        }
         if (finalReply) {
             finalReply = removeSandboxDownloadLinks(finalReply);
             session.needsHistorySeed = false;
             session.messages.push({
+                id: `${requestId}:assistant`,
                 role: 'assistant',
                 content: finalReply,
                 sources: finalSources,
                 generatedFiles: finalGeneratedFiles,
-                sessionFiles: finalSessionFiles
+                sessionFiles: finalSessionFiles,
+                createdAt: Date.now()
             });
             const assistantMessageIndex = session.messages.length - 1;
             attachAssistantActionsToLiveMessage(thinkingObj, session, assistantMessageIndex);
             session.updatedAt = Date.now();
             saveSessions();
             renderHistoryList();
+        } else if (durableRefs.length) {
+            session.updatedAt = Date.now();
+            saveSessions();
         }
     }
 }
