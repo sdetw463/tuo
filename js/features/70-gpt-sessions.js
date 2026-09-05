@@ -140,6 +140,10 @@ async function syncChangedGPTSessions() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ clientId: getGPTClientId(), session: compactSessionForServer(session) })
             });
+            if (response.status === 410) {
+                console.warn('当前云端会话暂时无法同步，本地历史仍会保留。');
+                continue;
+            }
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             gptLastSyncedAt.set(session.id, updatedAt);
         } catch (error) {

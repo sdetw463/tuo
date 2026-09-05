@@ -1422,7 +1422,10 @@ async function sendGPTMessage() {
                     reasoningMode: currentReasoningMode
                 })
             });
-            if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '网络请求失败'));
+            if (!response.ok) {
+                const errorMessage = await getErrorMessageFromResponse(response, '网络请求失败');
+                throw new Error(errorMessage);
+            }
 
             if ((response.headers.get('content-type') || '').includes('application/json')) {
                 outputEl = prepareAssistantOutput(thinkingObj);
@@ -1462,10 +1465,13 @@ async function sendGPTMessage() {
                 if (thinkingObj.el) thinkingObj.el.remove();
                 const chatArea = document.getElementById('gpt-chat-area');
                 const safeMsg = escapeHtml(rawErrorMsg);
-                const isFilter = /content management policy|content_filter|filtered|内容过滤|400/i.test(rawErrorMsg);
+                const isFilter = /content management policy|content_filter|responsible ai|jailbreak|filtered by|内容过滤/i.test(rawErrorMsg);
+                const isDatabaseError = /cosmos|documents\.azure\.com|composite index|throughput|ru\/s/i.test(rawErrorMsg);
                 const isAccountError = /账号|用户名|密码|访问验证|登录|注册/i.test(rawErrorMsg);
                 const suggestion = isFilter
                     ? '这通常是 Azure 内容过滤误伤。请点击左侧【新聊天】后重试，或换成“请客观描述图片中的场景、人物姿态、物品和文字”。'
+                    : isDatabaseError
+                        ? '这是聊天历史数据库错误，不是内容过滤。请稍后重试；若持续出现，请检查后端部署版本和 /api/status。'
                     : isAccountError
                         ? '请确认用户名和个人密码；若仍然失败，请在 Azure App Service 的日志流中搜索页面显示的错误编号。'
                         : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
