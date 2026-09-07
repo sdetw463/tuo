@@ -209,6 +209,11 @@ function openFull(src) {
 }
 
 async function tuoApiFetch(path, options = {}) {
+    if (/^\/api\/(ai-chat|ai-image|sessions)(\/|\?|$)/.test(path)) {
+        const headers = new Headers(options.headers || {});
+        if (typeof aiAccessToken !== 'undefined' && aiAccessToken) headers.set('X-AI-Access', aiAccessToken);
+        options = { ...options, headers };
+    }
     return fetch(`${TUOTUO_API_BASE}${path}`, options);
 }
 
