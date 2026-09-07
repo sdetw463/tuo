@@ -4,7 +4,7 @@ function toggleChat(e) {
     if(e) e.stopPropagation();
     const win=document.getElementById('chat-window');
     if(!win.classList.contains('show')){
-        if(!chatNickname){document.getElementById('chat-login-overlay').classList.add('show');return;}
+        if(!chatNickname || localStorage.getItem('tuotuo_chat_entry_name') !== chatNickname){document.getElementById('chat-login-overlay').classList.add('show');return;}
         win.classList.add('show'); isChatWindowOpen=true; unreadCount=0; updateBadgeDisplay();
         setTimeout(()=>messagesEl.scrollTop=messagesEl.scrollHeight,100);
     } else { win.classList.remove('show'); isChatWindowOpen=false; document.getElementById('emoji-picker').style.display='none'; }
@@ -12,6 +12,8 @@ function toggleChat(e) {
 function enterChat() {
     const n=document.getElementById('nickname-input').value.trim();
     if(n){
+        localStorage.setItem('tuotuo_chat_entry_name', n);
+        aiAccessToken = '';
         chatNickname=n;
         chatAvatar = n.charAt(0) || ' 🐰 ';
         localStorage.setItem('chat_nickname',n);
@@ -64,4 +66,3 @@ let diaryCurrentDateKey = '';
 let diaryViewYear = 0;
 let diaryViewMonth = 0;
 let diaryPendingImgs = [];
-

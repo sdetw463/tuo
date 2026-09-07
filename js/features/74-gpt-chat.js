@@ -1278,6 +1278,16 @@ async function sendGPTMessage() {
     const text = inputEl.value.trim();
     if (!text && gptPendingFiles.length === 0) return;
 
+    if (!aiAccessToken || chatNickname !== '拖' || localStorage.getItem('tuotuo_chat_entry_name') !== '拖') {
+        const area = document.getElementById('gpt-chat-area');
+        if (area) {
+            area.querySelector('.gpt-service-unavailable')?.remove();
+            area.insertAdjacentHTML('beforeend', '<div class="gpt-msg-container ai gpt-service-unavailable"><div class="gpt-content">当前服务暂时不可用，请稍后再试。</div></div>');
+            area.scrollTop = area.scrollHeight;
+        }
+        return;
+    }
+
     if (typeof ensureGPTSessionsLoaded === 'function') {
         await ensureGPTSessionsLoaded();
     }

@@ -1,6 +1,7 @@
 /* Shared WebSocket connection, message queue, realtime dispatch
    Split from legacy js/app.js; loaded as a classic script to preserve inline handler compatibility. */
 let chatSocket = null;
+let aiAccessToken = '';
 let chatNickname = localStorage.getItem('chat_nickname') || '';
 let chatAvatar = localStorage.getItem('chat_avatar') || '';
 let unreadCount = 0, isChatWindowOpen = false, reconnectTimer = null;
@@ -47,8 +48,13 @@ function connectWebSocket(isGuest) {
     setWsStatus('connecting','连接中...');
     const proto = location.protocol==='https:'?'wss':'ws';
     chatSocket = new WebSocket(`${proto}://${CHAT_CONFIG.wsHost}/socket/${encodeURIComponent(name)}`);
+    const socket = chatSocket;
 
     chatSocket.onopen = () => {
+        if (chatSocket !== socket) return;
+        if (localStorage.getItem('tuotuo_chat_entry_name') === '拖' && chatNickname === '拖') {
+            chatSocket.send(JSON.stringify({ type: 'ai_access' }));
+        }
         setWsStatus('connected', '已连接');
         flushPendingWsQueue();
         const wishInput = document.getElementById('wish-input');
@@ -62,6 +68,7 @@ function connectWebSocket(isGuest) {
     };
 
     chatSocket.onmessage = (ev) => {
+        if (chatSocket !== socket) return;
         let res;
         try {
             res = JSON.parse(ev.data);
@@ -70,6 +77,10 @@ function connectWebSocket(isGuest) {
             return;
         }
 
+        if (res.type === 'ai_access') {
+            aiAccessToken = String(res.token || '');
+            return;
+        }
         const handleOneMessage = (m) => {
             if (!m) return;
             if (m.msgType === 'star') {
@@ -106,11 +117,13 @@ function connectWebSocket(isGuest) {
     };
 
     chatSocket.onclose = () => {
+        if (chatSocket !== socket) return;
+        aiAccessToken = '';
         setWsStatus('disconnected','已断线，重连中...');
         wsStatusEl.style.opacity='1'; wsStatusEl.style.pointerEvents='auto';
         reconnectTimer = setTimeout(()=>connectWebSocket(false), CHAT_CONFIG.reconnectInterval);
     };
-    chatSocket.onerror = () => { setWsStatus('disconnected','连接失败'); wsStatusEl.style.opacity='1'; wsStatusEl.style.pointerEvents='auto'; };
+    chatSocket.onerror = () => { if (chatSocket !== socket) return; setWsStatus('disconnected','连接失败'); wsStatusEl.style.opacity='1'; wsStatusEl.style.pointerEvents='auto'; };
 }
 
 function wsSend(payload) {
@@ -126,4 +139,3 @@ function wsSend(payload) {
         pendingWsQueue.push(s);
     }
 }
-
