@@ -376,11 +376,17 @@ function removeSandboxDownloadLinks(text) {
 }
 
 function shouldSendAsRawInputFile(file, ext) {
-    const codeInterpreterExts = new Set([
-        'c','cpp','csv','css','docx','gif','html','java','jpeg','jpg','js','json','md',
-        'pdf','php','png','pptx','py','rb','tar','tex','ts','txt','xlsx','xml','zip'
-    ]);
-    return codeInterpreterExts.has(ext) || file.type === 'application/pdf';
+    // Preserve original bytes. The server handles Azure's extension allowlist;
+    // browser text extraction loses formatting and rejects archives/binary files.
+    return true;
+}
+
+const GPT_CHAT_FILE_LIMIT = 200 * 1024 * 1024;
+const GPT_CHAT_TOTAL_LIMIT = 500 * 1024 * 1024;
+
+function isGPTVisualImage(file) {
+    return /^(image\/(png|jpeg|webp|gif))$/i.test(file.type || '')
+        || /\.(png|jpe?g|webp|gif)$/i.test(file.name || '');
 }
 
 async function extractPdfText(file) {
@@ -451,7 +457,7 @@ async function handleGPTFileSelect(e) {
     const files = Array.from(e.target?.files || e.dataTransfer?.files || []);
     if (!files.length) return;
 
-    const maxAttachments = currentGPTMode === 'image' ? 5 : 3;
+    const maxAttachments = currentGPTMode === 'image' ? 5 : 10;
     const remainingSlots = maxAttachments - gptPendingFiles.length;
     if (remainingSlots <= 0) {
         alert(`最多只能同时上传 ${maxAttachments} 个附件哦～`);
@@ -472,29 +478,28 @@ async function handleGPTFileSelect(e) {
             continue;
         }
 
-        if (file.size > 10 * 1024 * 1024) {
-            alert(`文件 ${name} 太大啦，请尽量控制在 10MB 以内。`);
+        const fileLimit = currentGPTMode === 'image' ? 10 * 1024 * 1024 : GPT_CHAT_FILE_LIMIT;
+        if (file.size > fileLimit) {
+            alert(`文件 ${name} 太大啦，单个文件最多 ${fileLimit / 1024 / 1024}MB。`);
             continue;
         }
-        if (currentGPTMode !== 'image' && pendingBytes + file.size > 20 * 1024 * 1024) {
-            alert('本轮聊天附件合计不能超过 20MB。');
+        if (currentGPTMode !== 'image' && pendingBytes + file.size > GPT_CHAT_TOTAL_LIMIT) {
+            alert('本轮聊天附件合计不能超过 500MB。');
             continue;
         }
 
         try {
-            if (file.type.startsWith('image/')) {
+            if (currentGPTMode === 'image' || (isGPTVisualImage(file) && file.size <= 20 * 1024 * 1024)) {
                 showGPTTransientStatus(`正在处理图片：${name}`);
                 const processed = await processImageAsync(file, currentGPTMode);
                 gptPendingFiles.push({ type: 'image', data: processed.image, mask: processed.mask || null, width: processed.width || null, height: processed.height || null, size: file.size || 0, name });
             } else {
                 if (shouldSendAsRawInputFile(file, ext)) {
-                    showGPTTransientStatus(`正在上传原始文件：${name}`);
-                    const fileData = await readFileAsDataUrl(file);
+                    showGPTTransientStatus(`已选择文件：${name}，发送时分块上传`);
                     gptPendingFiles.push({
                         type: 'document',
-                        data: fileData,
-                        fileData,
-                        mimeType: file.type || 'application/pdf',
+                        rawFile: file,
+                        mimeType: file.type || 'application/octet-stream',
                         size: file.size || 0,
                         name
                     });
@@ -1268,6 +1273,35 @@ function getErrorMessageFromResponse(response, fallback) {
     });
 }
 
+async function uploadGPTFileChunks(file, sessionId, signal) {
+    const headers = { 'Content-Type': 'application/json', 'X-Client-ID': getGPTClientId() };
+    const check = async response => {
+        if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '文件上传失败'));
+        return response.json();
+    };
+    const start = await check(await tuoApiFetch('/api/ai-chat/uploads', {
+        method: 'POST', headers, signal,
+        body: JSON.stringify({ sessionId, name: file.name, size: file.size, mimeType: file.type })
+    }));
+    const route = `/api/ai-chat/uploads/${encodeURIComponent(start.uploadId)}`;
+    try {
+        for (let offset = 0; offset < file.size; offset += start.chunkBytes) {
+            const end = Math.min(file.size, offset + start.chunkBytes);
+            await check(await tuoApiFetch(`${route}/chunks?offset=${offset}`, {
+                method: 'POST', headers: { ...headers, 'Content-Type': 'application/octet-stream' }, signal,
+                body: file.slice(offset, end)
+            }));
+            showGPTTransientStatus(`正在上传 ${file.name}：${Math.round(end / file.size * 100)}%`);
+        }
+        return await check(await tuoApiFetch(`${route}/complete`, { method: 'POST', headers, signal, body: '{}' }));
+    } catch (error) {
+        // Cancellation also releases server-side temporary chunks. Durable
+        // files already completed remain attached to the conversation.
+        await tuoApiFetch(route, { method: 'DELETE', headers, signal: AbortSignal.timeout(5000) }).catch(() => {});
+        throw error;
+    }
+}
+
 async function sendGPTMessage() {
     const inputEl = document.getElementById('gpt-input-el');
     if (gptIsSending) {
@@ -1338,7 +1372,8 @@ async function sendGPTMessage() {
                 mimeType: f.mimeType || 'application/octet-stream',
                 size: f.size || 0
             };
-            if (f.fileData) documentPayload.fileData = f.fileData;
+            if (f.rawFile) documentPayload.rawFile = f.rawFile;
+            else if (f.fileData) documentPayload.fileData = f.fileData;
             if (f.content) documentPayload.content = f.content;
             documentsToSend.push(documentPayload);
             docsText += `\n\n【用户上传了附件：${f.name}】`;
@@ -1415,6 +1450,19 @@ async function sendGPTMessage() {
             const metaText = data.size ? `${data.size} / ${data.ratio || imageRatioAtSend}` : (data.ratio || imageRatioAtSend || 'auto');
             finalReply = `![TuoTuo为你绘制的画作](${data.url})${data.revised_prompt ? `\n\n*💡 提示词: ${data.revised_prompt}*` : ''}\n\n*🖼️ ${metaText}*`;
         } else {
+            for (const doc of documentsToSend) {
+                if (!doc.rawFile) continue;
+                const saved = await uploadGPTFileChunks(doc.rawFile, session.id, gptAbortController.signal);
+                doc.uploadToken = saved.downloadId;
+                delete doc.rawFile;
+                // Keep the durable reference even if the subsequent model call fails.
+                session.fileRefs = [...(session.fileRefs || []), saved];
+                if (session.messages.length) {
+                    const sent = session.messages.find(m => m.id === `${requestId}:user`);
+                    if (sent) sent.sessionFiles = [...(sent.sessionFiles || []), saved];
+                }
+                saveSessions();
+            }
             const response = await tuoApiFetch('/api/ai-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1422,7 +1470,7 @@ async function sendGPTMessage() {
                 body: JSON.stringify({
                     message: cleanMessageToBackend,
                     clientId: getGPTClientId(),
-                    sessionId: currentSessionId,
+                    sessionId: session.id,
                     requestId,
                     historyMessages: buildGPTContextMessages(session, 1),
                     sessionFiles: collectGPTSessionFiles(session),
