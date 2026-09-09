@@ -266,7 +266,7 @@
                     <div id="gpt-image-preview" class="gpt-file-preview"></div>
 
                     <div class="gpt-input-controls">
-                        <input type="file" id="gpt-image-upload" accept="image/*,.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.xml,.yaml,.yml,.py,.java,.c,.cpp,.h,.hpp,.cs,.go,.rs,.php,.rb,.swift,.kt,.sql,.sh,.bat,.ps1,.ini,.toml,.log,.doc,.docx,.xls,.xlsx,.pptx,.pdf" multiple style="display:none;" onchange="handleGPTFileSelect(event)">
+                        <input type="file" id="gpt-image-upload" multiple title="聊天附件：单文件200MB、每轮合计500MB、最多10个；支持ZIP等原始文件" style="display:none;" onchange="handleGPTFileSelect(event)">
 
                         <div class="gpt-attachment-menu" id="gpt-attachment-menu">
                             <div class="gpt-menu-item" onclick="triggerFileUpload()">
@@ -348,8 +348,8 @@
 <script src="js/features/50-chat.js?v=20260907-access"></script>
 <script src="js/features/60-diary.js?v=20260616-deep2"></script>
 <script src="js/features/70-gpt-sessions.js?v=20260710-foundry-refactor"></script>
-<script src="js/features/72-gpt-ui.js?v=20260616-deep2"></script>
-<script src="js/features/74-gpt-chat.js?v=20260907-access"></script>
+<script src="js/features/72-gpt-ui.js?v=20260909-chunks200"></script>
+<script src="js/features/74-gpt-chat.js?v=20260909-chunks200"></script>
 <script defer src="js/generated/liquid-glass-manager.js?v=20260720-glass-rollback-v4"></script>
 <script defer src="js/features/85-glass-refraction.js?v=20260720-glass-rollback-v4"></script>
 <script src="js/features/90-home.js?v=20260623-homepause1"></script>
