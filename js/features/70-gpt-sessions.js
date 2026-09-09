@@ -11,6 +11,16 @@ const GPT_LOCAL_SESSIONS_KEY = 'tuotuo_local_ai_sessions_v1';
 const GPT_LOCAL_CLIENT_ID_KEY = 'tuotuo_ai_client_id_v1';
 const GPT_MAX_STORED_MESSAGES = 300;
 const gptLastSyncedAt = new Map();
+let gptRemoteHistoryLoaded = false;
+let gptRemoteHistoryPromise = null;
+
+// Server updatedAt changes during background synchronization. It is NOT the
+// time of the last conversation and must never reorder old chats above new ones.
+function getGPTSessionActivityTime(session) {
+    const messageTime = Math.max(0, ...(session.messages || []).map(m => Number(m.createdAt) || 0));
+    const idTime = Number(String(session.id || '').match(/^session_(\d{13})/)?.[1]) || 0;
+    return messageTime || idTime || Number(session.createdAt) || 0;
+}
 
 function getGPTClientId() {
     try {
@@ -124,6 +134,7 @@ function compactSessionForServer(session) {
             sources: message.sources || [],
             generatedFiles: message.generatedFiles || message.files || [],
             sessionFiles: message.sessionFiles || [],
+            progress: GPTProgress.normalize(message.progress),
             createdAt: message.createdAt || 0
         }))
     };
@@ -275,7 +286,7 @@ function getOrderedSessions() {
 
     const sortRoots = (a, b) => {
         if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-        return (b.updatedAt || 0) - (a.updatedAt || 0) || (b.createdAt || 0) - (a.createdAt || 0);
+        return getGPTSessionActivityTime(b) - getGPTSessionActivityTime(a) || (b.createdAt || 0) - (a.createdAt || 0);
     };
 
     const sortChildren = (a, b) => {
@@ -295,13 +306,44 @@ function getOrderedSessions() {
     return ordered;
 }
 
+async function refreshGPTRemoteHistory() {
+    if (gptRemoteHistoryLoaded || typeof tuoApiFetch !== 'function') return;
+    if (gptRemoteHistoryPromise) return gptRemoteHistoryPromise;
+    gptRemoteHistoryPromise = (async () => {
+        try {
+            const response = await tuoApiFetch('/api/sessions', { headers: { 'X-Client-ID': getGPTClientId() } });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!Array.isArray(data.sessions)) throw new Error('云端历史响应格式错误');
+            chatSessions = mergeRemoteSessions(chatSessions, data.sessions);
+            gptRemoteHistoryLoaded = true;
+            // Mark only genuinely identical snapshots as synchronized. A newer
+            // server write timestamp is not proof that local messages were saved.
+            data.sessions.forEach(remote => {
+                const local = chatSessions.find(s => s.id === remote.id);
+                if (local && JSON.stringify(compactSessionForServer(local)) === JSON.stringify(compactSessionForServer(remote)))
+                    gptLastSyncedAt.set(local.id, Number(local.updatedAt) || 0);
+            });
+            try { persistSessionsToBrowser(); } catch (e) { console.warn('浏览器缓存空间不足，已加载的云端历史仍保留在内存中。', e); }
+            if (typeof renderHistoryList === 'function') renderHistoryList();
+        } catch (error) {
+            console.warn('读取云端 AI 历史失败，继续保留本地记录；再次打开聊天或恢复连接后重试:', error);
+            if (typeof showGPTTransientStatus === 'function') showGPTTransientStatus('云端历史暂未加载完整，当前显示本地记录；请稍后重新打开聊天。');
+        } finally { gptRemoteHistoryPromise = null; }
+    })();
+    return gptRemoteHistoryPromise;
+}
+
 function ensureGPTSessionsLoaded() {
-    if (gptSessionsLoaded) return Promise.resolve();
+    if (gptSessionsLoaded) return refreshGPTRemoteHistory();
     if (gptSessionsLoadPromise) return gptSessionsLoadPromise;
     gptSessionsLoadPromise = Promise.resolve().then(async () => {
-        const raw = localStorage.getItem(GPT_LOCAL_SESSIONS_KEY);
-        const savedSessions = raw ? JSON.parse(raw) : [];
-        if (!Array.isArray(savedSessions)) return;
+        let savedSessions = [];
+        try {
+            const raw = localStorage.getItem(GPT_LOCAL_SESSIONS_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed)) savedSessions = parsed;
+        } catch (error) { console.warn('本地历史缓存读取失败，仍将尝试云端加载:', error); }
         const localSessions = chatSessions
             .map(s => normalizeSessionRecord(s))
             .filter(s => s && s.id);
@@ -311,19 +353,7 @@ function ensureGPTSessionsLoaded() {
             if (!loadedIds.has(session.id)) loadedSessions.unshift(session);
         });
         chatSessions = loadedSessions;
-        try {
-            if (typeof tuoApiFetch === 'function') {
-                const response = await tuoApiFetch('/api/sessions', { headers: { 'X-Client-ID': getGPTClientId() } });
-                if (response.ok) {
-                    const data = await response.json();
-                    chatSessions = mergeRemoteSessions(chatSessions, data.sessions || []);
-                    (data.sessions || []).forEach(session => gptLastSyncedAt.set(session.id, Number(session.updatedAt) || 0));
-                    localStorage.setItem(GPT_LOCAL_SESSIONS_KEY, JSON.stringify(chatSessions));
-                }
-            }
-        } catch (error) {
-            console.warn('读取云端 AI 历史失败，继续使用本地记录:', error);
-        }
+        await refreshGPTRemoteHistory();
         repairSessionTree();
         if (document.getElementById('gpt-fullscreen').classList.contains('show')) {
             renderHistoryList();

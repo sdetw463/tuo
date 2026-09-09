@@ -3,6 +3,7 @@
 let gptPendingFiles = [];
 let gptIsSending = false;
 let gptAbortController = null;
+let gptActiveMessage = null;
 
 function getCurrentSession() {
     return getSessionById(currentSessionId);
@@ -269,10 +270,12 @@ function saveSessions() {
     saveSessionsTimer = setTimeout(() => {
         try {
             persistSessionsToBrowser();
-            syncChangedGPTSessions();
         } catch (err) {
             console.error('保存本地 AI 历史失败:', err);
+            showGPTTransientStatus('浏览器历史缓存已满，正在尝试保存到云端，请勿清除网站数据。');
         }
+        // A localStorage quota error must not prevent durable cloud saving.
+        syncChangedGPTSessions();
     }, 1000); // 稍微防抖，避免高频发请求
 }
 
@@ -669,6 +672,10 @@ function renderCurrentChat() {
         });
     }
 
+    // Reattach the same live node when returning to an in-flight conversation.
+    if (gptActiveMessage && gptActiveMessage.sessionId === currentSessionId) {
+        chatArea.appendChild(gptActiveMessage.el);
+    }
     setTimeout(() => {
         chatArea.scrollTop = chatArea.scrollHeight;
     }, 50);
@@ -730,6 +737,7 @@ function appendGPTMessageToDOM(msg, shouldScroll = true, session = null, message
                     <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">
                 </div>
                 <div class="gpt-ai-message-shell">
+                    ${GPTProgress.historyHtml(msg.progress)}
                     <div class="gpt-content markdown-body">${renderAssistantMessageHtml(msg.content || '', msg.sources || [], msg.generatedFiles || msg.files || [])}</div>
                     ${actionsHtml}
                 </div>
@@ -835,244 +843,48 @@ function handleGPTKey(e) {
     }
 }
 
-function startThinkingRing(avatarEl) {
-    if (!avatarEl) return function stop() {};
-    const DPR = window.devicePixelRatio || 1;
-    const CSS_SIZE = 56; // CSS显示尺寸（px）
-    const SIZE = CSS_SIZE * DPR; // 实际canvas像素
-
-    const R = (18 + 2.5) * DPR;
-    const LINE_W = 2.8 * DPR; // 线宽跟随DPR缩放
-
-    const canvas = document.createElement('canvas');
-    canvas.width = SIZE;
-    canvas.height = SIZE;
-    canvas.className = 'thinking-ring-canvas';
-    canvas.style.width = CSS_SIZE + 'px';
-    canvas.style.height = CSS_SIZE + 'px';
-    avatarEl.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    const cx = SIZE / 2, cy = SIZE / 2;
-
-    let phase = 0;
-    let angle = -Math.PI / 2;
-    let loopCount = 0;
-    let arcLen = 0.18;
-    const arcLen0Start = 0.18;
-    const arcLen0End = Math.PI * 1.2;
-    const arcLen1 = Math.PI * 1.5;
-    let rafId = null;
-    let running = true;
-
-    let transitPhase = -1; // 即将进入的phase
-    let transitProgress = 0;
-    const TRANSIT_SPEED = 0.04; // 每帧过渡进度，约25帧完成
-
-    let renderArcLen = arcLen;
-    let colorBlend = 0;
-
-    let phase0Progress = 0;
-    let totalAngleTraveled = 0;
-
-    function gravitySpeed(a) {
-        const base = 0.028;
-        const amp = 0.038;
-        return base + amp * (1 + Math.sin(a)) * 0.5;
-    }
-
-    function lerpColor(c0, c1, t) {
-        return [
-            Math.round(c0[0] * (1-t) + c1[0] * t),
-            Math.round(c0[1] * (1-t) + c1[1] * t),
-            Math.round(c0[2] * (1-t) + c1[2] * t),
-        ];
-    }
-
-    function getColors(p0prog, blend) {
-        const blue = [30, 120, 255];
-        const green = [0, 200, 80];
-        const red = [255, 50, 30];
-        const yellow = [255, 210, 0];
-
-        const t = Math.max(0, (p0prog - 0.5) * 2);
-        const p0Head = blue;
-        const p0Tail = lerpColor(blue, green, t);
-
-        const p1Head = red;
-        const p1Tail = yellow;
-
-        const head = lerpColor(p0Head, p1Head, blend);
-        const tail = lerpColor(p0Tail, p1Tail, blend);
-        return { head, tail };
-    }
-
-    function draw() {
-        if (!running) return;
-        ctx.clearRect(0, 0, SIZE, SIZE);
-
-        const speed = gravitySpeed(angle);
-
-        if (transitPhase >= 0) {
-            transitProgress += TRANSIT_SPEED;
-            renderArcLen = arcLen + (transitPhase === 1 ? arcLen1 : arcLen0Start) * transitProgress
-                           - arcLen * transitProgress;
-            const targetLen = transitPhase === 1 ? arcLen1 : arcLen0Start;
-            renderArcLen = arcLen * (1 - transitProgress) + targetLen * transitProgress;
-            colorBlend = transitPhase === 1
-                ? transitProgress
-                : 1 - transitProgress;
-
-            if (transitProgress >= 1) {
-                phase = transitPhase;
-                transitPhase = -1;
-                transitProgress = 0;
-                arcLen = phase === 1 ? arcLen1 : arcLen0Start;
-                renderArcLen = arcLen;
-                colorBlend = phase === 1 ? 1 : 0;
-                totalAngleTraveled = 0;
-                loopCount = 0;
-                phase0Progress = phase === 0 ? 0 : phase0Progress;
-            }
-        } else if (phase === 0) {
-            angle += speed;
-            totalAngleTraveled += speed;
-
-            if (totalAngleTraveled >= Math.PI * 2 * (loopCount + 1)) {
-                loopCount++;
-            }
-            phase0Progress = Math.min(totalAngleTraveled / (Math.PI * 4), 1);
-            arcLen = arcLen0Start + (arcLen0End - arcLen0Start) * phase0Progress;
-            renderArcLen = arcLen;
-            colorBlend = 0;
-
-            if (loopCount >= 2) {
-                transitPhase = 1;
-                transitProgress = 0;
-            }
-        } else {
-            angle += speed;
-            totalAngleTraveled += speed;
-            renderArcLen = arcLen1;
-            colorBlend = 1;
-
-            if (totalAngleTraveled >= Math.PI * 2) {
-                transitPhase = 0;
-                transitProgress = 0;
-            }
-        }
-
-        if (transitPhase >= 0) {
-            angle += speed;
-        }
-
-        const headA = angle;
-        const tailA = angle - renderArcLen;
-
-        const { head, tail } = getColors(phase0Progress, colorBlend);
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, R, tailA, headA, false);
-        ctx.lineWidth = LINE_W;
-        ctx.lineCap = 'butt'; // 修复2：平头，不加圆点
-
-        const grad = ctx.createLinearGradient(
-            cx + R * Math.cos(tailA), cy + R * Math.sin(tailA),
-            cx + R * Math.cos(headA), cy + R * Math.sin(headA)
-        );
-        grad.addColorStop(0, `rgb(${tail[0]},${tail[1]},${tail[2]})`);
-        grad.addColorStop(1, `rgb(${head[0]},${head[1]},${head[2]})`);
-        ctx.strokeStyle = grad;
-        ctx.stroke();
-
-        rafId = requestAnimationFrame(draw);
-    }
-
-    rafId = requestAnimationFrame(draw);
-
-    return function stop() {
-        running = false;
-        if (rafId) cancelAnimationFrame(rafId);
-        if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    };
-}
-
-function createThinkingMessage(text, files) {
+function createThinkingMessage(text, files, imageMode = false) {
     const chatArea = document.getElementById('gpt-chat-area');
-    const id = 'gpt_thinking_' + Date.now();
-
-    chatArea.insertAdjacentHTML('beforeend', `
-        <div class="gpt-msg-container ai gpt-thinking-message" id="${id}">
-            <div class="gpt-thinking-inline">
-                <div class="gpt-thinking-dot-avatar" aria-hidden="true">
-                    <div class="gpt-thinking-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-                <div class="gpt-ai-message-shell">
-                    <div class="gpt-content gpt-thinking-content" aria-live="polite">
-                        <span class="gpt-thinking-step-text show">正在连接 Foundry Agent</span>
-                    </div>
-                </div>
-            </div>
+    const el = document.createElement('div');
+    el.className = 'gpt-msg-container ai tt-progress-message';
+    el.innerHTML = `
+        <div class="gpt-avatar gpt-avatar-ai">
+            <img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
         </div>
-    `);
-
+        <div class="gpt-ai-message-shell">
+            <div class="gpt-content markdown-body" hidden></div>
+        </div>`;
+    const shell = el.querySelector('.gpt-ai-message-shell');
+    const progress = GPTProgress.create(shell, { image: imageMode });
+    chatArea.appendChild(el);
     chatArea.scrollTop = chatArea.scrollHeight;
-
-    const el = document.getElementById(id);
-    const avatarEl = el ? el.querySelector('.gpt-thinking-dot-avatar, .gpt-avatar-ai') : null;
-    const detailEl = el ? el.querySelector('.gpt-thinking-step-text') : null;
-
     return {
-        id,
-        el,
-        avatarEl,
-        contentBox: el ? el.querySelector('.gpt-content') : null,
-        detailEl,
-        stop() {}
+        el, progress, sessionId: currentSessionId,
+        contentBox: shell.querySelector('.gpt-content'),
+        stop(status = 'completed') { return progress.finish(status); }
     };
 }
 
-function updateThinkingStep(thinkingObj, text) {
-    const step = thinkingObj && thinkingObj.detailEl;
-    const value = String(text || '').replace(/\s+/g, ' ').trim();
-    if (!step || !value) return;
-    step.textContent = value;
-    step.title = value;
-    step.hidden = false;
-    step.classList.add('show');
+function updateThinkingStep(thinkingObj, text, tool = '') {
+    if (thinkingObj && thinkingObj.progress) thinkingObj.progress.status(text, tool);
 }
 
 function prepareAssistantOutput(thinkingObj) {
-    if (thinkingObj && typeof thinkingObj.stop === 'function') thinkingObj.stop();
-    if (thinkingObj && thinkingObj.el) {
-        const inline = thinkingObj.el.querySelector('.gpt-thinking-inline');
-        if (inline) {
-            while (inline.firstChild) thinkingObj.el.insertBefore(inline.firstChild, inline);
-            inline.remove();
-        }
-        thinkingObj.el.classList.remove('gpt-thinking-message');
-    }
-    if (thinkingObj && thinkingObj.avatarEl) {
-        thinkingObj.avatarEl.classList.remove('gpt-thinking-dot-avatar');
-        thinkingObj.avatarEl.classList.add('gpt-avatar', 'gpt-avatar-ai');
-        thinkingObj.avatarEl.innerHTML = `<img src="ai-avatar.png" alt="AI" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='';this.alt='AI';this.style.background='transparent';">`;
-    }
     const contentBox = thinkingObj && thinkingObj.contentBox;
     if (!contentBox) return document.createElement('div');
-    contentBox.className = 'gpt-content markdown-body';
-    contentBox.removeAttribute('aria-live');
-    contentBox.innerHTML = '';
+    contentBox.hidden = false;
+    // Progress stays a sibling of the answer, including tool calls after text starts.
+    thinkingObj.progress.answering();
     return contentBox;
 }
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-async function typewriterMarkdown(targetEl, fullText) {
+async function typewriterMarkdown(targetEl, fullText, signal) {
     const chars = Array.from(fullText || '');
     let current = '';
     for (let i = 0; i < chars.length; i++) {
+        if (signal && signal.aborted) throw new DOMException('已停止生成', 'AbortError');
         current += chars[i];
         if (i % 8 === 0 || i === chars.length - 1) {
             targetEl.innerHTML = renderMarkdownSafe(current);
@@ -1114,6 +926,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
     const isSSE = contentType.includes('text/event-stream');
 
     let buffer = '';
+    let dataLines = [];
     let lastRender = 0;
     const chatArea = document.getElementById('gpt-chat-area');
 
@@ -1126,33 +939,28 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
         }
 
         const isScrolledUp = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight > 15;
-        const statusHtml = streamState.liveStatus
-            ? `<div class="gpt-status-pill" role="status" aria-live="polite">${escapeHtml(streamState.liveStatus)}</div>`
-            : '';
-
         streamState.outputEl.innerHTML = renderAssistantMessageHtml(
             streamState.fullText,
             streamState.sources || [],
             streamState.generatedFiles || []
-        ) + statusHtml;
+        );
 
-        if (!isScrolledUp || force) {
+        if (!isScrolledUp && gptActiveMessage && gptActiveMessage.sessionId === currentSessionId) {
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
         lastRender = now;
     }
 
-    function updateLiveStatus(value) {
-        const status = String(value || '').replace(/\s+/g, ' ').trim();
+    function updateLiveStatus(value, tool = '') {
+        const status = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
         if (!status) return;
-        streamState.liveStatus = status;
-        if (streamState.outputEl) render(true);
-        else updateThinkingStep(thinkingObj, status);
+        updateThinkingStep(thinkingObj, status, tool);
     }
 
     function appendText(value) {
-        if (!value) return;
+        if (typeof value !== 'string' || !value) return;
+        thinkingObj.progress.answering();
         streamState.liveStatus = '';
         streamState.fullText += value;
         render();
@@ -1174,35 +982,53 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
             return;
         }
 
+        if (!obj || typeof obj !== 'object') return;
         if (obj.error) throw new Error(String(obj.error));
         if (obj.done) {
             streamState.receivedDone = true;
             streamState.liveStatus = '';
         }
 
-        const liveStatus = obj.status || obj.thinking || obj.progress || obj.stage || '';
-        if (liveStatus) {
-            const elapsed = Number(obj.elapsedSeconds);
-            const elapsedText = Number.isFinite(elapsed) && elapsed >= 5
-                ? `（已用时 ${Math.floor(elapsed / 60)}分${String(Math.floor(elapsed % 60)).padStart(2, '0')}秒）`
-                : '';
-            updateLiveStatus(`${liveStatus}${elapsedText}`);
+        // Heartbeats prove connectivity; they do not represent new thinking steps.
+        const liveStatus = obj.status || obj.progress || obj.stage || '';
+        if (liveStatus && !obj.ping) updateLiveStatus(liveStatus, obj.tool || '');
+        if (typeof obj.summaryDelta === 'string') {
+            thinkingObj.progress.summary(obj.summaryKey, obj.summaryDelta, false);
         }
-        if (obj.delta) {
-            appendText(obj.delta);
-        } else if (obj.reply) {
-            appendText(obj.reply);
-        } else if (obj.content) {
-            appendText(obj.content);
-        } else if (obj.sources && Array.isArray(obj.sources) && obj.sources.length > 0) {
+        if (typeof obj.summaryText === 'string') {
+            thinkingObj.progress.summary(obj.summaryKey, obj.summaryText, true);
+        }
+        if (typeof obj.delta === 'string') appendText(obj.delta);
+        else if (typeof obj.reply === 'string') appendText(obj.reply);
+        else if (typeof obj.content === 'string') appendText(obj.content);
+        if (Array.isArray(obj.sources) && obj.sources.length) {
             streamState.sources = mergeAssistantSources(streamState.sources || [], obj.sources);
             render(true);
-        } else if ((obj.files || obj.generatedFiles || obj.attachments) && Array.isArray(obj.files || obj.generatedFiles || obj.attachments)) {
-            streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], obj.files || obj.generatedFiles || obj.attachments);
+        }
+        const files = obj.files || obj.generatedFiles || obj.attachments;
+        if (Array.isArray(files)) {
+            streamState.generatedFiles = mergeGeneratedFiles(streamState.generatedFiles || [], files);
             render(true);
-        } else if (obj.sessionFiles && Array.isArray(obj.sessionFiles)) {
+        }
+        if (Array.isArray(obj.sessionFiles)) {
             streamState.sessionFiles = mergeGeneratedFiles(streamState.sessionFiles || [], obj.sessionFiles);
         }
+    }
+
+    function flushSSEEvent() {
+        if (!dataLines.length) return;
+        const payload = dataLines.join('\n');
+        dataLines = [];
+        processSSEPayload(payload);
+    }
+
+    function processSSELine(line) {
+        if (line === '') { flushSSEEvent(); return; }
+        if (line.startsWith(':')) return;
+        if (line.startsWith('data:')) {
+            dataLines.push(line.slice(5).replace(/^ /, ''));
+        }
+        // event:, id: and retry: are metadata, never answer text.
     }
 
     try {
@@ -1216,14 +1042,7 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
                 const lines = buffer.split(/\r?\n/);
                 buffer = lines.pop() || '';
 
-                for (const line of lines) {
-                    const trimmed = line.trim();
-                    if (!trimmed || trimmed.startsWith(':')) continue;
-                    const payload = trimmed.startsWith('data:')
-                        ? trimmed.slice(5).trim()
-                        : trimmed;
-                    processSSEPayload(payload);
-                }
+                for (const line of lines) processSSELine(line);
             } else {
                 appendText(chunk);
             }
@@ -1234,11 +1053,9 @@ async function consumeGPTStream(response, thinkingObj, streamState) {
             if (isSSE) buffer += trailing;
             else appendText(trailing);
         }
-        if (isSSE && buffer.trim()) {
-            const trimmed = buffer.trim();
-            if (!trimmed.startsWith(':')) {
-                processSSEPayload(trimmed.startsWith('data:') ? trimmed.slice(5).trim() : trimmed);
-            }
+        if (isSSE) {
+            if (buffer) processSSELine(buffer.replace(/\r$/, ''));
+            flushSSEEvent();
         }
 
         if (isSSE && !streamState.receivedDone) {
@@ -1273,7 +1090,7 @@ function getErrorMessageFromResponse(response, fallback) {
     });
 }
 
-async function uploadGPTFileChunks(file, sessionId, signal) {
+async function uploadGPTFileChunks(file, sessionId, signal, onProgress) {
     const headers = { 'Content-Type': 'application/json', 'X-Client-ID': getGPTClientId() };
     const check = async response => {
         if (!response.ok) throw new Error(await getErrorMessageFromResponse(response, '文件上传失败'));
@@ -1291,7 +1108,7 @@ async function uploadGPTFileChunks(file, sessionId, signal) {
                 method: 'POST', headers: { ...headers, 'Content-Type': 'application/octet-stream' }, signal,
                 body: file.slice(offset, end)
             }));
-            showGPTTransientStatus(`正在上传 ${file.name}：${Math.round(end / file.size * 100)}%`);
+            if (onProgress) onProgress(Math.round(end / file.size * 100));
         }
         return await check(await tuoApiFetch(`${route}/complete`, { method: 'POST', headers, signal, body: '{}' }));
     } catch (error) {
@@ -1392,11 +1209,13 @@ async function sendGPTMessage() {
     clearGPTFile();
     renderCurrentChat();
 
-    const thinkingObj = createThinkingMessage(textToSendToBackend, filesSnapshot);
+    const thinkingObj = createThinkingMessage(textToSendToBackend, filesSnapshot, modeAtSend === 'image');
+    gptActiveMessage = thinkingObj;
     gptIsSending = true;
     gptAbortController = new AbortController();
     autoResizeGPT(inputEl);
 
+    let resultStatus = 'completed';
     let finalReply = '';
     let finalSources = [];
     let finalGeneratedFiles = [];
@@ -1414,7 +1233,9 @@ async function sendGPTMessage() {
 
     try {
         if (modeAtSend === 'image') {
+            let imageTimedOut = false;
             const imageTimeout = setTimeout(() => {
+                imageTimedOut = true;
                 if (gptAbortController) gptAbortController.abort();
             }, 600000);
             let response;
@@ -1430,7 +1251,10 @@ async function sendGPTMessage() {
                     })
                 });
             } catch (fetchErr) {
-                if (fetchErr.name === 'AbortError') throw new Error('图片生成超时了（已等待约 10 分钟）。如果上传了参考图，请先换一张更小的图，或先不要上传参考图直接画。');
+                if (fetchErr.name === 'AbortError') {
+                    if (imageTimedOut) throw new Error('图片生成超时了（已等待约 10 分钟），请稍后重试。');
+                    throw fetchErr;
+                }
                 const refSizeText = imagesToSend.length ? `参考图已压缩后发送，约 ${Math.round(JSON.stringify(imagesToSend).length / 1024)}KB。` : '';
                 const browserError = fetchErr.message ? `浏览器错误：${fetchErr.message}。` : '';
                 throw new Error(`画图请求连接失败。${refSizeText}${browserError}可能是后端正在重启、接口网关中断，或 Azure 图片接口长时间未响应。请刷新后重试；如果仍失败，可以先不要上传参考图直接画。`);
@@ -1452,7 +1276,9 @@ async function sendGPTMessage() {
         } else {
             for (const doc of documentsToSend) {
                 if (!doc.rawFile) continue;
+                updateThinkingStep(thinkingObj, `正在上传附件：${doc.name}`, 'upload');
                 const saved = await uploadGPTFileChunks(doc.rawFile, session.id, gptAbortController.signal);
+                updateThinkingStep(thinkingObj, `附件上传完成：${doc.name}`, 'upload');
                 doc.uploadToken = saved.downloadId;
                 delete doc.rawFile;
                 // Keep the durable reference even if the subsequent model call fails.
@@ -1492,7 +1318,11 @@ async function sendGPTMessage() {
                 finalSources = normalizeAssistantSources(data.sources || []);
                 finalGeneratedFiles = normalizeGeneratedFiles(data.files || data.generatedFiles || data.attachments || []);
                 finalSessionFiles = normalizeGeneratedFiles(data.sessionFiles || []);
-                await typewriterMarkdown(outputEl, finalReply);
+                streamState.fullText = finalReply;
+                streamState.sources = finalSources;
+                streamState.generatedFiles = finalGeneratedFiles;
+                streamState.sessionFiles = finalSessionFiles;
+                await typewriterMarkdown(outputEl, finalReply, gptAbortController.signal);
                 outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
             } else {
                 const streamResult = await consumeGPTStream(response, thinkingObj, streamState);
@@ -1503,12 +1333,15 @@ async function sendGPTMessage() {
             }
         }
     } catch (err) {
-        thinkingObj.stop();
+        resultStatus = err.name === 'AbortError' ? 'stopped' : 'error';
+        thinkingObj.stop(resultStatus);
         if (err.name === 'AbortError') {
             outputEl = streamState.outputEl || outputEl || prepareAssistantOutput(thinkingObj);
             finalSources = normalizeAssistantSources(streamState.sources || []);
+            finalGeneratedFiles = normalizeGeneratedFiles(streamState.generatedFiles || []);
+            finalSessionFiles = normalizeGeneratedFiles(streamState.sessionFiles || []);
             finalReply = (streamState.fullText || outputEl.innerText || '') + "\n\n*[已停止生成]*";
-            outputEl.innerHTML = renderMarkdownSafe(finalReply, finalSources);
+            outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
         } else {
             const rawErrorMsg = err.message || '请求失败，请稍后再试';
             const partialText = String(streamState.fullText || '').trim();
@@ -1520,9 +1353,7 @@ async function sendGPTMessage() {
                 finalReply = `${streamState.fullText}\n\n> ⚠️ 流式生成未正常结束：${rawErrorMsg}`;
                 outputEl.innerHTML = renderAssistantMessageHtml(finalReply, finalSources, finalGeneratedFiles);
             } else {
-                if (thinkingObj.el) thinkingObj.el.remove();
-                const chatArea = document.getElementById('gpt-chat-area');
-                const safeMsg = escapeHtml(rawErrorMsg);
+                outputEl = prepareAssistantOutput(thinkingObj);
                 const isFilter = /content management policy|content_filter|responsible ai|jailbreak|filtered by|内容过滤/i.test(rawErrorMsg);
                 const isDatabaseError = /cosmos|documents\.azure\.com|composite index|throughput|ru\/s/i.test(rawErrorMsg);
                 const isAccountError = /账号|用户名|密码|访问验证|登录|注册/i.test(rawErrorMsg);
@@ -1533,13 +1364,15 @@ async function sendGPTMessage() {
                     : isAccountError
                         ? '请确认用户名和个人密码；若仍然失败，请在 Azure App Service 的日志流中搜索页面显示的错误编号。'
                         : '可以试试：新开一个聊天、减少图片数量、换一句更具体的提示词，或稍后重试。';
-                if (chatArea) {
-                    chatArea.insertAdjacentHTML('beforeend', `<div class="gpt-msg-container ai"><div class="gpt-avatar" style="color:#ff4d4f;background:#ffe4e6;">⚠️</div><div class="gpt-content" style="color:#ff4d4f;"><b>任务失败啦：</b><br>${safeMsg}<div class="gpt-error-actions">${escapeHtml(suggestion)}</div></div></div>`);
-                    chatArea.scrollTop = chatArea.scrollHeight;
-                }
+                finalReply = `> ⚠️ 本次未完成：${rawErrorMsg}\n\n${suggestion}`;
+                outputEl.innerHTML = renderAssistantMessageHtml(finalReply, [], []);
+
             }
         }
     } finally {
+        thinkingObj.stop(resultStatus);
+        gptActiveMessage = null;
+        gptAbortController = null;
         gptIsSending = false;
         autoResizeGPT(inputEl);
         const durableRefs = mergeGeneratedFiles(finalSessionFiles, finalGeneratedFiles);
@@ -1558,6 +1391,7 @@ async function sendGPTMessage() {
                 sources: finalSources,
                 generatedFiles: finalGeneratedFiles,
                 sessionFiles: finalSessionFiles,
+                progress: thinkingObj.progress.snapshot(),
                 createdAt: Date.now()
             });
             const assistantMessageIndex = session.messages.length - 1;
