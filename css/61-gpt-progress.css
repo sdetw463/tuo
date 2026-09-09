@@ -1,0 +1,81 @@
+/* Scoped progress UI. Loaded after css/style.css; no changes to other pages. */
+#gpt-fullscreen #gpt-chat-area .tt-progress {
+    display:block !important; width:100%; min-width:0; margin:0 0 14px;
+    border:0 !important; background:transparent !important; box-shadow:none !important;
+    color:#756775 !important; font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-toggle {
+    display:flex !important; align-items:center; gap:8px; width:fit-content; max-width:100%;
+    min-height:36px; margin:0; padding:2px 3px; border:0; border-radius:7px;
+    background:transparent !important; color:#756775 !important;
+    cursor:pointer; list-style:none; user-select:none; -webkit-tap-highlight-color:transparent;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-toggle::-webkit-details-marker {display:none;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-toggle::marker {content:"";}
+#gpt-fullscreen #gpt-chat-area .tt-progress-toggle:hover {background:#fff3f8 !important;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-toggle:focus-visible {outline:2px solid #c76a94; outline-offset:4px;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-title {
+    color:#756775 !important; font-size:14px; font-weight:550; line-height:1.6;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-clock {
+    color:#9b8593 !important; font-size:12px; white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-clock:empty {display:none;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-chevron {
+    color:#9b8593 !important; flex:none; transform:rotate(0); transition:transform .18s ease;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress[open] .tt-progress-chevron {transform:rotate(90deg);}
+#gpt-fullscreen #gpt-chat-area .tt-progress-panel {
+    margin:8px 0 4px 3px; padding:0 0 0 16px; border-left:2px solid #ecd8e2;
+    animation:tt-progress-enter .18s ease-out;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-list {
+    list-style:none; margin:0; padding:0 10px 0 0; max-height:270px; overflow:auto;
+    overscroll-behavior:contain; scrollbar-width:thin;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-entry {list-style:none; margin:0 0 12px; padding:0;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-entry:last-child {margin-bottom:0;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-kind {font-size:11px; color:#9b8593 !important;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-entry p {
+    margin:2px 0 0; font-size:13px; line-height:1.75; color:#746471 !important;
+    white-space:pre-wrap; overflow-wrap:anywhere;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-summary p {color:#534651 !important;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-note {
+    margin:12px 0 0; font-size:11px; line-height:1.6; color:#9b8593 !important;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress[data-result="error"] .tt-progress-title {color:#a34e60 !important;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-sr {
+    position:absolute !important; width:1px !important; height:1px !important; padding:0 !important;
+    margin:-1px !important; overflow:hidden !important; clip:rect(0,0,0,0); white-space:nowrap; border:0 !important;
+}
+#gpt-fullscreen #gpt-chat-area .tt-progress-message .gpt-content[hidden] {display:none !important;}
+#gpt-fullscreen #gpt-chat-area .tt-progress-message {pointer-events:auto !important;}
+@supports ((background-clip:text) or (-webkit-background-clip:text)) {
+    #gpt-fullscreen #gpt-chat-area .tt-progress.is-running .tt-progress-title {
+        background-image:linear-gradient(105deg,#857583 0%,#857583 38%,#fff 49%,#f9eff5 51%,#857583 63%,#857583 100%) !important;
+        background-size:240% 100% !important; background-repeat:no-repeat !important;
+        background-clip:text !important; -webkit-background-clip:text !important;
+        color:transparent !important; -webkit-text-fill-color:transparent;
+        animation:tt-progress-shimmer 2.2s linear infinite !important;
+    }
+}
+@keyframes tt-progress-shimmer {from {background-position:150% 0;} to {background-position:-100% 0;}}
+@keyframes tt-progress-enter {from {opacity:0; transform:translateY(-3px);} to {opacity:1; transform:translateY(0);}}
+@media(max-width:600px) {
+    #gpt-fullscreen #gpt-chat-area .tt-progress-panel {padding-left:12px;}
+    #gpt-fullscreen #gpt-chat-area .tt-progress-list {max-height:220px;}
+    #gpt-fullscreen #gpt-chat-area .tt-progress-toggle {min-height:40px;}
+}
+@media(prefers-reduced-motion:reduce) {
+    #gpt-fullscreen #gpt-chat-area .tt-progress.is-running .tt-progress-title {
+        animation:none !important; background:none !important; color:#756775 !important; -webkit-text-fill-color:currentColor;
+    }
+    #gpt-fullscreen #gpt-chat-area .tt-progress-panel {animation:none !important;}
+    #gpt-fullscreen #gpt-chat-area .tt-progress-chevron {transition:none !important;}
+}
+@media(forced-colors:active) {
+    #gpt-fullscreen #gpt-chat-area .tt-progress.is-running .tt-progress-title {
+        animation:none !important; background:none !important; color:CanvasText !important; -webkit-text-fill-color:currentColor;
+    }
+}
