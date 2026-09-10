@@ -34,7 +34,7 @@
     function itemsHtml(entries) {
         return entries.map(function (e) {
             return '<li class="tt-progress-entry tt-progress-' + e.kind + '">' +
-                '<span class="tt-progress-kind">' + (e.kind === 'summary' ? '思考摘要' : '处理状态') + '</span>' +
+                (e.kind === 'summary' ? '<span class="tt-progress-kind">思考摘要</span>' : '') +
                 '<p>' + escape(e.text) + '</p></li>';
         }).join('');
     }
@@ -46,7 +46,7 @@
             '<svg class="tt-progress-chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">' +
             '<path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
             '</summary><div class="tt-progress-panel"><ol class="tt-progress-list">' + itemsHtml(entries) +
-            '</ol><p class="tt-progress-note">仅展示实际处理状态和模型提供的公开摘要；用时包含网络等待与回答生成。</p></div></details>';
+            '</ol></div></details>';
     }
     function historyHtml(raw) {
         var state = normalize(raw);
